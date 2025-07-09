@@ -17,23 +17,38 @@
 ## 📁 Project Structure
 
 src/
-├── apis/ # API call definitions (REST or GraphQL)
-├── app/ # App-level configs, wrappers, theme, context
-├── assets/ # Static assets (images, logos, svgs, etc.)
-├── components/ # Shared and reusable UI components
-├── hooks/ # Custom React hooks
-├── layouts/ # Layout components for route grouping (e.g., AuthLayout, AdminLayout)
-├── lib/ # Helper libraries, external utilities
-├── locales/ # i18n translation files (if using)
-├── models/ # TypeScript types, interfaces
-├── modules/ # Feature-based module separation (e.g., auth, dashboard)
-├── pages/ # Main route-level pages (optional if using file-based routing)
-├── redux/ # Redux slices, store config
-├── routes/ # Route definitions & guards
-├── utils/ # Utility functions
-├── mocks/ # API mock data (for dev/testing)
-├── settings/ # App config, constants, theme settings
 
+├── apis/ # API call definitions (REST or GraphQL)
+
+├── app/ # App-level configs, wrappers, theme, context
+
+├── assets/ # Static assets (images, logos, svgs, etc.)
+
+├── components/ # Shared and reusable UI components
+
+├── hooks/ # Custom React hooks
+
+├── layouts/ # Layout components for route grouping (e.g., AuthLayout, AdminLayout)
+
+├── lib/ # Helper libraries, external utilities
+
+├── locales/ # i18n translation files (if using)
+
+├── models/ # TypeScript types, interfaces
+
+├── modules/ # Feature-based module separation (e.g., auth, dashboard)
+
+├── pages/ # Main route-level pages (optional if using file-based routing)
+
+├── redux/ # Redux slices, store config
+
+├── routes/ # Route definitions & guards
+
+├── utils/ # Utility functions
+
+├── mocks/ # API mock data (for dev/testing)
+
+├── settings/ # App config, constants, theme settings
 
 ---
 
