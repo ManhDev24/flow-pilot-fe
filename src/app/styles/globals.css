@@ -1,0 +1,13 @@
+
+/* Font global */
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../styles/Font/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body {
+  font-family: 'CustomFont', Arial, Helvetica, sans-serif;
+}

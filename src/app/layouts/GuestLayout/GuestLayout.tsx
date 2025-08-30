@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 function GuestLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <div>GuestLayout</div>
+    {/* Guest Layout */}
       {children}
     </>
   )
