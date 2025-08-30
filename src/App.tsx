@@ -3,6 +3,8 @@ import './App.css'
 import useRouteElement from './app/routes/useRouteElement'
 import { useEffect } from 'react'
 
+import './app/styles/globals.css'
+
 const ScrollToTop = () => {
   const { pathname } = useLocation()
 
