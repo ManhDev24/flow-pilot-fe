@@ -3,6 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/app/co
 
 import { Video, Menu, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -88,9 +89,12 @@ const Header = () => {
             <Video className='h-7 w-7' />
             Book a Demo
           </button>
-          <button className='text-lg font-normal px-[30px] py-[8px] bg-[#0094FF] text-white border-[#0094FF] rounded-md hover:bg-[#07c]'>
-            Log In
-          </button>
+          <Link to='/auth/login'>
+            <button className='text-lg font-normal px-[30px] py-[8px] bg-[#0094FF] text-white border-[#0094FF] rounded-md hover:bg-[#07c]'>
+              Log In
+            </button>
+          </Link>
+
           <button
             className='xl:hidden flex items-center justify-center w-12 h-12 rounded-md bg-gray-100 hover:bg-gray-200 transition ml-2'
             aria-label='Open menu'
