@@ -32,6 +32,7 @@ import MyPerformance from '../modules/Employee/MyPerformance/MyPerformance'
 import type { ReactNode } from 'react'
 import Forbidden from '../pages/Forbidden/Forbidden'
 import NotFound from '../pages/NotFound/NotFound'
+import ForgotPassword from '../modules/Auth/ForgotPassword/ForgotPassword'
 
 const RejectedRouter = () => {
   // const { currentRole } = useSelector((state) => state.role);
@@ -171,6 +172,14 @@ const useRouteElement = () => {
           element: (
             <AuthLayout>
               <Register />
+            </AuthLayout>
+          )
+        },
+        {
+          path: PATH.FORGOT_PASSWORD,
+          element: (
+            <AuthLayout>
+              <ForgotPassword />
             </AuthLayout>
           )
         }

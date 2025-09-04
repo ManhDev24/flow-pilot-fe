@@ -1,11 +1,12 @@
 export const PATH = {
   // GUEST MODULE
   HOME: '/',
-  LANDING_PAGE: 'landing-page',
+  LANDING_PAGE: '/landing-page',
   PRICING_PAGE: '/pricing-page',
   // AUTH MODULE
   AUTH: '/auth',
   LOGIN: '/auth/login',
+  FORGOT_PASSWORD: '/auth/forgot-password',
   REGISTER: '/auth/register',
   // SUPER ADMIN
   SUPER_ADMIN: '/super-admin',
