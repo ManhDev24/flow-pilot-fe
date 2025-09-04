@@ -70,7 +70,7 @@ const Header = () => {
 
   return (
     <div className='wrapper-Header w-full bg-no-repeat bg-cover bg-center px-2 sm:px-4'>
-      <div className='navbar flex flex-col sm:flex-row justify-between items-center w-full mx-auto py-2 sm:py-0'>
+      <div className=' container navbar flex flex-col sm:flex-row justify-between items-center w-full mx-auto py-2 sm:py-0'>
         <div className='Navbar-logo group cursor-pointer mb-2 sm:mb-0'>
           <div className='flex items-center'>
             <img
@@ -83,8 +83,8 @@ const Header = () => {
             </p>
           </div>
         </div>
-  <div className='Navbar-main-menu hidden xl:block'>{mainMenu}</div>
-  <div className='Navbar-account-menu flex items-center gap-2 sm:gap-4 mt-2 sm:mt-0'>
+        <div className='Navbar-main-menu hidden xl:block'>{mainMenu}</div>
+        <div className='Navbar-account-menu flex items-center gap-2 sm:gap-4 mt-2 sm:mt-0'>
           <button className='flex items-center gap-2 py-2 px-3 text-black text-sm sm:text-base font-normal transition-all duration-300 hover:text-gray-600'>
             <Video className='h-7 w-7' />
             Book a Demo

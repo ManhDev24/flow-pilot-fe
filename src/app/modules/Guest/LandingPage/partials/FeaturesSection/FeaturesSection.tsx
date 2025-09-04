@@ -11,12 +11,14 @@ const FeaturesSection = () => {
     <div className='pb-8 pt-6 sm:pb-[70px] sm:pt-[48px]'>
       <div className='FeaturesSection-wrapper container mx-auto flex flex-col justify-center items-center px-2 sm:px-4'>
         {/* Feature 1 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item mb-4 sm:mb-0 sm:ms-[10px] flex justify-center'>
-            <img src={FeatureImage1} alt='Feature 1' className='w-full max-w-[320px] sm:max-w-none' />
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:ms-[10px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage1} alt='Feature 1' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
-            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>Create projects and share them with your teammates</p>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
+            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
+              Create projects and share them with your teammates
+            </p>
             <p className='text-base sm:text-xl max-w-full sm:max-w-[600px]'>
               In Flow Pilot you can create as many projects as you need, organize them into folders, and add your
               teammates to collaborate. Additionally, you can invite guests, such as clients or freelancers, to join
@@ -25,8 +27,8 @@ const FeaturesSection = () => {
           </div>
         </div>
         {/* Feature 2 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Schedule your team’s tasks and events on specific days
             </p>
@@ -36,16 +38,16 @@ const FeaturesSection = () => {
               solely on today’s tasks and get maximum out of every single day.
             </p>
           </div>
-          <div className='feature-item mb-4 sm:mb-0 sm:me-[122px] flex justify-center'>
-            <img src={FeatureImage2} alt='Feature 2' className='w-full max-w-[320px] sm:max-w-none' />
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage2} alt='Feature 2' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
         {/* Feature 3 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item mb-4 sm:mb-0 sm:ms-[10px] flex justify-center'>
-            <img src={FeatureImage3} alt='Feature 3' className='w-full max-w-[320px] sm:max-w-none' />
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:ms-[10px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage3} alt='Feature 3' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Use waiting list as a backlog for future tasks and ideas
             </p>
@@ -57,25 +59,27 @@ const FeaturesSection = () => {
           </div>
         </div>
         {/* Feature 4 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
-            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>Customize your workflow with custom task statuses</p>
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
+            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
+              Customize your workflow with custom task statuses
+            </p>
             <p className='text-base sm:text-xl max-w-full sm:max-w-[600px]'>
               Need a workflow more advanced than just “new → in progress → done”? With FlowPilot, you can create
               unlimited custom task stages—like testing, review, or approval—and arrange them in any order to perfectly
               match your team’s process.
             </p>
           </div>
-          <div className='feature-item mb-4 sm:mb-0 sm:me-[122px] flex justify-center'>
-            <img src={FeatureImage4} alt='Feature 4' className='w-full max-w-[320px] sm:max-w-none' />
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage4} alt='Feature 4' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
         {/* Feature 5 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item mb-4 sm:mb-0 sm:ms-[10px] flex justify-center'>
-            <img src={FeatureImage5} alt='Feature 5' className='w-full max-w-[320px] sm:max-w-none' />
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:ms-[10px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage5} alt='Feature 5' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Schedule new meetings without switching to another tool
             </p>
@@ -87,8 +91,8 @@ const FeaturesSection = () => {
           </div>
         </div>
         {/* Feature 6 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Connect your Google Calendar to manage all events in Flow Pilot
             </p>
@@ -98,17 +102,19 @@ const FeaturesSection = () => {
               Why juggle multiple tools when you can manage everything in Bordio?
             </p>
           </div>
-          <div className='feature-item mb-4 sm:mb-0 sm:me-[122px] flex justify-center'>
-            <img src={FeatureImage6} alt='Feature 6' className='w-full max-w-[320px] sm:max-w-none' />
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage6} alt='Feature 6' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
         {/* Feature 7 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item mb-4 sm:mb-0 sm:ms-[10px] flex justify-center'>
-            <img src={FeatureImage7} alt='Feature 7' className='w-full max-w-[320px] sm:max-w-none' />
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:ms-[10px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage7} alt='Feature 7' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
-            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>Manage your teams workload with time estimates</p>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
+            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
+              Manage your teams workload with time estimates
+            </p>
             <p className='text-base sm:text-xl max-w-full sm:max-w-[600px]'>
               Many task management tools calculate users’ workload based only on tasks, which can lead to inaccurate
               data. Remember, your teammates spend significant time in meetings as well, don’t they? Bordio solves it by
@@ -117,17 +123,19 @@ const FeaturesSection = () => {
           </div>
         </div>
         {/* Feature 8 */}
-  <div className='mb-8 sm:mb-[60px] grid grid-cols-1 sm:grid-cols-2 gap-4'>
-          <div className='feature-item p-2 sm:p-4 flex flex-col justify-center items-start text-start'>
-            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>Set recurring tasks and events to save time</p>
+        <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
+            <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
+              Set recurring tasks and events to save time
+            </p>
             <p className='text-base sm:text-xl max-w-full sm:max-w-[600px]'>
               Every team has regular activities such as weekly team meeting or making a monthly report. Instead of
               creating them every single time, you can set repeats and they will appear in your team’s calendar only on
               chosen days. Less manual work, more productivity!
             </p>
           </div>
-          <div className='feature-item mb-4 sm:mb-0 sm:me-[122px] flex justify-center'>
-            <img src={FeatureImage8} alt='Feature 8' className='w-full max-w-[320px] sm:max-w-none' />
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage8} alt='Feature 8' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
       </div>
