@@ -6,7 +6,7 @@ import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import { object, string } from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Form,
   FormControl,
@@ -18,6 +18,7 @@ import {
 } from '@/app/components/ui/form'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import type { LoginForm } from './models/LoginFormInterface'
+import { PATH } from '@/app/routes/path'
 const loginFormSchema = object({
   email: string().email('Invalid email address').required('Email is required'),
   password: string()
@@ -61,7 +62,7 @@ function Login() {
         <CardContent className='w-full flex flex-col items-center p-0 '>
           <button
             className='absolute left-8 top-8 flex items-center gap-1 text-blue-500 hover:text-blue-700 font-medium px-2 py-1 rounded-md z-10'
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(PATH.LANDING_PAGE)}
             aria-label='Back'
           >
             <svg width='20' height='20' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -165,16 +166,11 @@ function Login() {
           <div className='flex flex-col gap-2 w-full text-sm text-gray-500 mt-2'>
             <span className='text-center'>
               Forgot password?{' '}
-              <a href='#' className='text-blue-500 hover:underline font-medium'>
+              <Link to={PATH.FORGOT_PASSWORD} className='text-blue-500 hover:underline font-medium'>
                 Reset
-              </a>
+              </Link>
             </span>
-            <span className='text-center'>
-              Don't have an account?{' '}
-              <a href='#' className='text-blue-500 hover:underline font-medium'>
-                Register
-              </a>
-            </span>
+       
           </div>
         </CardContent>
       </Card>
