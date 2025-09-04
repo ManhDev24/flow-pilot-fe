@@ -44,53 +44,50 @@ const HeroSection = () => {
         </div>
         <div className='tab-content flex flex-col items-center w-full'>
           <Tabs defaultValue='calendar' className='w-full flex flex-col items-center'>
-            <TabsList
-              className='flex flex-wrap rounded-xl px-2 sm:px-6 py-2 sm:py-7 gap-2 sm:gap-3 w-full min-w-0 sm:min-w-[540px] max-w-full sm:max-w-[1000px] justify-center mx-auto'
-              style={{ backgroundColor: 'rgba(230, 234, 239, 0.95)' }}
-            >
-              <TabsTrigger
-                value='calendar'
-                className='flex items-center gap-2 sm:gap-4 px-2 sm:px-8 py-2 sm:py-6 rounded-lg text-xs sm:text-[18px] font-semibold text-[#222] data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:font-bold data-[state=active]:text-black transition'
-              >
-                <CalendarDays className='w-5 h-5 sm:w-9 sm:h-9' />
-                Calendar planner
-              </TabsTrigger>
-              <TabsTrigger
-                value='task'
-                className='flex items-center gap-2 sm:gap-4 px-2 sm:px-8 py-2 sm:py-6 rounded-lg text-xs sm:text-[18px] font-semibold text-[#222] data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:font-bold data-[state=active]:text-black transition'
-              >
-                <ListTodo className='w-5 h-5 sm:w-9 sm:h-9' />
-                Task list
-              </TabsTrigger>
-              <TabsTrigger
-                value='kanban'
-                className='flex items-center gap-2 sm:gap-4 px-2 sm:px-8 py-2 sm:py-6 rounded-lg text-xs sm:text-[18px] font-semibold text-[#222] data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:font-bold data-[state=active]:text-black transition'
-              >
-                <ListTodo className='w-5 h-5 sm:w-9 sm:h-9' />
-                Kanban board
-              </TabsTrigger>
-              <TabsTrigger
-                value='projects'
-                className='flex items-center gap-2 sm:gap-4 px-2 sm:px-8 py-2 sm:py-6 rounded-lg text-xs sm:text-[18px] font-semibold text-[#222] data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:font-bold data-[state=active]:text-black transition'
-              >
-                <Folder className='w-5 h-5 sm:w-9 sm:h-9' />
-                Projects
-              </TabsTrigger>
-              <TabsTrigger
-                value='notes'
-                className='flex items-center gap-2 sm:gap-4 px-2 sm:px-8 py-2 sm:py-6 rounded-lg text-xs sm:text-[18px] font-semibold text-[#222] data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:font-bold data-[state=active]:text-black transition'
-              >
-                <StickyNote className='w-5 h-5 sm:w-9 sm:h-9' />
-                Notes
-              </TabsTrigger>
-            </TabsList>
+            <div className='w-full flex justify-center items-center my-4'>
+              <TabsList className='flex gap-4'>
+                <TabsTrigger
+                  value='calendar'
+                  className='w-[56px] h-[56px] rounded-xl flex items-center justify-center bg-[#f3f5f7] data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-none transition-all duration-150'
+                >
+                  <CalendarDays className='w-6 h-6 mx-auto data-[state=active]:text-[#0094FF] text-[#8C939F]' />
+                </TabsTrigger>
+                <TabsTrigger
+                  value='task'
+                  className='w-[56px] h-[56px] rounded-xl flex items-center justify-center bg-[#f3f5f7] data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-none transition-all duration-150'
+                >
+                  <ListTodo className='w-6 h-6 mx-auto data-[state=active]:text-[#0094FF] text-[#8C939F]' />
+                </TabsTrigger>
+                <TabsTrigger
+                  value='kanban'
+                  className='w-[56px] h-[56px] rounded-xl flex items-center justify-center bg-[#f3f5f7] data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-none transition-all duration-150'
+                >
+                  <ListTodo className='w-6 h-6 mx-auto data-[state=active]:text-[#0094FF] text-[#8C939F]' />
+                </TabsTrigger>
+                <TabsTrigger
+                  value='projects'
+                  className='w-[56px] h-[56px] rounded-xl flex items-center justify-center bg-[#f3f5f7] data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-none transition-all duration-150'
+                >
+                  <Folder className='w-6 h-6 mx-auto data-[state=active]:text-[#0094FF] text-[#8C939F]' />
+                </TabsTrigger>
+                <TabsTrigger
+                  value='notes'
+                  className='w-[56px] h-[56px] rounded-xl flex items-center justify-center bg-[#f3f5f7] data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-none transition-all duration-150'
+                >
+                  <StickyNote className='w-6 h-6 mx-auto data-[state=active]:text-[#0094FF] text-[#8C939F]' />
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
             <TabsContent
               value='calendar'
               className='transition-opacity duration-300 ease-in-out'
               style={{ minHeight: 160 }}
             >
               <div className='calendar-image flex justify-center'>
-                {loading.calendar && <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />}
+                {loading.calendar && (
+                  <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />
+                )}
                 <img
                   src={CalendarPlanerImage}
                   alt='calendar-planner'
@@ -122,7 +119,9 @@ const HeroSection = () => {
               style={{ minHeight: 160 }}
             >
               <div className='kanban-image flex justify-center'>
-                {loading.kanban && <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />}
+                {loading.kanban && (
+                  <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />
+                )}
                 <img
                   src={KanBanImage}
                   alt='kanban'
@@ -138,7 +137,9 @@ const HeroSection = () => {
               style={{ minHeight: 160 }}
             >
               <div className='projects-image flex justify-center'>
-                {loading.projects && <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />}
+                {loading.projects && (
+                  <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />
+                )}
                 <img
                   src={ProjectsImage}
                   alt='projects'
@@ -170,26 +171,46 @@ const HeroSection = () => {
               <p className='text-base sm:text-2xl font-medium'>Rating 4.7</p>
             </div>
             <div>
-              <img src='https://bordio.com/wp-content/themes/understrap/images/rating.svg' alt='rating' className='h-4 sm:h-auto' />
+              <img
+                src='https://bordio.com/wp-content/themes/understrap/images/rating.svg'
+                alt='rating'
+                className='h-4 sm:h-auto'
+              />
             </div>
             <div>
               <p className='text-xs sm:text-sm'>Based on 300+ reviews</p>
             </div>
           </div>
           <div className='flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-2 sm:mt-4'>
-              <div>
-                  <img src="https://bordio.com/wp-content/themes/understrap/images/rating-logo_1.svg" alt="image1" className='h-4 sm:h-auto' />
-              </div>
-              <div>
-                  <img src="https://bordio.com/wp-content/themes/understrap/images/rating-logo_2.svg" alt="image2" className='h-4 sm:h-auto' />
-              </div>
-              <div>
-                  <img src="https://bordio.com/wp-content/themes/understrap/images/rating-logo_3.svg" alt="image3" className='h-4 sm:h-auto' />
-              </div>
-              <div>
-                  <img src="https://bordio.com/wp-content/themes/understrap/images/rating-logo_4.svg" alt="image4" className='h-4 sm:h-auto' />
-              </div>
+            <div>
+              <img
+                src='https://bordio.com/wp-content/themes/understrap/images/rating-logo_1.svg'
+                alt='image1'
+                className='h-4 sm:h-auto'
+              />
             </div>
+            <div>
+              <img
+                src='https://bordio.com/wp-content/themes/understrap/images/rating-logo_2.svg'
+                alt='image2'
+                className='h-4 sm:h-auto'
+              />
+            </div>
+            <div>
+              <img
+                src='https://bordio.com/wp-content/themes/understrap/images/rating-logo_3.svg'
+                alt='image3'
+                className='h-4 sm:h-auto'
+              />
+            </div>
+            <div>
+              <img
+                src='https://bordio.com/wp-content/themes/understrap/images/rating-logo_4.svg'
+                alt='image4'
+                className='h-4 sm:h-auto'
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
