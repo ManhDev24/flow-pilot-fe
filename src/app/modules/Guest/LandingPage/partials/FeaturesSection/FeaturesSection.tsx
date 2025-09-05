@@ -28,6 +28,9 @@ const FeaturesSection = () => {
         </div>
         {/* Feature 2 */}
         <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage2} alt='Feature 2' className='w-full max-w-[320px] lg:max-w-none' />
+          </div>
           <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Schedule your team’s tasks and events on specific days
@@ -37,9 +40,6 @@ const FeaturesSection = () => {
               meetings on specific days, creating a short, actionable plan for each day. This allows your team to focus
               solely on today’s tasks and get maximum out of every single day.
             </p>
-          </div>
-          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
-            <img src={FeatureImage2} alt='Feature 2' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
         {/* Feature 3 */}
@@ -60,6 +60,9 @@ const FeaturesSection = () => {
         </div>
         {/* Feature 4 */}
         <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage4} alt='Feature 4' className='w-full max-w-[320px] lg:max-w-none' />
+          </div>
           <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Customize your workflow with custom task statuses
@@ -69,9 +72,6 @@ const FeaturesSection = () => {
               unlimited custom task stages—like testing, review, or approval—and arrange them in any order to perfectly
               match your team’s process.
             </p>
-          </div>
-          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
-            <img src={FeatureImage4} alt='Feature 4' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
         {/* Feature 5 */}
@@ -92,6 +92,9 @@ const FeaturesSection = () => {
         </div>
         {/* Feature 6 */}
         <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage6} alt='Feature 6' className='w-full max-w-[320px] lg:max-w-none' />
+          </div>
           <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Connect your Google Calendar to manage all events in Flow Pilot
@@ -102,9 +105,6 @@ const FeaturesSection = () => {
               Why juggle multiple tools when you can manage everything in Bordio?
             </p>
           </div>
-          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
-            <img src={FeatureImage6} alt='Feature 6' className='w-full max-w-[320px] lg:max-w-none' />
-          </div>
         </div>
         {/* Feature 7 */}
         <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row lg:items-center gap-4'>
@@ -113,7 +113,7 @@ const FeaturesSection = () => {
           </div>
           <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
-              Manage your teams workload with time estimates
+              Manage your team's workload with time estimates
             </p>
             <p className='text-base sm:text-xl max-w-full sm:max-w-[600px]'>
               Many task management tools calculate users’ workload based only on tasks, which can lead to inaccurate
@@ -124,6 +124,9 @@ const FeaturesSection = () => {
         </div>
         {/* Feature 8 */}
         <div className='mb-8 sm:mb-[60px] flex flex-col lg:flex-row-reverse lg:items-center gap-4'>
+          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
+            <img src={FeatureImage8} alt='Feature 8' className='w-full max-w-[320px] lg:max-w-none' />
+          </div>
           <div className='feature-item p-2 lg:p-4 flex flex-col justify-center items-start text-start order-2 lg:order-none'>
             <p className='font-bold mb-4 sm:mb-6 text-xl sm:text-4xl max-w-full sm:max-w-[600px]'>
               Set recurring tasks and events to save time
@@ -133,9 +136,6 @@ const FeaturesSection = () => {
               creating them every single time, you can set repeats and they will appear in your team’s calendar only on
               chosen days. Less manual work, more productivity!
             </p>
-          </div>
-          <div className='feature-item mb-4 lg:mb-0 lg:me-[122px] flex justify-center order-1 lg:order-none'>
-            <img src={FeatureImage8} alt='Feature 8' className='w-full max-w-[320px] lg:max-w-none' />
           </div>
         </div>
       </div>
