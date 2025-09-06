@@ -1,36 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Card, CardContent } from '@/app/components/ui/card'
-import { Input } from '@/app/components/ui/input'
-import { Button } from '@/app/components/ui/button'
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
-import { object, string } from 'yup'
+import { Button } from '@/app/components/ui/button'
+import { Card, CardContent } from '@/app/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form'
+import { Input } from '@/app/components/ui/input'
+import { PATH } from '@/app/routes/path'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/app/components/ui/form'
+import { useLogin } from './hooks/useLogin'
 import { useForm, type SubmitHandler } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import { object, string } from 'yup'
 import type { LoginForm } from './models/LoginFormInterface'
-import { PATH } from '@/app/routes/path'
 const loginFormSchema = object({
   email: string().email('Invalid email address').required('Email is required'),
   password: string()
     .min(6, 'Password must be at least 6 characters')
     .max(100, 'Password cannot exceed 100 characters')
-    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
+    // .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
     .required('Password is required')
 })
 
 function Login() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const loginMutation = useLogin()
+  const isLoading = loginMutation.status === 'pending'
   const navigate = useNavigate()
 
   const form = useForm<LoginForm>({
@@ -42,15 +36,10 @@ function Login() {
     resolver: yupResolver(loginFormSchema)
   })
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    formState: { errors },
-    clearErrors
-  } = form
+  const { control, handleSubmit } = form
+
   const onSubmit: SubmitHandler<LoginForm> = (data) => {
-    console.log(data)
+    loginMutation.mutate(data)
   }
 
   return (
@@ -170,7 +159,6 @@ function Login() {
                 Reset
               </Link>
             </span>
-       
           </div>
         </CardContent>
       </Card>
