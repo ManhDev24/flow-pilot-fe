@@ -1,0 +1,304 @@
+{
+  "overview": {
+    "total_users": 12,
+    "active_users": 8,
+    "admin_users": 4,
+    "new_today": 5
+  },
+  "filters": {
+    "roles": [
+      "Super Admin",
+      "Admin Workspace",
+      "Team Leader",
+      "Employee",
+      "Member"
+    ],
+    "statuses": [
+      "active",
+      "inactive",
+      "pending"
+    ]
+  },
+  "pagination": {
+    "page": 1,
+    "per_page": 25,
+    "total": 12
+  },
+  "users": [
+    {
+      "id": "2f1e609e-0293-472f-ae65-41e6f42d71a9",
+      "name": "Alice Johnson",
+      "email": "alice.johnson@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-26",
+      "role": {
+        "id": 1,
+        "name": "Super Admin"
+      },
+      "workspaces": [
+        {
+          "id": "7937b4f9-8ef7-4260-8be2-f7dc7273b30c",
+          "name": "Global Admin"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-09-15T10:00:00Z",
+      "created_at": "2023-08-01T12:00:00Z",
+      "updated_at": "2023-10-26T09:00:00Z"
+    },
+    {
+      "id": "8f97679b-1184-4130-89c6-bd11040252b5",
+      "name": "Bob Williams",
+      "email": "bob.williams@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-25",
+      "role": {
+        "id": 2,
+        "name": "Admin Workspace"
+      },
+      "workspaces": [
+        {
+          "id": "52c11b04-956c-4707-bcb5-9c7c733bc283",
+          "name": "Alpha Corp"
+        },
+        {
+          "id": "ef64907c-9878-4116-a826-3dbdd8223947",
+          "name": "Beta Solutions"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-09-20T09:30:00Z",
+      "created_at": "2023-08-05T08:30:00Z",
+      "updated_at": "2023-10-25T18:00:00Z"
+    },
+    {
+      "id": "7bdfbdcf-fb68-42e1-9c9c-703133865198",
+      "name": "Charlie Davis",
+      "email": "charlie.davis@example.com",
+      "avatar_url": null,
+      "status": "inactive",
+      "last_login": "2023-10-20",
+      "role": {
+        "id": 4,
+        "name": "Employee"
+      },
+      "workspaces": [
+        {
+          "id": "1c035988-1991-44c1-a320-7c8e88a89f81",
+          "name": "Gamma Inc"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": null,
+      "created_at": "2023-09-02T14:00:00Z",
+      "updated_at": "2023-10-20T11:00:00Z"
+    },
+    {
+      "id": "8f85f9a0-792b-4434-b1ca-9a0d5089e546",
+      "name": "Diana Miller",
+      "email": "diana.miller@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-26",
+      "role": {
+        "id": 4,
+        "name": "Employee"
+      },
+      "workspaces": [
+        {
+          "id": "40fcc60e-2c50-4578-92f7-809092d66bd4",
+          "name": "Delta Systems"
+        }
+      ],
+      "department": null,
+      "is_first_login": true,
+      "password_changed_at": null,
+      "created_at": "2023-09-05T10:10:00Z",
+      "updated_at": "2023-10-26T10:10:00Z"
+    },
+    {
+      "id": "1b46ac3a-6d75-49da-b3f5-7f1985c6f2a6",
+      "name": "Eve Brown",
+      "email": "eve.brown@example.com",
+      "avatar_url": null,
+      "status": "pending",
+      "last_login": "2023-10-22",
+      "role": {
+        "id": 3,
+        "name": "Team Leader"
+      },
+      "workspaces": [
+        {
+          "id": "53599e26-879a-46b1-99d9-9e3919f148e5",
+          "name": "Epsilon Innovations"
+        }
+      ],
+      "department": null,
+      "is_first_login": true,
+      "password_changed_at": null,
+      "created_at": "2023-10-10T07:00:00Z",
+      "updated_at": "2023-10-22T07:00:00Z"
+    },
+    {
+      "id": "3b91495a-d461-4fb0-b2c4-cdfc8296fdb3",
+      "name": "Frank White",
+      "email": "frank.white@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-24",
+      "role": {
+        "id": 4,
+        "name": "Employee"
+      },
+      "workspaces": [
+        {
+          "id": "662df4ae-a5fa-4143-960d-9ba2a0260992",
+          "name": "Zeta Group"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-09-30T12:45:00Z",
+      "created_at": "2023-08-25T12:45:00Z",
+      "updated_at": "2023-10-24T12:45:00Z"
+    },
+    {
+      "id": "ad7e18a3-e861-470c-b8f7-c8f6bda708ea",
+      "name": "Grace Green",
+      "email": "grace.green@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-28",
+      "role": {
+        "id": 1,
+        "name": "Super Admin"
+      },
+      "workspaces": [
+        {
+          "id": "7937b4f9-8ef7-4260-8be2-f7dc7273b30c",
+          "name": "Global Admin"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-10-01T09:00:00Z",
+      "created_at": "2023-07-20T09:00:00Z",
+      "updated_at": "2023-10-28T09:00:00Z"
+    },
+    {
+      "id": "48056c6e-7284-4fa5-a6b2-7e86eaf69279",
+      "name": "Henry King",
+      "email": "henry.king@example.com",
+      "avatar_url": null,
+      "status": "inactive",
+      "last_login": "2023-10-18",
+      "role": {
+        "id": 5,
+        "name": "Member"
+      },
+      "workspaces": [],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": null,
+      "created_at": "2023-09-01T11:20:00Z",
+      "updated_at": "2023-10-18T11:20:00Z"
+    },
+    {
+      "id": "58fc6507-2048-4c74-ab69-490fbf562ca1",
+      "name": "Ivy Lee",
+      "email": "ivy.lee@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-25",
+      "role": {
+        "id": 2,
+        "name": "Admin Workspace"
+      },
+      "workspaces": [
+        {
+          "id": "c4bd074a-99b0-435d-b1a1-298e270c02ee",
+          "name": "Theta Systems"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-10-02T08:00:00Z",
+      "created_at": "2023-08-15T08:00:00Z",
+      "updated_at": "2023-10-25T08:00:00Z"
+    },
+    {
+      "id": "9437a1ea-c549-4c7e-992f-205c6b499660",
+      "name": "Jack Taylor",
+      "email": "jack.taylor@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-26",
+      "role": {
+        "id": 3,
+        "name": "Team Leader"
+      },
+      "workspaces": [
+        {
+          "id": "52be3441-61c7-46e2-bcca-1bcb51a21a14",
+          "name": "Iota Corp"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-10-05T15:00:00Z",
+      "created_at": "2023-08-28T15:00:00Z",
+      "updated_at": "2023-10-26T15:00:00Z"
+    },
+    {
+      "id": "9713b211-6aa7-409a-945d-d5cbde1b90d2",
+      "name": "Kelly Hall",
+      "email": "kelly.hall@example.com",
+      "avatar_url": null,
+      "status": "pending",
+      "last_login": "2023-10-23",
+      "role": {
+        "id": 4,
+        "name": "Employee"
+      },
+      "workspaces": [
+        {
+          "id": "d2998f0e-7155-45cf-bf86-1db56bc95131",
+          "name": "Kappa Group"
+        }
+      ],
+      "department": null,
+      "is_first_login": true,
+      "password_changed_at": null,
+      "created_at": "2023-10-12T16:00:00Z",
+      "updated_at": "2023-10-23T16:00:00Z"
+    },
+    {
+      "id": "ba4c1f2e-5ba3-404d-a832-a14c8a67096d",
+      "name": "Liam Clark",
+      "email": "liam.clark@example.com",
+      "avatar_url": null,
+      "status": "active",
+      "last_login": "2023-10-26",
+      "role": {
+        "id": 4,
+        "name": "Employee"
+      },
+      "workspaces": [
+        {
+          "id": "7937b4f9-8ef7-4260-8be2-f7dc7273b30c",
+          "name": "Global Admin"
+        }
+      ],
+      "department": null,
+      "is_first_login": false,
+      "password_changed_at": "2023-10-03T13:00:00Z",
+      "created_at": "2023-08-10T13:00:00Z",
+      "updated_at": "2023-10-26T13:00:00Z"
+    }
+  ]
+}
