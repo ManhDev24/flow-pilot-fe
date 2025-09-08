@@ -1,5 +1,6 @@
 import logoFlowpilot from '@/app/assets/LogoFlowPilot2.png'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/app/components/ui/dropdown-menu'
+import { PATH } from '@/app/routes/path'
 
 import { Video, Menu, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
@@ -56,9 +57,11 @@ const Header = () => {
         </DropdownMenu>
       </li>
       <li>
-        <button className='flex items-center gap-1 text-base font-normal rounded-xl transition-all duration-200 border border-transparent hover:border-gray-100 hover:bg-gray-100 px-[12px] py-[10px]'>
-          Pricing
-        </button>
+        <Link to={PATH.PRICING_PAGE}>
+          <button className='flex items-center gap-1 text-base font-normal rounded-xl transition-all duration-200 border border-transparent hover:border-gray-100 hover:bg-gray-100 px-[12px] py-[10px]'>
+            Pricing
+          </button>
+        </Link>
       </li>
       <li>
         <button className='flex items-center gap-1 text-base font-normal rounded-xl transition-all duration-200 border border-transparent hover:border-gray-100 hover:bg-gray-100 px-[12px] py-[10px]'>
@@ -71,18 +74,20 @@ const Header = () => {
   return (
     <div className='wrapper-Header w-full bg-no-repeat bg-cover bg-center px-2 sm:px-4'>
       <div className=' container navbar flex flex-col sm:flex-row justify-between items-center w-full mx-auto py-2 sm:py-0'>
-        <div className='Navbar-logo group cursor-pointer mb-2 sm:mb-0'>
-          <div className='flex items-center'>
-            <img
-              className='max-w-[100px] sm:max-w-[142px] max-h-[60px] sm:max-h-[112px] lg:max-w-[200px] transition duration-200 group-hover:brightness-90'
-              src={logoFlowpilot}
-              alt='flow-pillot-logo'
-            />
-            <p className='text-base sm:text-xl font-bold uppercase text-black transition duration-200 group-hover:text-gray-600 group-hover:brightness-90 ml-2'>
-              Flowpilot
-            </p>
+        <Link to='/'>
+          <div className='Navbar-logo group cursor-pointer mb-2 sm:mb-0'>
+            <div className='flex items-center'>
+              <img
+                className='max-w-[100px] sm:max-w-[142px] max-h-[60px] sm:max-h-[112px] lg:max-w-[200px] transition duration-200 group-hover:brightness-90'
+                src={logoFlowpilot}
+                alt='flow-pillot-logo'
+              />
+              <p className='text-base sm:text-xl font-bold uppercase text-black transition duration-200 group-hover:text-gray-600 group-hover:brightness-90 ml-2'>
+                Flowpilot
+              </p>
+            </div>
           </div>
-        </div>
+        </Link>
         <div className='Navbar-main-menu hidden xl:block'>{mainMenu}</div>
         <div className='Navbar-account-menu flex items-center gap-2 sm:gap-4 mt-2 sm:mt-0'>
           <button className='flex items-center gap-2 py-2 px-3 text-black text-sm sm:text-base font-normal transition-all duration-300 hover:text-gray-600'>
