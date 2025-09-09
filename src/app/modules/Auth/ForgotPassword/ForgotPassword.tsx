@@ -1,29 +1,28 @@
-import { useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
-import { Card, CardContent } from '@/app/components/ui/card'
-import { Input } from '@/app/components/ui/input'
-import { Button } from '@/app/components/ui/button'
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
-import { Link, useNavigate } from 'react-router-dom'
-import { object, string } from 'yup'
-import { ForgotPasswordForm } from './models/ForgetPasswordFormInterface'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { Button } from '@/app/components/ui/button'
+import { Card, CardContent } from '@/app/components/ui/card'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage
 } from '@/app/components/ui/form'
+import { Input } from '@/app/components/ui/input'
 import { PATH } from '@/app/routes/path'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import { object, string } from 'yup'
+import type { ForgotPasswordForm } from './models/ForgetPasswordFormInterface'
 const forgotPasswordSchema = object({
   email: string().email('Invalid email address').required('Email is required')
 })
 
 const ForgotPassword = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const form = useForm<ForgotPasswordForm>({
@@ -35,9 +34,9 @@ const ForgotPassword = () => {
   })
   const {
     control,
-    register,
+    // register,
     handleSubmit,
-    formState: { errors }
+    // formState: { errors }
   } = form
 
   const onSubmit: SubmitHandler<ForgotPasswordForm> = (data) => {
