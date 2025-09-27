@@ -3,10 +3,10 @@ import axios from 'axios'
 export const fetcher = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'x-api-key': import.meta.env.VITE_API_KEY
   }
 })
-
 
 // fetcher.interceptors.request.use((config) => {
 //   const token = localStorage.getItem('access_token')
