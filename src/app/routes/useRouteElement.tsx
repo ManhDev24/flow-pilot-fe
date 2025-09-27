@@ -76,6 +76,7 @@ const RejectedAuthRouter = () => {
 
 const ProtectedRouter = ({ roles }: { roles: string[] }) => {
   const storedRole = localStorage.getItem('role')
+  console.log('storedRole: ', storedRole);
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />

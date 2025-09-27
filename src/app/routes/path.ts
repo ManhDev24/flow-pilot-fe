@@ -19,6 +19,7 @@ export const PATH = {
   ADMIN_DASHBOARD: '/admin-ws/dashboard',
   ADMIN_MY_WORKSPACE: '/admin-ws/my-workspace',
   ADMIN_MY_EMPLOYEES: '/admin-ws/my-employees',
+  ADMIN_MY_REPORT: '/admin-ws/my-reports',
   ADMIN_MY_EMPLOYEE_DETAIL: '/admin-ws/my-employee-detail/:id',
   ADMIN_MY_PROJECTS: '/admin-ws/my-projects',
   ADMIN_MY_PROJECT_DETAIL: '/admin-ws/my-project-detail/:id',
