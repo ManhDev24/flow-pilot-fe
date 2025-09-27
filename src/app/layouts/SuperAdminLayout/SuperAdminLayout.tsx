@@ -20,7 +20,7 @@ function SuperAdminLayout({ children }: { children: ReactNode }) {
   const navigationItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: `${PATH.SUPER_ADMIN_DASHBOARD}` },
     { icon: Users, label: 'Users', to: `${PATH.SUPER_ADMIN_USERS}` },
-    { icon: Briefcase, label: 'Workspaces', to: `${PATH.SUPER_ADMIN_WORKSPACES}`},
+    { icon: Briefcase, label: 'Workspaces', to: `${PATH.SUPER_ADMIN_WORKSPACES}` },
     { icon: Settings, label: 'Settings', to: `${PATH.ADMIN_SETTINGS}` }
   ]
   return (

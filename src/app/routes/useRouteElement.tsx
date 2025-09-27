@@ -47,7 +47,7 @@ const RejectedRouter = () => {
     }
 
     const redirectPath = redirectMap[storedRole]
-    
+
     return <Navigate to={redirectPath} replace />
   }
 
@@ -65,8 +65,8 @@ const RejectedAuthRouter = () => {
   const redirectMap: Record<string, string> = {
     'super-admin': PATH.SUPER_ADMIN,
     'admin-ws': PATH.ADMIN,
-    leader: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
-    staff: PATH.EMPLOYEE_MY_TASKS
+    PROJECTMANAGER: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
+    EMPLOYEE: PATH.EMPLOYEE_MY_TASKS
   }
 
   const redirectPath = redirectMap[storedRole]
@@ -110,11 +110,11 @@ const EmployeeIndexPage = () => {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole === 'leader') {
+  if (storedRole === 'PROJECTMANAGER') {
     return <Navigate to={PATH.EMPLOYEE_LEAD_PROJECT_REPORTS} replace />
   }
 
-  if (storedRole === 'staff') {
+  if (storedRole === 'EMPLOYEE') {
     return <Navigate to={PATH.EMPLOYEE_MY_TASKS} replace />
   }
 
@@ -298,7 +298,7 @@ const useRouteElement = () => {
     // Employee Module
     {
       path: PATH.EMPLOYEE,
-      element: <ProtectedRouter roles={['staff', 'leader']} />,
+      element: <ProtectedRouter roles={['EMPLOYEE', 'PROJECTMANAGER']} />,
       children: [
         {
           index: true,
@@ -340,7 +340,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MY_TASKS,
           element: (
-            <RoleGuard roles={['staff']}>
+            <RoleGuard roles={['EMPLOYEE']}>
               <EmployeeLayout>
                 <MyTasks />
               </EmployeeLayout>
@@ -350,7 +350,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MY_PERFORMANCE,
           element: (
-            <RoleGuard roles={['staff']}>
+            <RoleGuard roles={['EMPLOYEE']}>
               <EmployeeLayout>
                 <MyPerformance />
               </EmployeeLayout>
@@ -361,7 +361,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
           element: (
-            <RoleGuard roles={['leader']}>
+            <RoleGuard roles={['PROJECTMANAGER']}>
               <EmployeeLayout>
                 <ProjectReports />
               </EmployeeLayout>
@@ -371,7 +371,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_LEAD_BACKLOG,
           element: (
-            <RoleGuard roles={['leader']}>
+            <RoleGuard roles={['PROJECTMANAGER']}>
               <EmployeeLayout>
                 <BackLogs />
               </EmployeeLayout>
@@ -381,7 +381,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_LEAD_MEMBER_REPORTS,
           element: (
-            <RoleGuard roles={['leader']}>
+            <RoleGuard roles={['PROJECTMANAGER']}>
               <EmployeeLayout>
                 <MemberReports />
               </EmployeeLayout>
