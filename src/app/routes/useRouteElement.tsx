@@ -33,6 +33,7 @@ import type { ReactNode } from 'react'
 import Forbidden from '../pages/Forbidden/Forbidden'
 import NotFound from '../pages/NotFound/NotFound'
 import ForgotPassword from '../modules/Auth/ForgotPassword/ForgotPassword'
+import AdminReports from '@/app/modules/AdminWs/AdminReports/AdminReports'
 
 const RejectedRouter = () => {
   // const { currentRole } = useSelector((state) => state.role);
@@ -41,7 +42,7 @@ const RejectedRouter = () => {
   if (storedRole) {
     const redirectMap: Record<string, string> = {
       'super-admin': PATH.SUPER_ADMIN,
-      'admin-ws': PATH.ADMIN,
+      ADMIN: PATH.ADMIN,
       leader: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
       staff: PATH.EMPLOYEE_MY_TASKS
     }
@@ -64,7 +65,7 @@ const RejectedAuthRouter = () => {
 
   const redirectMap: Record<string, string> = {
     'super-admin': PATH.SUPER_ADMIN,
-    'admin-ws': PATH.ADMIN,
+    ADMIN: PATH.ADMIN,
     PROJECTMANAGER: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
     EMPLOYEE: PATH.EMPLOYEE_MY_TASKS
   }
@@ -76,6 +77,7 @@ const RejectedAuthRouter = () => {
 
 const ProtectedRouter = ({ roles }: { roles: string[] }) => {
   const storedRole = localStorage.getItem('role')
+  console.log('storedRole: ', storedRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
@@ -231,7 +233,7 @@ const useRouteElement = () => {
     // Admin Ws Module
     {
       path: PATH.ADMIN,
-      element: <ProtectedRouter roles={['admin-ws']} />,
+      element: <ProtectedRouter roles={['ADMIN']} />,
       children: [
         {
           index: true,
@@ -242,6 +244,14 @@ const useRouteElement = () => {
           element: (
             <AdminWsLayout>
               <DashboardAdmin />
+            </AdminWsLayout>
+          )
+        },
+        {
+          path: PATH.ADMIN_MY_REPORT,
+          element: (
+            <AdminWsLayout>
+              <AdminReports />
             </AdminWsLayout>
           )
         },
