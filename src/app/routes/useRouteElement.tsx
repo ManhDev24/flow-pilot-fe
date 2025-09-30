@@ -19,8 +19,6 @@ import WorkspaceDetail from '../modules/SuperAdmin/WorkspaceDetail/WorkspaceDeta
 import MyEmployeeDetail from '../modules/AdminWs/MyEmployeeDetail/MyEmployeeDetail'
 import MyProjectDetail from '../modules/AdminWs/MyProjectDetail/MyProjectDetail'
 import EmployeeLayout from '../layouts/EmployeeLayout/EmployeeLayout'
-import ProjectReports from '../modules/Employee/ProjectReports/ProjectReports'
-import BackLogs from '../modules/Employee/BackLogs/BackLogs'
 import MemberReports from '../modules/Employee/MemberReports/MemberReports'
 import AdminSettings from '../modules/AdminWs/AdminSettings/AdminSettings'
 import AccountSettings from '../modules/Employee/AccountSettings/AccountSettings'
@@ -34,6 +32,12 @@ import Forbidden from '../pages/Forbidden/Forbidden'
 import NotFound from '../pages/NotFound/NotFound'
 import ForgotPassword from '../modules/Auth/ForgotPassword/ForgotPassword'
 import AdminReports from '@/app/modules/AdminWs/AdminReports/AdminReports'
+import ManagerLayout from '@/app/layouts/ManagerLayout/ManagerLayout'
+import KanbanBoardManager from '@/app/modules/Manager/KanBoardManager/KanbanBoardManager'
+import MyTeamManager from '@/app/modules/Manager/MyTeamManager/MyTeamManager'
+import MyPerformanceManager from '@/app/modules/Manager/MyPerformanceManager/MyPerformanceManager'
+import MyFileManager from '@/app/modules/Manager/MyFileManager/MyFileManager'
+import ProjectReport from '@/app/modules/Manager/ProjectReport/ProjectReport'
 
 const RejectedRouter = () => {
   // const { currentRole } = useSelector((state) => state.role);
@@ -43,8 +47,9 @@ const RejectedRouter = () => {
     const redirectMap: Record<string, string> = {
       'super-admin': PATH.SUPER_ADMIN,
       ADMIN: PATH.ADMIN,
-      leader: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
-      staff: PATH.EMPLOYEE_MY_TASKS
+      leader: PATH.EMPLOYEE_MANAGE_MY_TASKS,
+      staff: PATH.EMPLOYEE_MY_TASKS,
+      manager: PATH.EMPLOYEE_MANAGE_MY_TASKS
     }
 
     const redirectPath = redirectMap[storedRole]
@@ -66,7 +71,7 @@ const RejectedAuthRouter = () => {
   const redirectMap: Record<string, string> = {
     'super-admin': PATH.SUPER_ADMIN,
     ADMIN: PATH.ADMIN,
-    PROJECTMANAGER: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
+    PROJECTMANAGER: PATH.EMPLOYEE_MANAGE_PROJECTS,
     EMPLOYEE: PATH.EMPLOYEE_MY_TASKS
   }
 
@@ -111,13 +116,23 @@ const EmployeeIndexPage = () => {
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
-
-  if (storedRole === 'PROJECTMANAGER') {
-    return <Navigate to={PATH.EMPLOYEE_LEAD_PROJECT_REPORTS} replace />
-  }
-
   if (storedRole === 'EMPLOYEE') {
     return <Navigate to={PATH.EMPLOYEE_MY_TASKS} replace />
+  }
+
+  return <Navigate to={PATH.FORBIDDEN} replace />
+}
+
+const EmployeeManagerIndexPage = () => {
+  // const { currentRole } = useSelector((state) => state.role);
+  const storedRole = localStorage.getItem('role')
+
+  if (!storedRole) {
+    return <Navigate to={PATH.LOGIN} replace />
+  }
+
+  if (storedRole === 'PROJECTMANAGER') {
+    return <Navigate to={PATH.EMPLOYEE_MANAGE_PROJECTS} replace />
   }
 
   return <Navigate to={PATH.FORBIDDEN} replace />
@@ -366,35 +381,73 @@ const useRouteElement = () => {
               </EmployeeLayout>
             </RoleGuard>
           )
-        },
-        // Team leader only
+        }
+      ]
+    },
+
+    {
+      path: PATH.EMPLOYEE_MANAGER,
+      element: <ProtectedRouter roles={['PROJECTMANAGER']} />,
+      children: [
         {
-          path: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
+          index: true,
+          element: <EmployeeManagerIndexPage />
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_TASKS,
+          element: (
+            <ManagerLayout>
+              <MemberReports />
+            </ManagerLayout>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_KANBAN,
           element: (
             <RoleGuard roles={['PROJECTMANAGER']}>
-              <EmployeeLayout>
-                <ProjectReports />
-              </EmployeeLayout>
+              <ManagerLayout>
+                <KanbanBoardManager />
+              </ManagerLayout>
             </RoleGuard>
           )
         },
         {
-          path: PATH.EMPLOYEE_LEAD_BACKLOG,
+          path: PATH.EMPLOYEE_MANAGE_MY_TEAM,
           element: (
             <RoleGuard roles={['PROJECTMANAGER']}>
-              <EmployeeLayout>
-                <BackLogs />
-              </EmployeeLayout>
+              <ManagerLayout>
+                <MyTeamManager />
+              </ManagerLayout>
             </RoleGuard>
           )
         },
         {
-          path: PATH.EMPLOYEE_LEAD_MEMBER_REPORTS,
+          path: PATH.EMPLOYEE_MANAGE_BACKLOG,
           element: (
             <RoleGuard roles={['PROJECTMANAGER']}>
-              <EmployeeLayout>
-                <MemberReports />
-              </EmployeeLayout>
+              <ManagerLayout>
+                <MyPerformanceManager />
+              </ManagerLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_FILES,
+          element: (
+            <RoleGuard roles={['PROJECTMANAGER']}>
+              <ManagerLayout>
+                <MyFileManager />
+              </ManagerLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_PROJECTS,
+          element: (
+            <RoleGuard roles={['PROJECTMANAGER']}>
+              <ManagerLayout>
+                <ProjectReport />
+              </ManagerLayout>
             </RoleGuard>
           )
         }
