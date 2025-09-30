@@ -25,12 +25,13 @@ import { Switch } from '@/app/components/ui/switch'
 export default function FlowpilotDashboard() {
   const [focusDuration, setFocusDuration] = useState([25])
   const [breakDuration, setBreakDuration] = useState([5])
-  const [currentTime, setCurrentTime] = useState(25 * 60) // Will be updated based on settings
-  const [initialTime, setInitialTime] = useState(25 * 60) // Track initial time for circle calculation
+  const [currentTime, setCurrentTime] = useState(25 * 60)
+  const [initialTime, setInitialTime] = useState(25 * 60)
   const [isRunning, setIsRunning] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false) // Track if timer completed
+  const [isCompleted, setIsCompleted] = useState(false)
   const [selectedMode, setSelectedMode] = useState('pomodoro')
-  const [notifications, setNotifications] = useState(true)
+  const [isBreakMode, setIsBreakMode] = useState(false)
+  const [showAlert, setShowAlert] = useState(false)
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -38,8 +39,8 @@ export default function FlowpilotDashboard() {
       interval = setInterval(() => {
         setCurrentTime((time) => {
           if (time <= 1) {
+            setShowAlert(true)
             setIsRunning(false)
-            setIsCompleted(true)
             return 0
           }
           return time - 1
@@ -73,6 +74,8 @@ export default function FlowpilotDashboard() {
   const handleReset = () => {
     setIsRunning(false)
     setIsCompleted(false)
+    setIsBreakMode(false)
+    setShowAlert(false)
     const newTime = getTimeForMode(selectedMode)
     setCurrentTime(newTime)
     setInitialTime(newTime)
@@ -96,7 +99,6 @@ export default function FlowpilotDashboard() {
     setIsRunning(false)
     setIsCompleted(false)
 
-    // Update focus duration based on mode
     let newFocusDuration, newBreakDuration
     switch (mode) {
       case 'pomodoro':
@@ -124,12 +126,29 @@ export default function FlowpilotDashboard() {
     setInitialTime(newTime)
   }
 
+  // Sửa tính toán circle progress để đồng bộ với thời gian
   const getCircleProgress = () => {
     if (isCompleted) {
-      return 0
+      return 2 * Math.PI * 45 // Full circle when completed
     }
-    const progress = currentTime / initialTime
-    return 2 * Math.PI * 45 * (1 - progress)
+    const progress = (initialTime - currentTime) / initialTime // Tính theo thời gian đã trôi qua
+    return 2 * Math.PI * 45 * progress
+  }
+
+  // Handle continue break time
+  const handleContinueBreak = () => {
+    setShowAlert(false)
+    if (!isBreakMode) {
+      setIsBreakMode(true)
+      const breakTime = breakDuration[0] * 60
+      setCurrentTime(breakTime)
+      setInitialTime(breakTime)
+      setIsRunning(true)
+    } else {
+      setIsBreakMode(false)
+      setIsCompleted(true)
+      handleReset()
+    }
   }
 
   const weeklyData = [
@@ -146,6 +165,41 @@ export default function FlowpilotDashboard() {
 
   return (
     <div className=''>
+      {/* Alert Popup - Updated */}
+      {showAlert && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='bg-white rounded-lg p-6 max-w-sm mx-4 text-center shadow-xl'>
+            <div className='mb-4'>
+              <div className='w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3'>
+                <CheckCircle className='w-8 h-8 text-indigo-600' />
+              </div>
+              <h3 className='text-lg font-semibold text-gray-900 mb-2'>
+                {!isBreakMode ? 'Focus Time Complete!' : 'Break Time Complete!'}
+              </h3>
+              <p className='text-gray-600'>
+                {!isBreakMode
+                  ? `Great work! Ready for a ${breakDuration[0]} minute break?`
+                  : 'Break is over! Ready for another focus session?'}
+              </p>
+            </div>
+            <div className='flex gap-3 justify-center'>
+              <Button onClick={handleContinueBreak} className='bg-indigo-600 hover:bg-indigo-700 text-white px-6'>
+                {!isBreakMode ? 'Start Break' : 'New Session'}
+              </Button>
+              <Button
+                variant='outline'
+                onClick={() => {
+                  setShowAlert(false)
+                  handleReset()
+                }}
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className=' p-6'>
         {/* Metrics Cards */}
@@ -209,56 +263,93 @@ export default function FlowpilotDashboard() {
 
         <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
           {/* Timer Section */}
-
           <div className='col-span-3 '>
             {/* Timer Mode Buttons */}
             <Card className='mb-8'>
-              <CardContent className='space-y-8'>
+              <CardContent className='space-y-8 pt-6'>
                 {/* Timer Mode Buttons */}
                 <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
                   <Button
                     variant={selectedMode === 'pomodoro' ? 'default' : 'outline'}
                     onClick={() => handleModeChange('pomodoro')}
-                    className={selectedMode === 'pomodoro' ? 'bg-indigo-600 text-white' : ''}
+                    className={selectedMode === 'pomodoro' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}
                   >
-                    Pomodoro ({focusDuration[0]}/{breakDuration[0]})
+                    Pomodoro (25/5)
                   </Button>
                   <Button
                     variant={selectedMode === 'deep' ? 'default' : 'outline'}
                     onClick={() => handleModeChange('deep')}
-                    className={selectedMode === 'deep' ? 'bg-indigo-600 text-white' : ''}
+                    className={selectedMode === 'deep' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}
                   >
                     Deep Work (45/10)
                   </Button>
                   <Button
                     variant={selectedMode === 'marathon' ? 'default' : 'outline'}
                     onClick={() => handleModeChange('marathon')}
-                    className={selectedMode === 'marathon' ? 'bg-indigo-600 text-white' : ''}
+                    className={selectedMode === 'marathon' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}
                   >
                     Marathon (60/15)
                   </Button>
                 </div>
 
-                {/* Timer Circle */}
+                {/* Timer Circle - Updated */}
                 <div className='flex justify-center'>
                   <div className='relative w-72 h-72'>
-                    <svg className='w-full h-full transform -rotate-90' viewBox='0 0 100 100'>
-                      <circle cx='50' cy='50' r='45' stroke='#e5e7eb' strokeWidth='2' fill='none' />
+                    <svg className='w-full h-full' viewBox='0 0 100 100'>
+                      {/* Background Circle */}
+                      <circle cx='50' cy='50' r='45' stroke='#e5e7eb' strokeWidth='3' fill='none' />
+
+                      {/* Countdown Circle - Updated to use indigo-600 only */}
                       <circle
                         cx='50'
                         cy='50'
                         r='45'
-                        stroke={isCompleted ? '#ffffff' : '#6366f1'}
-                        strokeWidth='2'
+                        stroke='#4f46e5'
+                        strokeWidth='4'
                         fill='none'
                         strokeDasharray={`${2 * Math.PI * 45}`}
-                        strokeDashoffset={getCircleProgress()}
-                        className='transition-all duration-1000 ease-linear'
+                        strokeDashoffset={2 * Math.PI * 45 - getCircleProgress()}
                         strokeLinecap='round'
+                        style={{
+                          transform: 'rotate(-90deg)',
+                          transformOrigin: '50% 50%',
+                          transition: 'stroke-dashoffset 1s linear'
+                        }}
                       />
+
+                      {/* Glow effect when running */}
+                      {/* {isRunning && (
+                        <circle
+                          cx='50'
+                          cy='50'
+                          r='45'
+                          stroke='#4f46e5'
+                          strokeWidth='2'
+                          fill='none'
+                          opacity='0.3'
+                          strokeDasharray={`${2 * Math.PI * 45}`}
+                          strokeDashoffset={2 * Math.PI * 45 - getCircleProgress()}
+                          strokeLinecap='round'
+                          style={{
+                            transform: 'rotate(-90deg)',
+                            transformOrigin: '50% 50%',
+                            transition: 'stroke-dashoffset 0.1s linear'
+                          }}
+                        />
+                      )} */}
                     </svg>
-                    <div className='absolute inset-0 flex items-center justify-center'>
-                      <span className={`text-5xl font-light ${isCompleted ? 'text-white' : 'text-indigo-600'}`}>
+
+                    {/* Time Text - Updated */}
+                    <div className='absolute inset-0 flex flex-col items-center justify-center'>
+                      {isBreakMode && <span className='text-sm font-medium text-indigo-600 mb-1'>Break Time</span>}
+                      <span
+                        className={`text-5xl font-light transition-colors duration-500 ${
+                          isCompleted ? 'text-gray-400' : 'text-indigo-600'
+                        }`}
+                        style={{
+                          textShadow: isRunning ? '0 2px 4px rgba(79, 70, 229, 0.1)' : 'none'
+                        }}
+                      >
                         {formatTime(currentTime)}
                       </span>
                     </div>
@@ -404,7 +495,6 @@ export default function FlowpilotDashboard() {
                     value={focusDuration}
                     onValueChange={(value) => {
                       setFocusDuration(value)
-                      // Update selected mode to custom when manually adjusting
                       if (selectedMode !== 'custom') {
                         setSelectedMode('custom')
                       }
@@ -424,7 +514,6 @@ export default function FlowpilotDashboard() {
                     value={breakDuration}
                     onValueChange={(value) => {
                       setBreakDuration(value)
-                      // Update selected mode to custom when manually adjusting
                       if (selectedMode !== 'custom') {
                         setSelectedMode('custom')
                       }
@@ -434,11 +523,6 @@ export default function FlowpilotDashboard() {
                     step={5}
                     className='w-full'
                   />
-                </div>
-
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium'>Enable Notifications</span>
-                  <Switch checked={notifications} onCheckedChange={setNotifications} />
                 </div>
               </CardContent>
             </Card>

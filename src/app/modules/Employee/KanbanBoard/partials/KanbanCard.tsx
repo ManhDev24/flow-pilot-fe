@@ -50,7 +50,7 @@ export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars
     >
       {image && (
         <div className='relative h-40 w-full bg-muted'>
-          <image src={image} alt={title} className='object-cover' />
+          <img src={image} alt={title} className='object-cover' />
         </div>
       )}
       <div className='p-4'>

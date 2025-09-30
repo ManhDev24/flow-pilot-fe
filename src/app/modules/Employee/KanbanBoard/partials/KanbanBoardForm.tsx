@@ -42,7 +42,7 @@ const initialColumns: Column[] = [
     cards: [
       {
         id: '1',
-        image: '/succulent-plant-in-mint-pot.jpg',
+        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
         title: 'Commodo ex esse in no',
         tags: [
           { label: 'Research', color: 'purple' },
@@ -144,7 +144,7 @@ const initialColumns: Column[] = [
       },
       {
         id: '9',
-        image: '/cactus-in-orange-pot.jpg',
+        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
         title: 'In sunt proident officia pariatur lorem magna ex consequat',
         tags: [{ label: 'Medium', color: 'purple' }],
         subtasks: 3,
@@ -168,7 +168,7 @@ const initialColumns: Column[] = [
       },
       {
         id: '11',
-        image: '/tall-cactus-in-beige-pot.jpg',
+        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
         title: 'Duis irure aliqua officia tempor in excepteur quis',
         tags: [{ label: 'Improvement', color: 'pink' }],
         subtasks: 3,
@@ -183,7 +183,7 @@ const initialColumns: Column[] = [
     cards: [
       {
         id: '12',
-        image: '/purple-flowers-in-white-vases.jpg',
+        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
         title: 'Duis ea aute ipsum nostrud laboris quis dolore consectetur cupidatat esse aute aliqua',
         tags: [
           { label: 'Backlog', color: 'red' },
