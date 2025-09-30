@@ -1,5 +1,7 @@
+import { FileManagerDashboard } from '@/app/modules/Manager/MyFileManager/partials/FileManagerDashboard'
+
 function MyFileManager() {
-  return <div>MyFileManager</div>
+  return <FileManagerDashboard />
 }
 
 export default MyFileManager

@@ -1,5 +1,7 @@
+import { KanbanBoardForm } from '@/app/modules/Manager/KanBoardManager/partials/KanbanBoardForm'
+
 function KanbanBoardManager() {
-  return <div>KanbanBoardManager</div>
+  return <KanbanBoardForm />
 }
 
 export default KanbanBoardManager

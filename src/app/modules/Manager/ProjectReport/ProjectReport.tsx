@@ -1,5 +1,7 @@
+import { ProjectReportDashboard } from '@/app/modules/Manager/ProjectReport/partials/ProjectReportDashboard'
+
 function ProjectReport() {
-  return <div>ProjectReport</div>
+  return <ProjectReportDashboard />
 }
 
 export default ProjectReport
