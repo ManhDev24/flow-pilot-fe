@@ -30,7 +30,6 @@ import { Badge } from '@/app/components/ui/badge'
 import { Textarea } from '@/app/components/ui/textarea'
 import { Separator } from '@/app/components/ui/separator'
 import { Checkbox } from '@/app/components/ui/checkbox'
-import { stat } from 'fs'
 
 export default function MyTasksPage() {
   const [selectedTask, setSelectedTask] = useState('design-marketing')
@@ -128,7 +127,7 @@ export default function MyTasksPage() {
   return (
     <div className=' h-screen'>
       <div className='flex-1 flex'>
-        <div className='w-96 bg-white border-r border-gray-200 flex flex-col'>
+        <div className='w-90 bg-white border-r border-gray-200 flex flex-col'>
           <div className='p-4 border-b border-gray-200'>
             <h1 className='text-xl font-semibold text-gray-900 mb-4'>My Tasks</h1>
             <div className='flex space-x-2'>

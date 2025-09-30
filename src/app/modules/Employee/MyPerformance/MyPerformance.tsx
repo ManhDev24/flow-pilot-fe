@@ -132,15 +132,6 @@ export default function FlowpilotDashboard() {
     return 2 * Math.PI * 45 * (1 - progress)
   }
 
-  const sidebarItems = [
-    { icon: Calendar, label: 'My Tasks', active: false },
-    { icon: BarChart3, label: 'Kanban', active: false },
-    { icon: Users, label: 'My Team', active: false },
-    { icon: Timer, label: 'My performance', active: true },
-    { icon: Folder, label: 'My File', active: false },
-    { icon: Settings, label: 'Settings', active: false }
-  ]
-
   const weeklyData = [
     { day: 'Mon', hours: 4 },
     { day: 'Tue', hours: 5 },
@@ -154,49 +145,11 @@ export default function FlowpilotDashboard() {
   const maxHours = Math.max(...weeklyData.map((d) => d.hours))
 
   return (
-    <div className='min-h-screen bg-gray-50 flex'>
-      {/* Left Sidebar */}
-      <div className='w-64 bg-white border-r border-gray-200 p-4'>
-        <div className='flex items-center gap-2 mb-8'>
-          <div className='w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center'>
-            <span className='text-white font-bold text-sm'>F</span>
-          </div>
-          <span className='font-bold text-lg'>FLOWPILOT</span>
-        </div>
-
-        <nav className='space-y-2'>
-          {sidebarItems.map((item, index) => (
-            <div
-              key={index}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
-                item.active ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              <item.icon className='w-5 h-5' />
-              <span className='font-medium'>{item.label}</span>
-            </div>
-          ))}
-        </nav>
-      </div>
-
+    <div className=''>
       {/* Main Content */}
-      <div className='flex-1 p-6'>
-        {/* Header */}
-        <div className='flex items-center justify-between mb-6'>
-          <div className='flex items-center gap-2 text-sm text-gray-500'>
-            <Clock className='w-4 h-4' />
-            <span>Last 7 Days</span>
-          </div>
-          <div className='flex items-center gap-4'>
-            <Bell className='w-5 h-5 text-gray-400' />
-            <div className='w-8 h-8 bg-red-500 rounded-full flex items-center justify-center'>
-              <span className='text-white text-sm font-medium'>1</span>
-            </div>
-          </div>
-        </div>
-
+      <div className=' p-6'>
         {/* Metrics Cards */}
-        <div className='grid grid-cols-4 gap-6 mb-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
           <Card>
             <CardContent className='p-6'>
               <div className='flex items-center justify-between'>
@@ -254,73 +207,77 @@ export default function FlowpilotDashboard() {
           </Card>
         </div>
 
-        <div className='grid grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
           {/* Timer Section */}
-          <div className='col-span-2'>
+
+          <div className='col-span-3 '>
             {/* Timer Mode Buttons */}
-            <div className='flex gap-2 mb-6'>
-              <Button
-                variant={selectedMode === 'pomodoro' ? 'default' : 'outline'}
-                onClick={() => handleModeChange('pomodoro')}
-                className={selectedMode === 'pomodoro' ? 'bg-indigo-600' : ''}
-              >
-                Pomodoro ({focusDuration[0]}/{breakDuration[0]})
-              </Button>
-              <Button
-                variant={selectedMode === 'deep' ? 'default' : 'outline'}
-                onClick={() => handleModeChange('deep')}
-                className={selectedMode === 'deep' ? 'bg-indigo-600' : ''}
-              >
-                Deep Work (45/10)
-              </Button>
-              <Button
-                variant={selectedMode === 'marathon' ? 'default' : 'outline'}
-                onClick={() => handleModeChange('marathon')}
-                className={selectedMode === 'marathon' ? 'bg-indigo-600' : ''}
-              >
-                Marathon (60/15)
-              </Button>
-            </div>
-
-            {/* Timer Circle */}
-            <div className='flex justify-center mb-8'>
-              <div className='relative w-80 h-80'>
-                <svg className='w-full h-full transform -rotate-90' viewBox='0 0 100 100'>
-                  {/* Background circle */}
-                  <circle cx='50' cy='50' r='45' stroke='#e5e7eb' strokeWidth='2' fill='none' />
-                  {/* Progress circle */}
-                  <circle
-                    cx='50'
-                    cy='50'
-                    r='45'
-                    stroke={isCompleted ? '#ffffff' : '#6366f1'}
-                    strokeWidth='2'
-                    fill='none'
-                    strokeDasharray={`${2 * Math.PI * 45}`}
-                    strokeDashoffset={getCircleProgress()}
-                    className='transition-all duration-1000 ease-linear'
-                    strokeLinecap='round'
-                  />
-                </svg>
-                <div className='absolute inset-0 flex items-center justify-center'>
-                  <span className={`text-6xl font-light ${isCompleted ? 'text-white' : 'text-indigo-600'}`}>
-                    {formatTime(currentTime)}
-                  </span>
+            <Card className='mb-8'>
+              <CardContent className='space-y-8'>
+                {/* Timer Mode Buttons */}
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+                  <Button
+                    variant={selectedMode === 'pomodoro' ? 'default' : 'outline'}
+                    onClick={() => handleModeChange('pomodoro')}
+                    className={selectedMode === 'pomodoro' ? 'bg-indigo-600 text-white' : ''}
+                  >
+                    Pomodoro ({focusDuration[0]}/{breakDuration[0]})
+                  </Button>
+                  <Button
+                    variant={selectedMode === 'deep' ? 'default' : 'outline'}
+                    onClick={() => handleModeChange('deep')}
+                    className={selectedMode === 'deep' ? 'bg-indigo-600 text-white' : ''}
+                  >
+                    Deep Work (45/10)
+                  </Button>
+                  <Button
+                    variant={selectedMode === 'marathon' ? 'default' : 'outline'}
+                    onClick={() => handleModeChange('marathon')}
+                    className={selectedMode === 'marathon' ? 'bg-indigo-600 text-white' : ''}
+                  >
+                    Marathon (60/15)
+                  </Button>
                 </div>
-              </div>
-            </div>
 
-            {/* Timer Controls */}
-            <div className='flex justify-center gap-4 mb-8'>
-              <Button onClick={handleStart} className='bg-indigo-600 hover:bg-indigo-700 px-8'>
-                <Play className='w-4 h-4 mr-2' />
-                {isCompleted ? 'Start' : isRunning ? 'Pause' : 'Start'}
-              </Button>
-              <Button variant='outline' onClick={handleReset}>
-                <RotateCcw className='w-4 h-4 mr-2' />
-                Reset
-              </Button>
-            </div>
+                {/* Timer Circle */}
+                <div className='flex justify-center'>
+                  <div className='relative w-72 h-72'>
+                    <svg className='w-full h-full transform -rotate-90' viewBox='0 0 100 100'>
+                      <circle cx='50' cy='50' r='45' stroke='#e5e7eb' strokeWidth='2' fill='none' />
+                      <circle
+                        cx='50'
+                        cy='50'
+                        r='45'
+                        stroke={isCompleted ? '#ffffff' : '#6366f1'}
+                        strokeWidth='2'
+                        fill='none'
+                        strokeDasharray={`${2 * Math.PI * 45}`}
+                        strokeDashoffset={getCircleProgress()}
+                        className='transition-all duration-1000 ease-linear'
+                        strokeLinecap='round'
+                      />
+                    </svg>
+                    <div className='absolute inset-0 flex items-center justify-center'>
+                      <span className={`text-5xl font-light ${isCompleted ? 'text-white' : 'text-indigo-600'}`}>
+                        {formatTime(currentTime)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timer Controls */}
+                <div className='flex justify-center gap-4'>
+                  <Button onClick={handleStart} className='bg-indigo-600 hover:bg-indigo-700 px-8'>
+                    <Play className='w-4 h-4 mr-2' />
+                    {isCompleted ? 'Start' : isRunning ? 'Pause' : 'Start'}
+                  </Button>
+                  <Button variant='outline' onClick={handleReset}>
+                    <RotateCcw className='w-4 h-4 mr-2' />
+                    Reset
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Today's Schedule */}
             <Card>
@@ -589,29 +546,6 @@ export default function FlowpilotDashboard() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <div className='mt-8 flex items-center gap-2 text-xs text-gray-400'>
-          <span>Made with</span>
-          <div className='flex items-center gap-1'>
-            <div className='w-4 h-4 bg-purple-600 rounded flex items-center justify-center'>
-              <span className='text-white text-xs'>V</span>
-            </div>
-            <span>Visily</span>
-          </div>
-        </div>
-      </div>
-
-      {/* User Profile */}
-      <div className='absolute bottom-6 left-6 flex items-center gap-3'>
-        <div className='w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center'>
-          <User className='w-5 h-5 text-gray-600' />
-        </div>
-        <div>
-          <p className='text-sm font-medium'>John Doe</p>
-          <p className='text-xs text-gray-500'>UI/UX Designer</p>
-        </div>
-        <Settings className='w-4 h-4 text-gray-400 cursor-pointer' />
       </div>
     </div>
   )
