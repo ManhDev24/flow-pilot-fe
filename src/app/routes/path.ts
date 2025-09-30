@@ -34,9 +34,15 @@ export const PATH = {
   EMPLOYEE_MY_TASKS: '/emp/my-tasks',
   EMPLOYEE_MY_PERFORMANCE: '/emp/my-performance',
   // TEAM LEADER
-  EMPLOYEE_LEAD_BACKLOG: '/emp/back-log',
-  EMPLOYEE_LEAD_MEMBER_REPORTS: '/emp/my-team/member-reports/:id',
-  EMPLOYEE_LEAD_PROJECT_REPORTS: '/emp/project-reports',
+
+  EMPLOYEE_MANAGER: '/emp/mng',
+  EMPLOYEE_MANAGE_PROJECTS: '/emp/mng/my-projects',
+  EMPLOYEE_MANAGE_MY_TASKS: '/emp/mng/my-tasks',
+  EMPLOYEE_MANAGE_KANBAN: '/emp/mng/kanban-board',
+  EMPLOYEE_MANAGE_MY_TEAM: '/emp/mng/my-team',
+  EMPLOYEE_MANAGE_MY_PERFORMANCE: '/emp/mng/my-performance',
+  EMPLOYEE_MANAGE_MY_FILES: '/emp/mng/my-files',
+  EMPLOYEE_MANAGE_BACKLOG: '/emp/mng/backlog',
   // EMPLOYEE_LEAD: '/emp/team-lead',
   // EMPLOYEE_STAFF: '/emp/staff',
   FORBIDDEN: '/403',
