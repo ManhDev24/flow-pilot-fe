@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import {
   Sidebar,
   SidebarContent,
@@ -9,18 +9,18 @@ import {
   SidebarMenuItem,
   SidebarProvider
 } from '@/app/components/ui/sidebar'
-import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Briefcase, Settings, ClipboardPlus } from 'lucide-react'
-import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import { PATH } from '@/app/routes/path'
+import { ClipboardPlus, Folder, LayoutDashboard, User } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 function AdminWsLayout({ children }: { children: ReactNode }) {
   const location = useLocation()
 
   const navigationItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: `${PATH.ADMIN_DASHBOARD}` },
-    { icon: ClipboardPlus, label: 'Report', to: `${PATH.ADMIN_DASHBOARD}` },
-    { icon: Briefcase, label: 'Workspaces', to: `${PATH.SUPER_ADMIN_WORKSPACES}` },
-    { icon: Settings, label: 'Settings', to: `${PATH.ADMIN_SETTINGS}` }
+    { icon: ClipboardPlus, label: 'Report', to: `${PATH.ADMIN_MY_REPORT}` },
+    { icon: User, label: 'Employees', to: `${PATH.ADMIN_MY_EMPLOYEES}` },
+    { icon: Folder, label: 'Project', to: `${PATH.ADMIN_SETTINGS}` }
   ]
   return (
     <SidebarProvider>
