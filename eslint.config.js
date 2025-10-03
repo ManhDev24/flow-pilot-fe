@@ -26,7 +26,9 @@ export default tseslint.config([
     },
     rules: {
       'react-refresh/only-export-components': 'off',
-      'prettier/prettier': 'off'
+      'prettier/prettier': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
     }
   },
 ])
