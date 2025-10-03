@@ -5,6 +5,9 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './App.tsx'
 import './index.css'
+import { Provider } from 'react-redux'
+import store from './app/redux/store.ts'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -15,10 +18,12 @@ const queryClient = new QueryClient({
 })
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-      <App />
-      <ToastContainer />
-    </QueryClientProvider>
-  </BrowserRouter>
+  <Provider store={store}>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ToastContainer />
+      </QueryClientProvider>
+    </BrowserRouter>
+  </Provider>
 )
