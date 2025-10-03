@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getLocalStorage, removeLocalStorage, setLocalStorage } from '../utils';
 import type { IUserStatePayload } from '../models';
-import type { LoginResponse, LoginResponseData } from '../modules/Auth/Login/models/LoginFormInterface';
+import type { LoginResponseData } from '../modules/Auth/Login/models/LoginFormInterface';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
