@@ -12,6 +12,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { object, string } from 'yup'
 import type { LoginForm } from './models/LoginFormInterface'
+
 const loginFormSchema = object({
   email: string().email('Invalid email address').required('Email is required'),
   password: string()

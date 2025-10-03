@@ -38,22 +38,23 @@ import MyTeamManager from '@/app/modules/Manager/MyTeamManager/MyTeamManager'
 import MyPerformanceManager from '@/app/modules/Manager/MyPerformanceManager/MyPerformanceManager'
 import MyFileManager from '@/app/modules/Manager/MyFileManager/MyFileManager'
 import ProjectReport from '@/app/modules/Manager/ProjectReport/ProjectReport'
+import { useSelector } from 'react-redux'
+import type { IUserState } from '../models'
+import { getLocalStorage } from '../utils'
+
+const redirectMap: Record<string, string> = {
+  superadmin: PATH.SUPER_ADMIN,
+  admin: PATH.ADMIN,
+  projectmanager: PATH.EMPLOYEE_MANAGE_MY_TASKS,
+  employee: PATH.EMPLOYEE_MY_TASKS
+}
 
 const RejectedRouter = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
+  const storedRole: string = currentUser?.role || getLocalStorage('role')
 
   if (storedRole) {
-    const redirectMap: Record<string, string> = {
-      'super-admin': PATH.SUPER_ADMIN,
-      ADMIN: PATH.ADMIN,
-      leader: PATH.EMPLOYEE_MANAGE_MY_TASKS,
-      staff: PATH.EMPLOYEE_MY_TASKS,
-      manager: PATH.EMPLOYEE_MANAGE_MY_TASKS
-    }
-
-    const redirectPath = redirectMap[storedRole]
-
+    const redirectPath = redirectMap[storedRole.toLowerCase()]
     return <Navigate to={redirectPath} replace />
   }
 
@@ -61,34 +62,27 @@ const RejectedRouter = () => {
 }
 
 const RejectedAuthRouter = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
+  const storedRole: string = currentUser?.role || getLocalStorage('role')
 
   if (!storedRole) {
     return <Outlet />
   }
 
-  const redirectMap: Record<string, string> = {
-    'super-admin': PATH.SUPER_ADMIN,
-    ADMIN: PATH.ADMIN,
-    PROJECTMANAGER: PATH.EMPLOYEE_MANAGE_PROJECTS,
-    EMPLOYEE: PATH.EMPLOYEE_MY_TASKS
-  }
-
-  const redirectPath = redirectMap[storedRole]
+  const redirectPath = redirectMap[storedRole.toLowerCase()]
 
   return redirectPath ? <Navigate to={redirectPath} replace /> : <Navigate to={PATH.HOME} replace />
 }
 
 const ProtectedRouter = ({ roles }: { roles: string[] }) => {
-  const storedRole = localStorage.getItem('role')
-  console.log('storedRole: ', storedRole)
+  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
+  const storedRole: string = currentUser?.role || getLocalStorage('role')
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole && roles.includes(storedRole)) {
+  if (storedRole && roles.includes(storedRole.toLowerCase())) {
     return <Outlet />
   }
 
@@ -96,13 +90,14 @@ const ProtectedRouter = ({ roles }: { roles: string[] }) => {
 }
 
 const RoleGuard = ({ roles, children }: { roles: string[]; children: ReactNode }) => {
-  const storedRole = localStorage.getItem('role')
+  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
+  const storedRole: string = currentUser?.role || getLocalStorage('role')
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole && roles.includes(storedRole)) {
+  if (storedRole && roles.includes(storedRole.toLowerCase())) {
     return <>{children}</>
   }
 
@@ -110,13 +105,13 @@ const RoleGuard = ({ roles, children }: { roles: string[]; children: ReactNode }
 }
 
 const EmployeeIndexPage = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
+  const storedRole: string = currentUser?.role || getLocalStorage('role')
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
-  if (storedRole === 'EMPLOYEE') {
+  if (storedRole.toLowerCase() === 'employee') {
     return <Navigate to={PATH.EMPLOYEE_MY_TASKS} replace />
   }
 
@@ -124,14 +119,14 @@ const EmployeeIndexPage = () => {
 }
 
 const EmployeeManagerIndexPage = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
+  const storedRole: string = currentUser?.role || getLocalStorage('role')
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole === 'PROJECTMANAGER') {
+  if (storedRole.toLowerCase() === 'projectmanager') {
     return <Navigate to={PATH.EMPLOYEE_MANAGE_PROJECTS} replace />
   }
 
@@ -205,7 +200,7 @@ const useRouteElement = () => {
     // Super Admin Module
     {
       path: PATH.SUPER_ADMIN,
-      element: <ProtectedRouter roles={['super-admin']} />,
+      element: <ProtectedRouter roles={['superadmin']} />,
       children: [
         {
           index: true,
@@ -248,7 +243,7 @@ const useRouteElement = () => {
     // Admin Ws Module
     {
       path: PATH.ADMIN,
-      element: <ProtectedRouter roles={['ADMIN']} />,
+      element: <ProtectedRouter roles={['admin']} />,
       children: [
         {
           index: true,
@@ -323,7 +318,7 @@ const useRouteElement = () => {
     // Employee Module
     {
       path: PATH.EMPLOYEE,
-      element: <ProtectedRouter roles={['EMPLOYEE', 'PROJECTMANAGER']} />,
+      element: <ProtectedRouter roles={['employee', 'projectmanager']} />,
       children: [
         {
           index: true,
@@ -365,7 +360,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MY_TASKS,
           element: (
-            <RoleGuard roles={['EMPLOYEE']}>
+            <RoleGuard roles={['employee']}>
               <EmployeeLayout>
                 <MyTasks />
               </EmployeeLayout>
@@ -375,7 +370,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MY_PERFORMANCE,
           element: (
-            <RoleGuard roles={['EMPLOYEE']}>
+            <RoleGuard roles={['employee']}>
               <EmployeeLayout>
                 <MyPerformance />
               </EmployeeLayout>
@@ -387,7 +382,7 @@ const useRouteElement = () => {
 
     {
       path: PATH.EMPLOYEE_MANAGER,
-      element: <ProtectedRouter roles={['PROJECTMANAGER']} />,
+      element: <ProtectedRouter roles={['projectmanager']} />,
       children: [
         {
           index: true,
@@ -404,7 +399,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MANAGE_KANBAN,
           element: (
-            <RoleGuard roles={['PROJECTMANAGER']}>
+            <RoleGuard roles={['projectmanager']}>
               <ManagerLayout>
                 <KanbanBoardManager />
               </ManagerLayout>
@@ -414,7 +409,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MANAGE_MY_TEAM,
           element: (
-            <RoleGuard roles={['PROJECTMANAGER']}>
+            <RoleGuard roles={['projectmanager']}>
               <ManagerLayout>
                 <MyTeamManager />
               </ManagerLayout>
@@ -424,7 +419,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MANAGE_BACKLOG,
           element: (
-            <RoleGuard roles={['PROJECTMANAGER']}>
+            <RoleGuard roles={['projectmanager']}>
               <ManagerLayout>
                 <MyPerformanceManager />
               </ManagerLayout>
@@ -434,7 +429,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MANAGE_MY_FILES,
           element: (
-            <RoleGuard roles={['PROJECTMANAGER']}>
+            <RoleGuard roles={['projectmanager']}>
               <ManagerLayout>
                 <MyFileManager />
               </ManagerLayout>
@@ -444,7 +439,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MANAGE_PROJECTS,
           element: (
-            <RoleGuard roles={['PROJECTMANAGER']}>
+            <RoleGuard roles={['projectmanager']}>
               <ManagerLayout>
                 <ProjectReport />
               </ManagerLayout>

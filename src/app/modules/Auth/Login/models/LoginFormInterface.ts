@@ -19,5 +19,6 @@ export interface ErrorMessageObject {
 export interface LoginResponseData {
   accessToken: string
   refreshToken: string
+  wsid: string
   role: string
 }

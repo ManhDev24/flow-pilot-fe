@@ -1,17 +1,22 @@
 import axios from 'axios'
+import { getLocalStorage, removeLocalStorage, setLocalStorage } from '../utils';
+import type { IUserStatePayload } from '../models';
+import type { LoginResponse, LoginResponseData } from '../modules/Auth/Login/models/LoginFormInterface';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export const fetcher = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'x-api-key': import.meta.env.VITE_API_KEY
   }
 })
 
 fetcher.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  const userLocalStorage: IUserStatePayload = getLocalStorage('user');
+
+  if (userLocalStorage) {
+    config.headers.Authorization = `Bearer ${userLocalStorage.accessToken}`
   }
   return config
 })
@@ -23,28 +28,31 @@ fetcher.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401
+      && error.response?.data?.code == 'INVALID_EXPIRED_ACCESS_TOKEN'
+      && !originalRequest._retry
+    ) {
       originalRequest._retry = true
 
-      const accessToken = localStorage.getItem('access_token')
-      const refreshToken = localStorage.getItem('refresh_token')
+      const userLocalStorage: IUserStatePayload = getLocalStorage('user');
+      const oldAccessToken = userLocalStorage?.accessToken
+      const oldRefreshToken = userLocalStorage?.refreshToken
 
-      if (accessToken && refreshToken) {
+      if (oldAccessToken && oldRefreshToken) {
         try {
-          const refreshResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh-token`, {
-            refresh_token: refreshToken
+          const refreshResponse = await axios.post(`${BASE_URL}auth/refresh-token`, {
+            refreshToken: oldRefreshToken
           })
           console.log('refreshResponse: ', refreshResponse);
 
-          const newAccessToken = refreshResponse.data.access_token
-          const newRefreshToken = refreshResponse.data.refresh_token
+          const { accessToken, refreshToken, role, wsid } = refreshResponse.data?.data as LoginResponseData;
+          setLocalStorage('role', role);
+          const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid };
+          setLocalStorage('user', userStatePayload);
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`
 
-          if (newAccessToken) {
-            localStorage.setItem('access_token', newAccessToken)
-            localStorage.setItem('refresh_token', newRefreshToken)
-            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-            return fetcher(originalRequest)
-          }
+          return fetcher(originalRequest)
         } catch (refreshError) {
           console.error('Token refresh failed:', refreshError)
           // Only clear storage and redirect if we're sure tokens are invalid
@@ -53,9 +61,8 @@ fetcher.interceptors.response.use(
             axios.isAxiosError(refreshError) &&
             (refreshError.response?.status === 401 || refreshError.response?.status === 403)
           ) {
-            localStorage.removeItem('access_token')
-            localStorage.removeItem('refresh_token')
-            localStorage.removeItem('user_role')
+            removeLocalStorage('user')
+            removeLocalStorage('role')
 
             // Avoid redirect loop - only redirect if not already on auth pages
             if (!window.location.pathname.startsWith('/auth')) {
@@ -67,9 +74,8 @@ fetcher.interceptors.response.use(
       } else {
         // If no tokens available and we're not on auth page, redirect to login
         if (!window.location.pathname.startsWith('/auth')) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          localStorage.removeItem('user_role')
+          removeLocalStorage('user')
+          removeLocalStorage('role')
           window.location.href = '/auth/login'
         }
       }
