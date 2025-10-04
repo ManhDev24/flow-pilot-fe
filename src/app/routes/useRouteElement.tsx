@@ -39,8 +39,8 @@ import MyPerformanceManager from '@/app/modules/Manager/MyPerformanceManager/MyP
 import MyFileManager from '@/app/modules/Manager/MyFileManager/MyFileManager'
 import ProjectReport from '@/app/modules/Manager/ProjectReport/ProjectReport'
 import { useSelector } from 'react-redux'
-import type { IUserState } from '../models'
-import { getLocalStorage } from '../utils'
+import type { IRoleState } from '../models'
+import FirstLogin from '../modules/Auth/FirstLogin/FirstLogin'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -50,8 +50,7 @@ const redirectMap: Record<string, string> = {
 }
 
 const RejectedRouter = () => {
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const storedRole: string = currentUser?.role || getLocalStorage('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (storedRole) {
     const redirectPath = redirectMap[storedRole.toLowerCase()]
@@ -62,8 +61,7 @@ const RejectedRouter = () => {
 }
 
 const RejectedAuthRouter = () => {
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const storedRole: string = currentUser?.role || getLocalStorage('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Outlet />
@@ -75,8 +73,7 @@ const RejectedAuthRouter = () => {
 }
 
 const ProtectedRouter = ({ roles }: { roles: string[] }) => {
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const storedRole: string = currentUser?.role || getLocalStorage('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
@@ -90,8 +87,7 @@ const ProtectedRouter = ({ roles }: { roles: string[] }) => {
 }
 
 const RoleGuard = ({ roles, children }: { roles: string[]; children: ReactNode }) => {
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const storedRole: string = currentUser?.role || getLocalStorage('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
@@ -105,12 +101,12 @@ const RoleGuard = ({ roles, children }: { roles: string[]; children: ReactNode }
 }
 
 const EmployeeIndexPage = () => {
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const storedRole: string = currentUser?.role || getLocalStorage('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
+
   if (storedRole.toLowerCase() === 'employee') {
     return <Navigate to={PATH.EMPLOYEE_MY_TASKS} replace />
   }
@@ -119,8 +115,7 @@ const EmployeeIndexPage = () => {
 }
 
 const EmployeeManagerIndexPage = () => {
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const storedRole: string = currentUser?.role || getLocalStorage('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
@@ -163,6 +158,14 @@ const useRouteElement = () => {
       ]
     },
     // Auth Module
+    {
+      path: PATH.FIRST_LOGIN,
+      element: (
+        <AuthLayout>
+          <FirstLogin />
+        </AuthLayout>
+      )
+    },
     {
       path: PATH.AUTH,
       element: <RejectedAuthRouter />,

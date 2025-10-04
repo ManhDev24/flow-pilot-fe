@@ -44,7 +44,6 @@ fetcher.interceptors.response.use(
           const refreshResponse = await axios.post(`${BASE_URL}auth/refresh-token`, {
             refreshToken: oldRefreshToken
           })
-          console.log('refreshResponse: ', refreshResponse);
 
           const { accessToken, refreshToken, role, wsid } = refreshResponse.data?.data as LoginResponseData;
           setLocalStorage('role', role);

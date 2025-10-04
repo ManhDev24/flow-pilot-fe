@@ -1,14 +1,7 @@
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent } from '@/app/components/ui/card'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/app/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form'
 import { Input } from '@/app/components/ui/input'
 import { PATH } from '@/app/routes/path'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -17,12 +10,16 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { object, string } from 'yup'
 import type { ForgotPasswordForm } from './models/ForgetPasswordFormInterface'
+import { useMutation } from '@tanstack/react-query'
+import { authApi } from '@/app/apis/AUTH/Auth.api'
+import { toast } from 'react-toastify'
+
 const forgotPasswordSchema = object({
   email: string().email('Invalid email address').required('Email is required')
 })
 
 const ForgotPassword = () => {
-  const [isLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const form = useForm<ForgotPasswordForm>({
@@ -32,15 +29,27 @@ const ForgotPassword = () => {
     },
     resolver: yupResolver(forgotPasswordSchema)
   })
-  const {
-    control,
-    // register,
-    handleSubmit,
-    // formState: { errors }
-  } = form
+
+  const { control, handleSubmit } = form
+
+  const { mutate: handleSendOtp } = useMutation({
+    mutationFn: (payload: { email: string }) => authApi.sendOtpForgotPassword(payload.email),
+    onSuccess: (data) => {
+      console.log('🚀 ~ ForgotPassword ~ data:', data)
+      toast.success('Đã gửi OTP thành công!')
+      navigate(PATH.RESET_PASSWORD, { state: { email: form.getValues('email') } })
+    },
+    onError: (error: { data: { message: string } }) => {
+      const errorMessage = error?.data?.message || 'Error sending OTP'
+      toast.error(errorMessage)
+      setIsLoading(false)
+    }
+  })
 
   const onSubmit: SubmitHandler<ForgotPasswordForm> = (data) => {
+    setIsLoading(true)
     console.log(data)
+    handleSendOtp({ email: data.email })
   }
 
   return (
@@ -62,7 +71,9 @@ const ForgotPassword = () => {
           </button>
           <div className='flex flex-col items-center mb-8'>
             <img className='w-28 h-28 object-contain drop-shadow-lg' src={logoFlowpilot} alt='flow-pilot-logo' />
-            <p className='text-gray-400 text-sm'>Forgot your password?</p>
+            <p className='text-gray-400 text-sm text-center'>
+              Please provide your email address, and we’ll send you an OTP to reset your password.
+            </p>
           </div>
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className='w-full flex flex-col items-center gap-4'>
@@ -79,7 +90,7 @@ const ForgotPassword = () => {
                   </FormItem>
                 )}
               />
-          
+
               <Button
                 type='submit'
                 className='w-full max-w-sm bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-full text-lg transition mb-4 border-0 shadow-md'
@@ -90,16 +101,10 @@ const ForgotPassword = () => {
             </form>
           </Form>
           <div className='flex flex-col gap-2 w-full text-sm text-gray-500 mt-2'>
-            {/* <span className='text-center'>
-              Forgot password?{' '}
-              <Link to={PATH.FORGOT_PASSWORD} className='text-blue-500 hover:underline font-medium'>
-                Reset
-              </Link>
-            </span> */}
             <span className='text-center'>
-              Return back to login?{' '}
+              Already have an account?{' '}
               <Link to={PATH.LOGIN} className='text-blue-500 hover:underline font-medium'>
-                Login
+                Click here
               </Link>
             </span>
           </div>
