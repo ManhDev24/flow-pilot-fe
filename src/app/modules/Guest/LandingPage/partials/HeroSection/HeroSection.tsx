@@ -4,7 +4,7 @@ import { CalendarDays, Folder, ListTodo, StickyNote } from 'lucide-react'
 import { useState } from 'react'
 
 import ProjectsImage from '@/app/assets/all-projects-xl-1x.webp'
-import CalendarPlanerImage from '@/app/assets/bordio-calendar-xl-1x.webp'
+import CalendarPlanerImage from '@/app/assets/kanban.png'
 import KanBanImage from '@/app/assets/kanban-xl-1x.webp'
 import NotesImage from '@/app/assets/notes-xl-1x.webp'
 import TaskListImage from '@/app/assets/table-view-xl-1x.webp'
@@ -42,7 +42,7 @@ const HeroSection = () => {
           </button>
           <p className='text-xs sm:text-[14px] text-[#8C939F]'>No credit card required.</p>
         </div>
-        <div className='tab-content flex flex-col items-center w-full'>
+        <div className='tab-content flex flex-col items-center w-full mx-auto'>
           <Tabs defaultValue='calendar' className='w-full flex flex-col items-center'>
             <div className='w-full flex justify-center items-center my-4'>
               <TabsList className='flex gap-4'>
@@ -79,94 +79,106 @@ const HeroSection = () => {
               </TabsList>
             </div>
 
-            <TabsContent
-              value='calendar'
-              className='transition-opacity duration-300 ease-in-out'
-              style={{ minHeight: 160 }}
-            >
-              <div className='calendar-image flex justify-center'>
-                {loading.calendar && (
-                  <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />
-                )}
-                <img
-                  src={CalendarPlanerImage}
-                  alt='calendar-planner'
-                  className={`w-full sm:w-4/5 mx-auto mt-4 sm:mt-10 ${loading.calendar ? 'hidden' : 'block'}`}
-                  onLoad={() => handleImageLoad('calendar')}
-                  style={{ transition: 'opacity 0.3s' }}
-                />
-              </div>
-            </TabsContent>
-            <TabsContent
-              value='task'
-              className='transition-opacity duration-300 ease-in-out'
-              style={{ minHeight: 160 }}
-            >
-              <div className='tasklist-image flex justify-center'>
-                {loading.task && <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />}
-                <img
-                  src={TaskListImage}
-                  alt='task-list'
-                  className={`w-full sm:w-4/5 mx-auto mt-4 sm:mt-10 ${loading.task ? 'hidden' : 'block'}`}
-                  onLoad={() => handleImageLoad('task')}
-                  style={{ transition: 'opacity 0.3s' }}
-                />
-              </div>
-            </TabsContent>
-            <TabsContent
-              value='kanban'
-              className='transition-opacity duration-300 ease-in-out'
-              style={{ minHeight: 160 }}
-            >
-              <div className='kanban-image flex justify-center'>
-                {loading.kanban && (
-                  <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />
-                )}
-                <img
-                  src={KanBanImage}
-                  alt='kanban'
-                  className={`w-full sm:w-4/5 mx-auto mt-4 sm:mt-10 ${loading.kanban ? 'hidden' : 'block'}`}
-                  onLoad={() => handleImageLoad('kanban')}
-                  style={{ transition: 'opacity 0.3s' }}
-                />
-              </div>
-            </TabsContent>
-            <TabsContent
-              value='projects'
-              className='transition-opacity duration-300 ease-in-out'
-              style={{ minHeight: 160 }}
-            >
-              <div className='projects-image flex justify-center'>
-                {loading.projects && (
-                  <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />
-                )}
-                <img
-                  src={ProjectsImage}
-                  alt='projects'
-                  className={`w-full sm:w-4/5 mx-auto mt-4 sm:mt-10 ${loading.projects ? 'hidden' : 'block'}`}
-                  onLoad={() => handleImageLoad('projects')}
-                  style={{ transition: 'opacity 0.3s' }}
-                />
-              </div>
-            </TabsContent>
-            <TabsContent
-              value='notes'
-              className='transition-opacity duration-300 ease-in-out'
-              style={{ minHeight: 160 }}
-            >
-              <div className='notes-image flex justify-center'>
-                {loading.notes && <Skeleton className='w-full sm:w-4/5 h-[120px] sm:h-[260px] mx-auto mt-4 sm:mt-10' />}
-                <img
-                  src={NotesImage}
-                  alt='notes'
-                  className={`w-full sm:w-4/5 mx-auto mt-4 sm:mt-10 ${loading.notes ? 'hidden' : 'block'}`}
-                  onLoad={() => handleImageLoad('notes')}
-                  style={{ transition: 'opacity 0.3s' }}
-                />
-              </div>
-            </TabsContent>
+            <div className='w-full min-h-[400px] sm:min-h-[700px] mb-8'>
+              <TabsContent
+                value='calendar'
+                className='transition-opacity duration-300 ease-in-out h-full'
+              >
+                <div className='calendar-image flex justify-center items-center h-full'>
+                  {loading.calendar && (
+                    <Skeleton className='w-full h-[400px] sm:h-[700px] mx-auto' />
+                  )}
+                  <img
+                    src={CalendarPlanerImage}
+                    alt='calendar-planner'
+                    className={`w-full h-auto object-contain mx-auto ${loading.calendar ? 'hidden' : 'block'}`}
+                    onLoad={() => handleImageLoad('calendar')}
+                    style={{ 
+                      transition: 'opacity 0.3s',
+                      maxHeight: '700px'
+                    }}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent
+                value='task'
+                className='transition-opacity duration-300 ease-in-out h-full'
+              >
+                <div className='tasklist-image flex justify-center items-center h-full'>
+                  {loading.task && <Skeleton className='w-full h-[400px] sm:h-[700px] mx-auto' />}
+                  <img
+                    src={TaskListImage}
+                    alt='task-list'
+                    className={`w-full h-auto object-contain mx-auto ${loading.task ? 'hidden' : 'block'}`}
+                    onLoad={() => handleImageLoad('task')}
+                    style={{ 
+                      transition: 'opacity 0.3s',
+                      maxHeight: '700px'
+                    }}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent
+                value='kanban'
+                className='transition-opacity duration-300 ease-in-out h-full'
+              >
+                <div className='kanban-image flex justify-center items-center h-full'>
+                  {loading.kanban && (
+                    <Skeleton className='w-full h-[400px] sm:h-[700px] mx-auto' />
+                  )}
+                  <img
+                    src={KanBanImage}
+                    alt='kanban'
+                    className={`w-full h-auto object-contain mx-auto ${loading.kanban ? 'hidden' : 'block'}`}
+                    onLoad={() => handleImageLoad('kanban')}
+                    style={{ 
+                      transition: 'opacity 0.3s',
+                      maxHeight: '700px'
+                    }}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent
+                value='projects'
+                className='transition-opacity duration-300 ease-in-out h-full'
+              >
+                <div className='projects-image flex justify-center items-center h-full'>
+                  {loading.projects && (
+                    <Skeleton className='w-full h-[400px] sm:h-[700px] mx-auto' />
+                  )}
+                  <img
+                    src={ProjectsImage}
+                    alt='projects'
+                    className={`w-full h-auto object-contain mx-auto ${loading.projects ? 'hidden' : 'block'}`}
+                    onLoad={() => handleImageLoad('projects')}
+                    style={{ 
+                      transition: 'opacity 0.3s',
+                      maxHeight: '700px'
+                    }}
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent
+                value='notes'
+                className='transition-opacity duration-300 ease-in-out h-full'
+              >
+                <div className='notes-image flex justify-center items-center h-full'>
+                  {loading.notes && <Skeleton className='w-full h-[400px] sm:h-[700px] mx-auto' />}
+                  <img
+                    src={NotesImage}
+                    alt='notes'
+                    className={`w-full h-auto object-contain mx-auto ${loading.notes ? 'hidden' : 'block'}`}
+                    onLoad={() => handleImageLoad('notes')}
+                    style={{ 
+                      transition: 'opacity 0.3s',
+                      maxHeight: '700px'
+                    }}
+                  />
+                </div>
+              </TabsContent>
+            </div>
           </Tabs>
-          <div className='front-rating flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mt-4 sm:mt-8 text-[#222]'>
+          {/* <div className='front-rating flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4 mt-4 sm:mt-8 text-[#222]'>
             <div>
               <p className='text-base sm:text-2xl font-medium'>Rating 4.7</p>
             </div>
@@ -210,7 +222,7 @@ const HeroSection = () => {
                 className='h-4 sm:h-auto'
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
