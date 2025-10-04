@@ -1,4 +1,5 @@
 import type React from 'react'
+import type { CreateEmployeePayload } from '../models/AdminwsInterface'
 
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
@@ -8,29 +9,23 @@ import { Label } from '@/app/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { X } from 'lucide-react'
 
-interface InviteEmployeeData {
+interface CreateEmployeeData {
   name: string
   email: string
   role: string
-  jobTitle: string
-  department: string
-  project: string
 }
 
-interface InviteEmployeeModalProps {
+interface CreateEmployeeModalProps {
   isOpen: boolean
   onClose: () => void
-  onInvite: (employee: InviteEmployeeData) => void
+  onCreate: (employee: CreateEmployeePayload) => void
 }
 
-export function InviteEmployeeModal({ isOpen, onClose, onInvite }: InviteEmployeeModalProps) {
-  const [formData, setFormData] = useState<InviteEmployeeData>({
+export function CreateEmployeeModal({ isOpen, onClose, onCreate }: CreateEmployeeModalProps) {
+  const [formData, setFormData] = useState<CreateEmployeeData>({
     name: '',
     email: '',
-    role: '',
-    jobTitle: '',
-    department: '',
-    project: ''
+    role: ''
   })
   const [isLoading, setIsLoading] = useState(false)
 
@@ -41,7 +36,21 @@ export function InviteEmployeeModal({ isOpen, onClose, onInvite }: InviteEmploye
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    onInvite(formData)
+    // Convert role string to role_id
+    const roleMap: { [key: string]: number } = {
+      'Super Admin': 1,
+      'Admin': 2,
+      'Project Manager': 3,
+      'Employee': 4
+    }
+
+    const payload: CreateEmployeePayload = {
+      name: formData.name,
+      email: formData.email,
+      role_id: roleMap[formData.role] || 4 // Default to Employee if not found
+    }
+
+    onCreate(payload)
     setIsLoading(false)
     onClose()
 
@@ -49,14 +58,11 @@ export function InviteEmployeeModal({ isOpen, onClose, onInvite }: InviteEmploye
     setFormData({
       name: '',
       email: '',
-      role: '',
-      jobTitle: '',
-      department: '',
-      project: ''
+      role: ''
     })
   }
 
-  const handleInputChange = (field: keyof InviteEmployeeData, value: string) => {
+  const handleInputChange = (field: keyof CreateEmployeeData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -66,8 +72,8 @@ export function InviteEmployeeModal({ isOpen, onClose, onInvite }: InviteEmploye
         <DialogHeader className='px-6 py-4 border-b'>
           <div className='flex items-center justify-between'>
             <div>
-              <DialogTitle className='text-lg font-semibold'>Invite New Employee</DialogTitle>
-              <p className='text-sm text-muted-foreground mt-1'>Create a new employee account.</p>
+              <DialogTitle className='text-lg font-semibold'>Create New Employee</DialogTitle>
+              <p className='text-sm text-muted-foreground mt-1'>Add a new employee to your workspace.</p>
             </div>
             <Button variant='ghost' size='icon' onClick={onClose}>
               <X className='h-4 w-4' />
@@ -99,82 +105,29 @@ export function InviteEmployeeModal({ isOpen, onClose, onInvite }: InviteEmploye
             />
           </div>
 
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-2'>
-              <Label>Role</Label>
-              <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)} required>
-                <SelectTrigger>
-                  <SelectValue placeholder='Project Manager' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='Project Manager'>Project Manager</SelectItem>
-                  <SelectItem value='Employee'>Employee</SelectItem>
-                  <SelectItem value='Admin'>Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className='space-y-2'>
-              <Label>Job Title</Label>
-              <Select
-                value={formData.jobTitle}
-                onValueChange={(value) => handleInputChange('jobTitle', value)}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder='Tech Leader' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='Tech Leader'>Tech Leader</SelectItem>
-                  <SelectItem value='UX Leader'>UX Leader</SelectItem>
-                  <SelectItem value='Senior UI/UX Designer'>Senior UI/UX Designer</SelectItem>
-                  <SelectItem value='UI/UX Designer'>UI/UX Designer</SelectItem>
-                  <SelectItem value='UX Designer'>UX Designer</SelectItem>
-                  <SelectItem value='Graphic Designer'>Graphic Designer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
           <div className='space-y-2'>
-            <Label>Department</Label>
-            <Select
-              value={formData.department}
-              onValueChange={(value) => handleInputChange('department', value)}
-              required
-            >
+            <Label>Role</Label>
+            <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)} required>
               <SelectTrigger>
-                <SelectValue placeholder='Select department' />
+                <SelectValue placeholder='Select role' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='IT Dept'>IT Dept</SelectItem>
-                <SelectItem value='Products'>Products</SelectItem>
-                <SelectItem value='Marketing'>Marketing</SelectItem>
-                <SelectItem value='Growth'>Growth</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='space-y-2'>
-            <Label>Assigned Project</Label>
-            <Select value={formData.project} onValueChange={(value) => handleInputChange('project', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder='e.g. Alpha Project' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='Alpha Project'>Alpha Project</SelectItem>
-                <SelectItem value='Beta system'>Beta system</SelectItem>
-                <SelectItem value='Delta system'>Delta system</SelectItem>
-                <SelectItem value='Not assigned'>Not assigned</SelectItem>
+                <SelectItem value='Super Admin'>Super Admin</SelectItem>
+                <SelectItem value='Admin'>Admin</SelectItem>
+                <SelectItem value='Project Manager'>Project Manager</SelectItem>
+                <SelectItem value='Employee'>Employee</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <Button type='submit' className='w-full bg-blue-600 hover:bg-blue-700 text-white mt-6' disabled={isLoading}>
-            {isLoading ? 'INVITING...' : 'INVITE USER'}
+            {isLoading ? 'CREATING...' : 'CREATE EMPLOYEE'}
           </Button>
         </form>
       </DialogContent>
     </Dialog>
   )
 }
+
+// For backward compatibility
+export { CreateEmployeeModal as InviteEmployeeModal }
