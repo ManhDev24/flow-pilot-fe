@@ -6,7 +6,9 @@ export const PATH = {
   // AUTH MODULE
   AUTH: '/auth',
   LOGIN: '/auth/login',
+  FIRST_LOGIN: '/auth/first-login',
   FORGOT_PASSWORD: '/auth/forgot-password',
+  RESET_PASSWORD: '/auth/reset-password',
   REGISTER: '/auth/register',
   // SUPER ADMIN
   SUPER_ADMIN: '/super-admin',

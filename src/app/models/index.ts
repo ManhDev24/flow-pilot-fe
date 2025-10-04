@@ -14,3 +14,7 @@ export type IUserStatePayload = {
 export type IUserState = {
   currentUser: IUserStatePayload | null
 }
+
+export type IRoleState = {
+  currentRole: string
+}
