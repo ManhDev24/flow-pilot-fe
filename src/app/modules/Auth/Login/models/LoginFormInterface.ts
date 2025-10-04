@@ -21,4 +21,5 @@ export interface LoginResponseData {
   refreshToken: string
   wsid: string
   role: string
+  isFirstLogin: boolean
 }

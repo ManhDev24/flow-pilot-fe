@@ -157,7 +157,7 @@ function Login() {
             <span className='text-center'>
               Forgot password?{' '}
               <Link to={PATH.FORGOT_PASSWORD} className='text-blue-500 hover:underline font-medium'>
-                Reset
+                Click here
               </Link>
             </span>
           </div>
