@@ -18,7 +18,7 @@ const loginFormSchema = object({
   password: string()
     .min(6, 'Password must be at least 6 characters')
     .max(100, 'Password cannot exceed 100 characters')
-    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
+    // .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
     .required('Password is required')
 })
 

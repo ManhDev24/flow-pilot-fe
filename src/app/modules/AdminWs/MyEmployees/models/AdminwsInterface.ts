@@ -41,6 +41,14 @@ export interface CreateEmployeePayload {
   department_id?: number
 }
 
+export interface UpdateEmployeePayload {
+  name: string
+  email: string
+  avatar_url: string
+  department_id: number
+  role_id: number
+}
+
 export interface CreateEmployeeData {
   name: string
   email: string
@@ -51,6 +59,12 @@ export interface CreateEmployeeData {
 }
 
 export interface CreateEmployeeResponse {
+  success: boolean
+  message: string
+  data?: Employee
+}
+
+export interface UpdateEmployeeResponse {
   success: boolean
   message: string
   data?: Employee

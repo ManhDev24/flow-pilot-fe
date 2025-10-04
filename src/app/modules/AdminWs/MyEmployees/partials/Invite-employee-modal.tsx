@@ -38,15 +38,16 @@ export function CreateEmployeeModal({ isOpen, onClose, onCreate }: CreateEmploye
 
     // Convert role string to role_id
     const roleMap: { [key: string]: number } = {
-      Admin: 1,
-      'Project Manager': 2,
-      Employee: 3
+      'Super Admin': 1,
+      'Admin': 2,
+      'Project Manager': 3,
+      'Employee': 4
     }
 
     const payload: CreateEmployeePayload = {
       name: formData.name,
       email: formData.email,
-      role_id: roleMap[formData.role] || 3 // Default to Employee if not found
+      role_id: roleMap[formData.role] || 4 // Default to Employee if not found
     }
 
     onCreate(payload)
@@ -111,6 +112,7 @@ export function CreateEmployeeModal({ isOpen, onClose, onCreate }: CreateEmploye
                 <SelectValue placeholder='Select role' />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value='Super Admin'>Super Admin</SelectItem>
                 <SelectItem value='Admin'>Admin</SelectItem>
                 <SelectItem value='Project Manager'>Project Manager</SelectItem>
                 <SelectItem value='Employee'>Employee</SelectItem>

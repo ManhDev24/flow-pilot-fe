@@ -1,55 +1,80 @@
 import type React from 'react'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
-import { X } from 'lucide-react'
-
-interface Employee {
-  id: string
-  name: string
-  email: string
-  role: string
-  jobTitle: string
-  department: string
-  project: string
-}
+import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
+import type { Employee, UpdateEmployeePayload } from '@/app/modules/AdminWs/MyEmployees/models/AdminwsInterface'
 
 interface UpdateEmployeeModalProps {
   isOpen: boolean
   onClose: () => void
   employee: Employee | null
-  onUpdate: (employee: Employee) => void
+  onUpdate?: () => void
+}
+
+interface UpdateFormData {
+  name: string
+  email: string
+  avatar_url: string
+  department_id: number
+  role_id: number
 }
 
 export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: UpdateEmployeeModalProps) {
-  const [formData, setFormData] = useState<Employee>({
-    id: employee?.id || '',
-    name: employee?.name || '',
-    email: employee?.email || '',
-    role: employee?.role || '',
-    jobTitle: employee?.jobTitle || '',
-    department: employee?.department || '',
-    project: employee?.project || ''
+  const [formData, setFormData] = useState<UpdateFormData>({
+    name: '',
+    email: '',
+    avatar_url: '',
+    department_id: 0,
+    role_id: 0
   })
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    if (employee) {
+      setFormData({
+        name: employee.name || '',
+        email: employee.email || '',
+        avatar_url: employee.avatar_url || '',
+        department_id: employee.department_id || 0,
+        role_id: employee.role_id || 0
+      })
+    }
+  }, [employee])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!employee) return
+
     setIsLoading(true)
+    
+    try {
+      const updatePayload: UpdateEmployeePayload = {
+        name: formData.name,
+        email: formData.email,
+        avatar_url: formData.avatar_url,
+        department_id: formData.department_id,
+        role_id: formData.role_id
+      }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    onUpdate(formData)
-    setIsLoading(false)
-    onClose()
+      await AdminWsApi.updateUser(employee.id, updatePayload)
+      
+      if (onUpdate) {
+        onUpdate()
+      }
+      onClose()
+    } catch (error) {
+      console.error('Error updating employee:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleInputChange = (field: keyof Employee, value: string) => {
+  const handleInputChange = (field: keyof UpdateFormData, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -59,14 +84,9 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='sm:max-w-[500px] p-0'>
         <DialogHeader className='px-6 py-4 border-b'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <DialogTitle className='text-lg font-semibold'>Update Employee Information</DialogTitle>
-              <p className='text-sm text-muted-foreground mt-1'>View and update employee account.</p>
-            </div>
-            <Button variant='ghost' size='icon' onClick={onClose}>
-              <X className='h-4 w-4' />
-            </Button>
+          <div>
+            <DialogTitle className='text-lg font-semibold'>Update Employee Information</DialogTitle>
+            <p className='text-sm text-muted-foreground mt-1'>View and update employee account.</p>
           </div>
         </DialogHeader>
 
@@ -80,7 +100,6 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
               placeholder='Vu Hanhname'
             />
           </div>
-
           <div className='space-y-2'>
             <Label htmlFor='email'>Email</Label>
             <Input
@@ -92,67 +111,52 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
             />
           </div>
 
+          <div className='space-y-2'>
+            <Label htmlFor='avatar_url'>Avatar URL</Label>
+            <Input
+              id='avatar_url'
+              value={formData.avatar_url}
+              onChange={(e) => handleInputChange('avatar_url', e.target.value)}
+              placeholder='https://example.com/avatar.jpg'
+            />
+          </div>
+
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
-              <Label>Role</Label>
-              <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+              <Label>Role ID</Label>
+              <Select 
+                value={formData.role_id.toString()} 
+                onValueChange={(value) => handleInputChange('role_id', parseInt(value))}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder='Project Manager' />
+                  <SelectValue placeholder='Select Role' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='Project Manager'>Project Manager</SelectItem>
-                  <SelectItem value='Employee'>Employee</SelectItem>
-                  <SelectItem value='Admin'>Admin</SelectItem>
+                  <SelectItem value='1'>Super Admin</SelectItem>
+                  <SelectItem value='2'>Admin</SelectItem>
+                  <SelectItem value='3'>Project Manager</SelectItem>
+                  <SelectItem value='4'>Employee</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className='space-y-2'>
-              <Label>Job Title</Label>
-              <Select value={formData.jobTitle} onValueChange={(value) => handleInputChange('jobTitle', value)}>
+              <Label>Department ID</Label>
+              <Select 
+                value={formData.department_id.toString()} 
+                onValueChange={(value) => handleInputChange('department_id', parseInt(value))}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder='Tech Leader' />
+                  <SelectValue placeholder='Select Department' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='Tech Leader'>Tech Leader</SelectItem>
-                  <SelectItem value='UX Leader'>UX Leader</SelectItem>
-                  <SelectItem value='Senior UI/UX Designer'>Senior UI/UX Designer</SelectItem>
-                  <SelectItem value='UI/UX Designer'>UI/UX Designer</SelectItem>
-                  <SelectItem value='UX Designer'>UX Designer</SelectItem>
-                  <SelectItem value='Graphic Designer'>Graphic Designer</SelectItem>
+                  <SelectItem value='1'>IT Dept</SelectItem>
+                  <SelectItem value='2'>Products</SelectItem>
+                  <SelectItem value='3'>Marketing</SelectItem>
+                  <SelectItem value='4'>Growth</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className='space-y-2'>
-            <Label>Department</Label>
-            <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder='IT Dept' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='IT Dept'>IT Dept</SelectItem>
-                <SelectItem value='Products'>Products</SelectItem>
-                <SelectItem value='Marketing'>Marketing</SelectItem>
-                <SelectItem value='Growth'>Growth</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='space-y-2'>
-            <Label>Assigned Project</Label>
-            <Select value={formData.project} onValueChange={(value) => handleInputChange('project', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder='Alpha Project' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='Alpha Project'>Alpha Project</SelectItem>
-                <SelectItem value='Beta system'>Beta system</SelectItem>
-                <SelectItem value='Delta system'>Delta system</SelectItem>
-                <SelectItem value='Not assigned'>Not assigned</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <Button type='submit' className='w-full bg-blue-600 hover:bg-blue-700 text-white mt-6' disabled={isLoading}>

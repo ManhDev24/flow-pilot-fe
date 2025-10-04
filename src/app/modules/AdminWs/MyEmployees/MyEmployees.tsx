@@ -20,16 +20,6 @@ import { ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, X } from 'l
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 
-type ModalEmployee = {
-  id: string
-  name: string
-  email: string
-  role: string
-  jobTitle: string
-  department: string
-  project: string
-}
-
 function MyEmployees() {
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -98,19 +88,10 @@ function MyEmployees() {
       await AdminWsApi.deleteUser(selectedEmployee.id)
       queryClient.invalidateQueries({ queryKey: ['admin-ws-users'] })
       setIsBanModalOpen(false)
+      toast.success(`Employee "${selectedEmployee.name}" deleted successfully!`)
     } catch (error) {
       console.error('Delete failed:', error)
-    }
-  }
-
-  // Xử lý cập nhật thông tin nhân viên
-  const handleUpdateEmployee = async (employee: ModalEmployee) => {
-    try {
-      await AdminWsApi.updateUser(employee.id, employee)
-      queryClient.invalidateQueries({ queryKey: ['admin-ws-users'] })
-      setIsUpdateModalOpen(false)
-    } catch (error) {
-      console.error('Update failed:', error)
+      toast.error('Failed to delete employee.')
     }
   }
 
@@ -128,6 +109,12 @@ function MyEmployees() {
     } else {
       setSelectedEmployees(selectedEmployees.filter((id) => id !== employeeId))
     }
+  }
+
+  // Xử lý cập nhật thành công
+  const handleUpdateSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-ws-users'] })
+    toast.success('Employee updated successfully!')
   }
 
   // Xử lý tạo nhân viên
@@ -226,7 +213,6 @@ function MyEmployees() {
                 ))}
               </SelectContent>
             </Select>
-
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
               <SelectTrigger className='w-[110px]'>
                 <SelectValue placeholder='All Status' />
@@ -298,7 +284,7 @@ function MyEmployees() {
                     <TableCell className='text-gray-600'>{employee.role?.role || 'Employee'}</TableCell>
                     <TableCell className='text-gray-600'>{employee.department?.name || 'Products'}</TableCell>
                     <TableCell className='text-gray-600'>
-                      {selectedProject !== 'all' ? selectedProject : 'Alpha system'}
+                      {selectedProject !== 'all' ? selectedProject : 'No Assign Project'}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -387,20 +373,8 @@ function MyEmployees() {
         <UpdateEmployeeModal
           isOpen={isUpdateModalOpen}
           onClose={() => setIsUpdateModalOpen(false)}
-          employee={
-            selectedEmployee
-              ? {
-                  id: selectedEmployee.id,
-                  name: selectedEmployee.name,
-                  email: selectedEmployee.email,
-                  role: selectedEmployee.role?.role || '',
-                  jobTitle: '', // This field might need to be added to API or handled differently
-                  department: selectedEmployee.department?.name || '',
-                  project: '' // This field might need to be added to API or handled differently
-                }
-              : null
-          }
-          onUpdate={handleUpdateEmployee}
+          employee={selectedEmployee}
+          onUpdate={handleUpdateSuccess}
         />
         <BanAccountModal
           isOpen={isBanModalOpen}
