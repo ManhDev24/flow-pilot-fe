@@ -5,7 +5,7 @@ import LandingPage from '../modules/Guest/LandingPage/LandingPage'
 import PricingPage from '../modules/Guest/PricingPage/PricingPage'
 import AuthLayout from '../layouts/AuthLayout/AuthLayout'
 import Login from '../modules/Auth/Login/Login'
-import Register from '../modules/Auth/Register/Register'
+// import Register from '../modules/Auth/Register/Register'
 import SuperAdminLayout from '../layouts/SuperAdminLayout/SuperAdminLayout'
 import Dashboard from '../modules/SuperAdmin/Dashboard/Dashboard'
 import UserManagement from '../modules/SuperAdmin/UserManagement/UserManagement'
@@ -41,6 +41,8 @@ import ProjectReport from '@/app/modules/Manager/ProjectReport/ProjectReport'
 import { useSelector } from 'react-redux'
 import type { IRoleState } from '../models'
 import FirstLogin from '../modules/Auth/FirstLogin/FirstLogin'
+import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
+import ContactPage from '../modules/Guest/ContactPage/ContactPage'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -154,6 +156,14 @@ const useRouteElement = () => {
               <PricingPage />
             </GuestLayout>
           )
+        },
+        {
+          path: PATH.CONTACT_PAGE,
+          element: (
+            <GuestLayout>
+              <ContactPage />
+            </GuestLayout>
+          )
         }
       ]
     },
@@ -182,19 +192,27 @@ const useRouteElement = () => {
             </AuthLayout>
           )
         },
-        {
-          path: PATH.REGISTER,
-          element: (
-            <AuthLayout>
-              <Register />
-            </AuthLayout>
-          )
-        },
+        // {
+        //   path: PATH.REGISTER,
+        //   element: (
+        //     <AuthLayout>
+        //       <Register />
+        //     </AuthLayout>
+        //   )
+        // },
         {
           path: PATH.FORGOT_PASSWORD,
           element: (
             <AuthLayout>
               <ForgotPassword />
+            </AuthLayout>
+          )
+        },
+        {
+          path: PATH.RESET_PASSWORD,
+          element: (
+            <AuthLayout>
+              <ResetPassword />
             </AuthLayout>
           )
         }

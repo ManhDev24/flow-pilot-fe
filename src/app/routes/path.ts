@@ -3,6 +3,7 @@ export const PATH = {
   HOME: '/',
   LANDING_PAGE: '/landing-page',
   PRICING_PAGE: '/pricing-page',
+  CONTACT_PAGE: '/contact-page',
   // AUTH MODULE
   AUTH: '/auth',
   LOGIN: '/auth/login',
