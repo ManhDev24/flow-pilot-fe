@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
+import type { FocusLog } from './models/perfomance.type'
 import { AlertPopup } from './partials/AlertPopup'
 import { MetricsCards } from './partials/MetricsCards'
 import { PersonalNotifications } from './partials/PersonalNotifications'
@@ -21,6 +22,26 @@ export default function FlowpilotDashboard() {
   const [isBreakMode, setIsBreakMode] = useState(false)
   const [showAlert, setShowAlert] = useState(false)
   const [focusStartTime, setFocusStartTime] = useState<number | null>(null)
+  const [focusLogData, setFocusLogData] = useState<FocusLog[]>([])
+  const [loadingFocusLog, setLoadingFocusLog] = useState(true)
+
+  useEffect(() => {
+    const fetchFocusLog = async () => {
+      try {
+        setLoadingFocusLog(true)
+        const response = await MyTaskApi.getFocusMe()
+        if (response.success) {
+          setFocusLogData(response.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch focus log:', error)
+      } finally {
+        setLoadingFocusLog(false)
+      }
+    }
+
+    fetchFocusLog()
+  }, [])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -65,6 +86,11 @@ export default function FlowpilotDashboard() {
     try {
       await MyTaskApi.postFocusTime(focusedMinutes)
       console.log(`Focus time logged: ${focusedMinutes} minutes`)
+      // Refresh focus log data after logging
+      const response = await MyTaskApi.getFocusMe()
+      if (response.success) {
+        setFocusLogData(response.data)
+      }
     } catch (error) {
       console.error('Failed to log focus time:', error)
     }
@@ -165,16 +191,6 @@ export default function FlowpilotDashboard() {
     }
   }
 
-  const weeklyData = [
-    { day: 'Mon', hours: 4 },
-    { day: 'Tue', hours: 5 },
-    { day: 'Wed', hours: 6 },
-    { day: 'Thu', hours: 7 },
-    { day: 'Fri', hours: 8 },
-    { day: 'Sat', hours: 6 },
-    { day: 'Sun', hours: 5 }
-  ]
-
   return (
     <div className=''>
       <AlertPopup
@@ -207,7 +223,7 @@ export default function FlowpilotDashboard() {
           </div>
 
           <div className='space-y-6'>
-            <WeeklyFocusHistory weeklyData={weeklyData} />
+            <WeeklyFocusHistory focusLogData={focusLogData} loading={loadingFocusLog} />
 
             <TimerSettings
               focusDuration={focusDuration}

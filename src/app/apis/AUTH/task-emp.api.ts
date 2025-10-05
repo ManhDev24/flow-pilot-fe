@@ -1,5 +1,6 @@
 import { fetcher } from '@/app/apis/fetcher'
-import type { MyTaskResponse } from '@/app/modules/Employee/MyTasks/models/myTask.type'
+import type { MyFileResponse } from '@/app/modules/Employee/MyFiles/models/myFile.type'
+import type { FileByTaskRes, MyTaskResponse } from '@/app/modules/Employee/MyTasks/models/myTask.type'
 
 import type { AxiosError, AxiosResponse } from 'axios'
 
@@ -101,6 +102,31 @@ export const MyTaskApi = {
         status
       })
       return response.data as MyTaskResponse
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+  getFileByTaskId: async (taskId: string) => {
+    try {
+      const response: AxiosResponse<FileByTaskRes> = await fetcher.get(`/file/task/${taskId}`)
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+  uploadFileByTaskId: async (task_id: string, file: File) => {
+    try {
+      const formData = new FormData()
+      formData.append('task_id', task_id)
+      formData.append('file', file)
+      const response: AxiosResponse = await fetcher.post(`/file/upload/task`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      return response.data
     } catch (error) {
       const axiosError = error as AxiosError
       throw axiosError
