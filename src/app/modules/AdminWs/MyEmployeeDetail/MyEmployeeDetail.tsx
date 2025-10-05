@@ -1,4 +1,4 @@
-import { AIAssistant } from '@/app/modules/AdminWs/DashboardAdmin/partials/ai-assistant'
+import { AIAssistant } from '@/app/modules/AdminWs/MyEmployeeDetail/partials/ai-assistant'
 import { EmployeeProfile } from '@/app/modules/AdminWs/MyEmployeeDetail/partials/employee-profile'
 import { WorkPerformanceCharts } from '@/app/modules/AdminWs/MyEmployeeDetail/partials/work-performance-charts'
 
