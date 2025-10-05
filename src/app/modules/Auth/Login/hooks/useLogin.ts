@@ -24,8 +24,8 @@ export const useLogin = () => {
     },
     onSuccess: (data: LoginResponse) => {
       if (data.data) {
-        const { accessToken, refreshToken, role, wsid, isFirstLogin } = data.data;
-        const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid };
+        const { accessToken, refreshToken, role, wsid, isFirstLogin, projectId } = data.data;
+        const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid, projectId };
         setLocalStorage('user', userStatePayload);
         dispatch(setUser(userStatePayload));
 
