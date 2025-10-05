@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { performanceApi } from '@/app/apis/AUTH/performance.api'
+import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
 import type {
   AllProjectsStatsResponse,
   AllProjectsOverviewResponse,
@@ -28,7 +28,7 @@ export const performanceQueryKeys = {
 export const useAllProjectsStats = (fromDate?: string, toDate?: string) => {
   return useQuery<AllProjectsStatsResponse>({
     queryKey: performanceQueryKeys.allProjectsStats(fromDate, toDate),
-    queryFn: () => performanceApi.getAllProjectsStats(fromDate, toDate),
+    queryFn: () => MyTaskApi.getAllProjectsStats(fromDate, toDate),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2
   })
@@ -38,7 +38,7 @@ export const useAllProjectsStats = (fromDate?: string, toDate?: string) => {
 export const useAllProjectsOverview = (fromDate?: string, toDate?: string) => {
   return useQuery<AllProjectsOverviewResponse>({
     queryKey: performanceQueryKeys.allProjectsOverview(fromDate, toDate),
-    queryFn: () => performanceApi.getAllProjectsOverview(fromDate, toDate),
+    queryFn: () => MyTaskApi.getAllProjectsOverview(fromDate, toDate),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2
   })
@@ -48,7 +48,7 @@ export const useAllProjectsOverview = (fromDate?: string, toDate?: string) => {
 export const useAllProjectsKPI = (fromDate?: string, toDate?: string) => {
   return useQuery<AllProjectsKPIResponse>({
     queryKey: performanceQueryKeys.allProjectsKPI(fromDate, toDate),
-    queryFn: () => performanceApi.getAllProjectsKPI(fromDate, toDate),
+    queryFn: () => MyTaskApi.getAllProjectsKPI(fromDate, toDate),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2
   })
@@ -58,7 +58,7 @@ export const useAllProjectsKPI = (fromDate?: string, toDate?: string) => {
 export const useAllProjectsAIAnalysis = (fromDate?: string, toDate?: string) => {
   return useQuery<AllProjectsAIAnalysisResponse>({
     queryKey: performanceQueryKeys.allProjectsAIAnalysis(fromDate, toDate),
-    queryFn: () => performanceApi.getAllProjectsAIAnalysis(fromDate, toDate),
+    queryFn: () => MyTaskApi.getAllProjectsAIAnalysis(fromDate, toDate),
     staleTime: 10 * 60 * 1000, // 10 minutes (AI analysis có thể cache lâu hơn)
     retry: 2
   })
@@ -68,7 +68,7 @@ export const useAllProjectsAIAnalysis = (fromDate?: string, toDate?: string) => 
 export const useOrganizationPerformanceSummary = (fromDate?: string, toDate?: string) => {
   return useQuery<OrganizationPerformanceSummaryResponse>({
     queryKey: performanceQueryKeys.organizationSummary(fromDate, toDate),
-    queryFn: () => performanceApi.getOrganizationPerformanceSummary(fromDate, toDate),
+    queryFn: () => MyTaskApi.getOrganizationPerformanceSummary(fromDate, toDate),
     staleTime: 15 * 60 * 1000, // 15 minutes (báo cáo tổng hợp cache lâu nhất)
     retry: 2
   })
@@ -78,7 +78,7 @@ export const useOrganizationPerformanceSummary = (fromDate?: string, toDate?: st
 export const useEvaluateData = () => {
   return useQuery<EvaluateResponse>({
     queryKey: performanceQueryKeys.evaluate(),
-    queryFn: () => performanceApi.getEvaluate(),
+    queryFn: () => MyTaskApi.getEvaluate(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2
   })

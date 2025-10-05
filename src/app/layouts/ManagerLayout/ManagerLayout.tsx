@@ -7,27 +7,27 @@ import {
   SidebarMenuItem,
   SidebarProvider
 } from '@/app/components/ui/sidebar'
-import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Briefcase, Settings, FileText, Bell } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, Users, Settings, FileText } from 'lucide-react'
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
+import { NotificationDropdown } from '@/app/components/Notification/partials/NotificationDropdown'
 
 import type { ReactNode } from 'react'
 import { PATH } from '@/app/routes/path'
 
 function ManagerLayout({ children }: { children: ReactNode }) {
   const location = useLocation()
+  const navigate = useNavigate()
   const navigationItems = [
     { icon: LayoutDashboard, label: 'Project reports', to: `${PATH.EMPLOYEE_MANAGE_PROJECTS}` },
-    { icon: LayoutDashboard, label: 'My Tasks', to: `${PATH.EMPLOYEE_MANAGE_MY_TASKS}` },
     { icon: Users, label: 'Kanban', to: `${PATH.EMPLOYEE_MANAGE_KANBAN}` },
-    { icon: Briefcase, label: 'BackLog', to: `${PATH.EMPLOYEE_MANAGE_BACKLOG}` },
-    { icon: Settings, label: 'My performance', to: `${PATH.EMPLOYEE_MANAGE_MY_TEAM}` },
+    { icon: Settings, label: 'My team', to: `${PATH.EMPLOYEE_MANAGE_MY_TEAM}` },
     { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MANAGE_MY_FILES}` }
   ]
 
   return (
     <SidebarProvider>
-      <div className='flex h-screen'>
+      <div className='flex h-screen w-full'>
         <Sidebar className='w-64 border-r border-gray-200'>
           <SidebarContent className='p-4 mt-12'>
             <SidebarMenu>
@@ -49,7 +49,7 @@ function ManagerLayout({ children }: { children: ReactNode }) {
         </Sidebar>
 
         {/* Main content area */}
-        <div className='flex-1 flex flex-col'>
+        <div className='flex-1 flex flex-col w-full'>
           {/* Header full width */}
           <header className='fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 flex justify-between items-center px-6 z-50'>
             <div className='flex items-center'>
@@ -57,9 +57,7 @@ function ManagerLayout({ children }: { children: ReactNode }) {
             </div>
 
             <div className='flex items-center space-x-4'>
-              <button className='p-2 text-gray-400 hover:text-gray-600 transition-colors'>
-                <Bell className='w-5 h-5' />
-              </button>
+              <NotificationDropdown onViewAll={() => navigate(PATH.EMPLOYEE_MANAGE_NOTIFICATIONS)} />
               <img src='https://i.pravatar.cc/40?img=5' alt='User Avatar' className='w-9 h-9 rounded-full' />
             </div>
           </header>

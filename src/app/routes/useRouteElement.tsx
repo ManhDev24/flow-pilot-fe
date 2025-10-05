@@ -43,6 +43,7 @@ import type { IRoleState } from '../models'
 import FirstLogin from '../modules/Auth/FirstLogin/FirstLogin'
 import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
 import ContactPage from '../modules/Guest/ContactPage/ContactPage'
+import NotificationManagement from '@/app/modules/Manager/NotificationManagement/NotificationManagement'
 import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
 
 const redirectMap: Record<string, string> = {
@@ -452,6 +453,16 @@ const useRouteElement = () => {
             <RoleGuard roles={['projectmanager']}>
               <ManagerLayout>
                 <MyPerformanceManager />
+              </ManagerLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_NOTIFICATIONS,
+          element: (
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <NotificationManagement />
               </ManagerLayout>
             </RoleGuard>
           )

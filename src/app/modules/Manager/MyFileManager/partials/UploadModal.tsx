@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Button } from '@/app/components/ui/button'
 import { Progress } from '@/app/components/ui/progress'
+import { MyTaskApi } from '@/app/apis/AUTH/file.api'
+import { toast } from 'react-toastify'
 import {
   Upload,
   X,
@@ -27,7 +29,7 @@ interface UploadFile {
 interface UploadModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onFilesUploaded: (files: File[]) => void
+  onFilesUploaded: () => void
 }
 
 export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModalProps) {
@@ -115,14 +117,26 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
   }
 
   const simulateUpload = async (file: UploadFile) => {
-    // Simulate upload progress
-    for (let progress = 0; progress <= 100; progress += 10) {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      setSelectedFiles((prev) =>
-        prev.map((f) =>
-          f.id === file.id ? { ...f, progress, status: progress === 100 ? 'completed' : 'uploading' } : f
-        )
-      )
+    try {
+      // Set status to uploading
+      setSelectedFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, status: 'uploading' } : f)))
+
+      // Simulate progress updates
+      for (let progress = 0; progress <= 90; progress += 10) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        setSelectedFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, progress } : f)))
+      }
+
+      // Upload file using API
+      await MyTaskApi.uploadFile(file.file)
+
+      // Mark as completed
+      setSelectedFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, progress: 100, status: 'completed' } : f)))
+    } catch (error) {
+      console.error('Upload failed:', error)
+      // Mark as error
+      setSelectedFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, status: 'error' } : f)))
+      throw error
     }
   }
 
@@ -131,24 +145,27 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
 
     setIsUploading(true)
 
-    // Start uploading all files
-    const uploadPromises = selectedFiles
-      .filter((file) => file.status === 'selected')
-      .map((file) => simulateUpload(file))
+    try {
+      const uploadPromises = selectedFiles
+        .filter((file) => file.status === 'selected')
+        .map((file) => simulateUpload(file))
 
-    await Promise.all(uploadPromises)
+      await Promise.all(uploadPromises)
 
-    // Call the callback with the actual files
-    const filesToUpload = selectedFiles.map((f) => f.file)
-    onFilesUploaded(filesToUpload)
+      toast.success(`${selectedFiles.length} file(s) uploaded successfully!`)
 
-    setIsUploading(false)
+      onFilesUploaded()
 
-    // Close modal after a short delay
-    setTimeout(() => {
-      onOpenChange(false)
-      setSelectedFiles([])
-    }, 1000)
+      setTimeout(() => {
+        onOpenChange(false)
+        setSelectedFiles([])
+      }, 1000)
+    } catch (error) {
+      console.error('Upload failed:', error)
+      toast.error('Some files failed to upload')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   const handleCancel = () => {
@@ -162,9 +179,6 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
         <DialogHeader>
           <div className='flex items-center justify-between'>
             <DialogTitle className='text-xl font-semibold text-foreground'>Upload Files</DialogTitle>
-            <button onClick={() => onOpenChange(false)} className='p-2 hover:bg-muted rounded-full transition-colors'>
-              <X className='h-5 w-5' />
-            </button>
           </div>
           <p className='text-sm text-muted-foreground mt-2'>Drag & drop files here, or click to select them.</p>
         </DialogHeader>
@@ -254,17 +268,6 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
             <Button onClick={handleUpload} disabled={selectedFiles.length === 0 || isUploading} className='px-8'>
               {isUploading ? 'Uploading...' : 'Upload Files'}
             </Button>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className='flex items-center justify-start pt-4 border-t border-border'>
-          <div className='flex items-center space-x-2 text-muted-foreground'>
-            <span className='text-xs'>Made with</span>
-            <div className='flex items-center space-x-1'>
-              <div className='w-3 h-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-sm'></div>
-              <span className='text-xs font-semibold'>Visily</span>
-            </div>
           </div>
         </div>
       </DialogContent>
