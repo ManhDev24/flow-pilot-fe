@@ -1,13 +1,13 @@
-import type React from 'react'
-import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
 import { Button } from '@/app/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Textarea } from '@/app/components/ui/textarea'
-import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
-import type { Department } from '../models/MydepartmentInterface'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import type { Department } from '../models/MyDepartmentInterface'
 
 interface UpdateDepartmentModalProps {
   isOpen: boolean

@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
@@ -7,9 +5,12 @@ import { Checkbox } from '@/app/components/ui/checkbox'
 import { Input } from '@/app/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Building2, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
-import type { Department } from './models/MydepartmentInterface'
+import type { Department } from './models/MyDepartmentInterface'
+import { CreateDepartmentModal, DeleteDepartmentModal, UpdateDepartmentModal } from './partials'
 
 // API returns { success: boolean, message: string, data: { items: Department[], total: number, page?: number, limit?: number } }
 type DepartmentsApiResponse = {
@@ -22,7 +23,6 @@ type DepartmentsApiResponse = {
     limit?: number
   }
 }
-import { CreateDepartmentModal, UpdateDepartmentModal, DeleteDepartmentModal } from './partials'
 
 function MyDepartment() {
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([])
