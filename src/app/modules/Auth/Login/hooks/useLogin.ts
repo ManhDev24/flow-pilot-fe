@@ -33,16 +33,16 @@ export const useLogin = () => {
           setEmail('');
           setLocalStorage('role', role);
           dispatch(setRole(role));
-          toast.success('Đăng nhập thành công!')
+          toast.success('Login successful!')
         }
 
         navigate(PATH.FIRST_LOGIN, { state: { email: email } });
       } else {
-        toast.error('Đăng nhập thất bại!');
+        toast.error('Login failed!');
       }
     },
     onError: (error: { response?: { data?: LoginResponse }; message?: string }) => {
-      let message = 'Đăng nhập thất bại!';
+      let message = 'Login failed!';
       const apiMessage = error?.response?.data?.message;
       if (typeof apiMessage === 'string') {
         message = apiMessage;
