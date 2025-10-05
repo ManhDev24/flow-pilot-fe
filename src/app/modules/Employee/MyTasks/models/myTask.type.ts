@@ -94,3 +94,22 @@ export interface Count {
   files: number
   reviews: number
 }
+
+export interface FileByTaskRes {
+  success: boolean
+  message: string
+  data: FileByTask[]
+}
+
+export interface FileByTask {
+  id: number
+  task_id: string
+  file_name: string
+  file_url: string
+  file_size: number
+  mime_type: string
+  uploaded_at: string
+  uploaded_by: string
+  created_at: string
+  updated_at: string
+}

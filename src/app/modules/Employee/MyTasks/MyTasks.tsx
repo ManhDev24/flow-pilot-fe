@@ -18,6 +18,7 @@ import {
   ClipboardList,
   Download,
   ListFilter,
+  Loader2,
   MessageSquare,
   Paperclip,
   Plus,
@@ -27,8 +28,8 @@ import {
   Upload,
   User
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import type { MyTask } from './models/myTask.type'
+import { useEffect, useState, useRef } from 'react'
+import type { MyTask, FileByTask } from './models/myTask.type'
 
 const getStatusStyles = (status: string) => {
   switch (status) {
@@ -126,6 +127,10 @@ export default function MyTasksPage() {
   const [tasks, setTasks] = useState<MyTask[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [taskFiles, setTaskFiles] = useState<FileByTask[]>([])
+  const [filesLoading, setFilesLoading] = useState(false)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentUserId = '327e1b0b-2698-4a0f-9273-ca9729a9f0cd'
 
@@ -164,17 +169,72 @@ export default function MyTasksPage() {
     }
   }
 
+  const fetchTaskFiles = async (taskId: string) => {
+    try {
+      setFilesLoading(true)
+      const response = await MyTaskApi.getFileByTaskId(taskId)
+      if (response.success) {
+        setTaskFiles(response.data)
+      }
+    } catch (err) {
+      console.error('Error fetching task files:', err)
+      setTaskFiles([])
+    } finally {
+      setFilesLoading(false)
+    }
+  }
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !selectedTask) return
+
+    try {
+      setUploadingFile(true)
+      await MyTaskApi.uploadFileByTaskId(selectedTask, file)
+      // Refresh files after upload
+      await fetchTaskFiles(selectedTask)
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    } catch (err) {
+      console.error('Error uploading file:', err)
+      alert('Failed to upload file')
+    } finally {
+      setUploadingFile(false)
+    }
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
+  }
+
+  const handleDownloadFile = (fileUrl: string, fileName: string) => {
+    const link = document.createElement('a')
+    link.href = fileUrl
+    link.download = fileName
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  useEffect(() => {
+    if (selectedTask) {
+      fetchTaskFiles(selectedTask)
+    }
+  }, [selectedTask])
+
   const selectedTaskData = tasks.find((task) => task.id === selectedTask)
 
   const activityLog = [
     { type: 'create', user: 'System', action: 'Task created', time: '2024-07-24 06:00 AM' },
     { type: 'status', user: 'Alice Johnson', action: 'Status changed to In Progress', time: '2024-07-24 06:36 AM' },
     { type: 'comment', user: 'Bob Miller', action: 'Added a comment', time: '2024-07-25 10:30 AM' }
-  ]
-
-  const attachments = [
-    { name: 'Brand_Guidelines_V2.pdf', size: '2.5 MB', type: 'pdf' },
-    { name: 'Campaign_Moodboard.png', size: '1.8 MB', type: 'image' }
   ]
 
   return (
@@ -448,29 +508,65 @@ export default function MyTasksPage() {
                 {/* Attachments */}
                 <div>
                   <div className='flex items-center justify-between mb-4'>
-                    <h3 className='text-lg font-semibold text-gray-900'>Attachments (2)</h3>
+                    <h3 className='text-lg font-semibold text-gray-900'>
+                      Attachments ({filesLoading ? '...' : taskFiles.length})
+                    </h3>
                   </div>
                   <div className='space-y-3'>
-                    {attachments.map((attachment, index) => (
-                      <div key={index} className='flex items-center justify-between p-3  rounded-lg'>
-                        <div className='flex items-center space-x-3'>
-                          <div className='w-8 h-8 rounded flex items-center justify-center'>
-                            <Paperclip className='w-4 h-4 text-blue-600' />
-                          </div>
-                          <div>
-                            <p className='text-sm font-medium text-gray-900'>{attachment.name}</p>
-                            <p className='text-xs text-gray-500'>{attachment.size}</p>
-                          </div>
-                        </div>
-                        <Button variant='ghost' size='sm'>
-                          <Download className='w-4 h-4 mr-2' />
-                          Download
-                        </Button>
+                    {filesLoading ? (
+                      <div className='flex items-center justify-center p-8'>
+                        <Loader2 className='w-6 h-6 animate-spin text-blue-600' />
                       </div>
-                    ))}
-                    <Button variant='outline' size='sm' className='w-full mt-2'>
-                      <Upload className='w-4 h-4 mr-2' />
-                      Upload Attachment
+                    ) : taskFiles.length > 0 ? (
+                      taskFiles.map((file) => (
+                        <div key={file.id} className='flex items-center justify-between p-3 rounded-lg'>
+                          <div className='flex items-center space-x-3'>
+                            <div className='w-8 h-8 rounded flex items-center justify-center'>
+                              <Paperclip className='w-4 h-4 text-blue-600' />
+                            </div>
+                            <div>
+                              <p className='text-sm font-medium text-gray-900'>{file.file_name}</p>
+                              <p className='text-xs text-gray-500'>{formatFileSize(file.file_size)}</p>
+                            </div>
+                          </div>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDownloadFile(file.file_url, file.file_name)}
+                          >
+                            <Download className='w-4 h-4 mr-2' />
+                            Download
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className='text-sm text-gray-500 text-center py-4'>No attachments</p>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type='file'
+                      className='hidden'
+                      onChange={handleFileUpload}
+                      disabled={uploadingFile}
+                    />
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='w-full mt-2'
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingFile}
+                    >
+                      {uploadingFile ? (
+                        <>
+                          <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className='w-4 h-4 mr-2' />
+                          Upload Attachment
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>

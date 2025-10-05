@@ -1,5 +1,5 @@
 import { fetcher } from '@/app/apis/fetcher'
-import type { PerformanceResponse } from '@/app/modules/Employee/MyPerformance/models/perfomance.type'
+import type { FocusLogResponse, PerformanceResponse } from '@/app/modules/Employee/MyPerformance/models/perfomance.type'
 import type { AxiosError, AxiosResponse } from 'axios'
 
 export const MyTaskApi = {
@@ -22,6 +22,15 @@ export const MyTaskApi = {
       const response: AxiosResponse = await fetcher.post(`/focus-log`, {
         focused_minutes
       })
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+  getFocusMe: async () => {
+    try {
+      const response: AxiosResponse<FocusLogResponse> = await fetcher.get(`/focus-log/me`)
       return response.data
     } catch (error) {
       const axiosError = error as AxiosError
