@@ -8,6 +8,7 @@ export type IUserStatePayload = {
   accessToken: string
   refreshToken: string
   wsid: string
+  projectId: string
   role: string
 }
 

@@ -20,6 +20,7 @@ export interface LoginResponseData {
   accessToken: string
   refreshToken: string
   wsid: string
+  projectId: string
   role: string
   isFirstLogin: boolean
 }
