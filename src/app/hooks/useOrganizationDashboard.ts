@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { performanceApi } from '@/app/apis/AUTH/performance.api'
+import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
 import type {
   OrganizationDashboardSummary,
   ProjectsAIAnalysis,
@@ -22,7 +22,7 @@ export const useOrganizationDashboard = (filters?: DashboardFilters): UseOrganiz
   const [evaluation, setEvaluation] = useState<OrganizationPerformanceEvaluation | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   // Cache để tránh gọi API trùng lặp
   const lastFiltersRef = useRef<string>('')
   const isMountedRef = useRef<boolean>(false)
@@ -30,24 +30,24 @@ export const useOrganizationDashboard = (filters?: DashboardFilters): UseOrganiz
   const fetchData = useCallback(async () => {
     // Serialize filters để so sánh
     const filtersString = JSON.stringify(filters || {})
-    
+
     // Kiểm tra nếu filters giống lần trước và đã có data
     if (filtersString === lastFiltersRef.current && dashboardData && !loading) {
       return
     }
-    
+
     // Cập nhật cache
     lastFiltersRef.current = filtersString
-    
+
     try {
       setLoading(true)
       setError(null)
 
       // Fetch all three APIs in parallel
       const [dashboardResponse, aiAnalysisResponse, evaluationResponse] = await Promise.all([
-        performanceApi.getOrganizationDashboardSummary(filters),
-        performanceApi.getProjectsAIAnalysis(filters),
-        performanceApi.getOrganizationPerformanceEvaluation(filters)
+        MyTaskApi.getOrganizationDashboardSummary(filters),
+        MyTaskApi.getProjectsAIAnalysis(filters),
+        MyTaskApi.getOrganizationPerformanceEvaluation(filters)
       ])
 
       setDashboardData(dashboardResponse.data)

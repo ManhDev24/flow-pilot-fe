@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { performanceApi } from '@/app/apis/AUTH/performance.api'
+import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
 import type {
   AllProjectsStatsResponse,
   AllProjectsOverviewResponse,
@@ -24,7 +24,7 @@ export const useProjectsPerformance = (fromDate?: string, toDate?: string): UseP
   const [projectsAIAnalysis, setProjectsAIAnalysis] = useState<AllProjectsAIAnalysisResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   // Cache để tránh gọi API trùng lặp
   const lastParamsRef = useRef<string>('')
   const isMountedRef = useRef<boolean>(false)
@@ -32,25 +32,25 @@ export const useProjectsPerformance = (fromDate?: string, toDate?: string): UseP
   const fetchData = useCallback(async () => {
     // Serialize params để so sánh
     const paramsString = JSON.stringify({ fromDate, toDate })
-    
+
     // Kiểm tra nếu params giống lần trước và đã có data
     if (paramsString === lastParamsRef.current && projectsStats && !loading) {
       return
     }
-    
+
     // Cập nhật cache
     lastParamsRef.current = paramsString
-    
+
     try {
       setLoading(true)
       setError(null)
 
       // Fetch all project performance APIs in parallel
       const [statsResponse, overviewResponse, kpiResponse, aiAnalysisResponse] = await Promise.all([
-        performanceApi.getAllProjectsStats(fromDate, toDate),
-        performanceApi.getAllProjectsOverview(fromDate, toDate),
-        performanceApi.getAllProjectsKPI(fromDate, toDate),
-        performanceApi.getAllProjectsAIAnalysis(fromDate, toDate)
+        MyTaskApi.getAllProjectsStats(fromDate, toDate),
+        MyTaskApi.getAllProjectsOverview(fromDate, toDate),
+        MyTaskApi.getAllProjectsKPI(fromDate, toDate),
+        MyTaskApi.getAllProjectsAIAnalysis(fromDate, toDate)
       ])
 
       setProjectsStats(statsResponse)
