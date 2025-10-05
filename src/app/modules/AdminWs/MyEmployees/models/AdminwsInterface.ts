@@ -22,6 +22,7 @@ export interface Employee {
   status: string
   role: EmployeeRole
   department: EmployeeDepartment
+  projectUsers?: { project?: { id: string; name: string; status?: string } }[]
 }
 
 export interface EmployeeRole {
@@ -44,7 +45,7 @@ export interface CreateEmployeePayload {
 export interface UpdateEmployeePayload {
   name: string
   email: string
-  avatar_url: string
+  // avatar_url: string
   department_id: number
   role_id: number
 }
@@ -67,5 +68,21 @@ export interface CreateEmployeeResponse {
 export interface UpdateEmployeeResponse {
   success: boolean
   message: string
-  data?: Employee
+  data?: EmployeeUpdateData
+}
+
+export interface EmployeeUpdateData {
+  id: string
+  name: string
+  email: string
+  avatar_url: any
+  department_id: any
+  role_id: number
+  workspace_id: string
+  status: string
+}
+
+export interface DeleteEmployeeResponse {
+  success: boolean
+  message: string
 }

@@ -14,14 +14,22 @@ import {
   Bar,
   Legend
 } from 'recharts'
+import type { 
+  OrganizationDashboardSummary
+} from '@/app/modules/AdminWs/models/performanceInterface'
 
-const roleDistributionData = [
+interface ChartsGridProps {
+  dashboardData: OrganizationDashboardSummary | null
+}
+
+// Default data when API data is not available
+const defaultRoleDistributionData = [
   { name: 'Software Engineer', value: 65, color: '#6366f1' },
   { name: 'Product Manager', value: 25, color: '#ec4899' },
   { name: 'Designer', value: 10, color: '#8b5cf6' }
 ]
 
-const accountStatusData = [
+const defaultAccountStatusData = [
   { month: 'Jan', active: 280, inactive: 45, pending: 25 },
   { month: 'Feb', active: 290, inactive: 40, pending: 20 },
   { month: 'Mar', active: 300, inactive: 35, pending: 15 },
@@ -30,7 +38,7 @@ const accountStatusData = [
   { month: 'Jul', active: 320, inactive: 20, pending: 10 }
 ]
 
-const growthTrendsData = [
+const defaultGrowthTrendsData = [
   { quarter: 'Q1 2023', newHires: 32, departures: 8 },
   { quarter: 'Q2 2023', newHires: 38, departures: 12 },
   { quarter: 'Q3 2023', newHires: 35, departures: 15 },
@@ -39,15 +47,28 @@ const growthTrendsData = [
   { quarter: 'Q2 2024', newHires: 55, departures: 5 }
 ]
 
-const topRolesData = [
-  { role: 'Software Engineer', count: 65 },
-  { role: 'Product Manager', count: 45 },
-  { role: 'UX Designer', count: 35 },
-  { role: 'Data Scientist', count: 25 },
-  { role: 'Other', count: 15 }
-]
+export function ChartsGridForReports({ dashboardData }: ChartsGridProps) {
+  // Transform API data for charts or use defaults
+  const roleDistributionData = dashboardData?.employeeRoleDistribution ? [
+    { name: 'Software Engineer', value: dashboardData.employeeRoleDistribution.softwareEngineer, color: '#6366f1' },
+    { name: 'Product Manager', value: dashboardData.employeeRoleDistribution.productManager, color: '#ec4899' },
+    { name: 'Designer', value: dashboardData.employeeRoleDistribution.designer, color: '#8b5cf6' }
+  ] : defaultRoleDistributionData
 
-export function ChartsGridForReports() {
+  const accountStatusData = dashboardData?.accountStatusOverTime || defaultAccountStatusData
+
+  const growthTrendsData = dashboardData?.employeeGrowthTrends || defaultGrowthTrendsData
+
+  const topRolesData = dashboardData?.topActiveRoles || [
+    { role: 'Software Engineer', count: 65 },
+    { role: 'Product Manager', count: 45 },
+    { role: 'UX Designer', count: 35 },
+    { role: 'Data Scientist', count: 25 },
+    { role: 'Other', count: 15 }
+  ]
+
+
+
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
       <Card className='bg-card border border-border'>
@@ -67,7 +88,7 @@ export function ChartsGridForReports() {
                   paddingAngle={5}
                   dataKey='value'
                 >
-                  {roleDistributionData.map((entry, index) => (
+                  {roleDistributionData.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -76,7 +97,7 @@ export function ChartsGridForReports() {
             </ResponsiveContainer>
           </div>
           <div className='flex justify-center space-x-4 mt-4'>
-            {roleDistributionData.map((item) => (
+            {roleDistributionData.map((item: any) => (
               <div key={item.name} className='flex items-center space-x-2'>
                 <div className='w-3 h-3 rounded-full' style={{ backgroundColor: item.color }} />
                 <span className='text-xs text-muted-foreground'>
@@ -130,11 +151,11 @@ export function ChartsGridForReports() {
           <CardTitle className='text-lg font-semibold'>Employee Growth Trends</CardTitle>
           <div className='flex items-center space-x-2 mt-2'>
             <div className='w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center'>
-              <span className='text-xs font-bold'>JD</span>
+              <span className='text-xs font-bold'>{dashboardData?.hrManager?.name?.split(' ').map(n => n[0]).join('') || 'JD'}</span>
             </div>
             <div>
-              <p className='text-sm font-medium'>John Doe</p>
-              <p className='text-xs text-muted-foreground'>HR Manager</p>
+              <p className='text-sm font-medium'>{dashboardData?.hrManager?.name || 'John Doe'}</p>
+              <p className='text-xs text-muted-foreground'>{dashboardData?.hrManager?.title || 'HR Manager'}</p>
             </div>
           </div>
         </CardHeader>
@@ -162,18 +183,24 @@ export function ChartsGridForReports() {
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            {topRolesData.map((role, index) => (
-              <div key={role.role} className='flex items-center space-x-3'>
-                <span className='text-sm font-medium w-32 text-left'>{role.role}</span>
-                <div className='flex-1 bg-secondary rounded-full h-6 relative'>
-                  <div
-                    className={`h-6 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-pink-500'}`}
-                    style={{ width: `${(role.count / 65) * 100}%` }}
-                  />
+            {topRolesData.map((role: any, index: number) => {
+              const roleName = role.roleName || role.role || 'Unknown'
+              const roleCount = role.count || 0
+              const maxRoleCount = Math.max(...topRolesData.map((r: any) => r.count || 0))
+              
+              return (
+                <div key={roleName} className='flex items-center space-x-3'>
+                  <span className='text-sm font-medium w-32 text-left'>{roleName}</span>
+                  <div className='flex-1 bg-secondary rounded-full h-6 relative'>
+                    <div
+                      className={`h-6 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-pink-500'}`}
+                      style={{ width: `${maxRoleCount > 0 ? (roleCount / maxRoleCount) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className='text-sm font-medium w-8 text-right'>{roleCount}</span>
                 </div>
-                <span className='text-sm font-medium w-8 text-right'>{role.count}</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </CardContent>
       </Card>
