@@ -1,7 +1,8 @@
 import { useDraggable } from '@dnd-kit/core'
 import { Card } from '@/app/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
-import { MessageSquare } from 'lucide-react'
+import { Button } from '@/app/components/ui/button'
+import { MessageSquare, MoreHorizontal } from 'lucide-react'
 
 interface Tag {
   label: string
@@ -16,6 +17,7 @@ interface KanbanCardProps {
   subtasks: number
   comments: number
   avatars: string[]
+  onViewDetail?: () => void
 }
 
 const tagColors: Record<string, string> = {
@@ -27,7 +29,7 @@ const tagColors: Record<string, string> = {
   blue: 'bg-blue-100 text-blue-700'
 }
 
-export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars }: KanbanCardProps) {
+export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars, onViewDetail }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: id
   })
@@ -54,7 +56,22 @@ export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars
         </div>
       )}
       <div className='p-4'>
-        <h3 className='mb-3 text-sm font-medium leading-snug text-card-foreground'>{title}</h3>
+        <div className='flex items-center justify-between mb-3'>
+          <h3 className='text-sm font-medium leading-snug text-card-foreground flex-1'>{title}</h3>
+          {onViewDetail && (
+            <Button
+              variant='ghost'
+              size='sm'
+              className='h-6 w-6 p-0 ml-2 hover:bg-muted'
+              onClick={(e) => {
+                e.stopPropagation()
+                onViewDetail()
+              }}
+            >
+              <MoreHorizontal className='h-4 w-4' />
+            </Button>
+          )}
+        </div>
         <div className='mb-3 flex flex-wrap gap-2'>
           {tags.map((tag, index) => (
             <span
