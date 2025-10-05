@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { notificationApi } from '@/app/apis/Notification/Notification.api'
+import { notificationApi } from '@/app/apis/AUTH/notification.api'
 import { toast } from 'react-toastify'
 import type { NotificationResponse } from '../models'
 

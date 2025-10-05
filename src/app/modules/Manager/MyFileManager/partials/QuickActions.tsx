@@ -4,15 +4,18 @@ import { Button } from '@/app/components/ui/button'
 import { UploadModal } from './UploadModal'
 import { FolderPlus, Upload, Share2, Trash2 } from 'lucide-react'
 
-export function QuickActions() {
+interface QuickActionsProps {
+  onFilesUploaded?: () => void
+}
+
+export function QuickActions({ onFilesUploaded }: QuickActionsProps) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
-  const handleFilesUploaded = (files: File[]) => {
-    console.log(
-      'Files uploaded:',
-      files.map((f) => f.name)
-    )
-    // Here you would handle the file upload to your server
+  const handleFilesUploaded = () => {
+    if (onFilesUploaded) {
+      onFilesUploaded()
+    }
+    setUploadModalOpen(false)
   }
 
   const actions = [

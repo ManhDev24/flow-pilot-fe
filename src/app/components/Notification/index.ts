@@ -19,4 +19,4 @@ export type {
 } from './models'
 
 // API
-export { notificationApi } from '@/app/apis/Notification/Notification.api'
+export { notificationApi } from '@/app/apis/AUTH/notification.api'
