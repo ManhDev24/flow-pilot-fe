@@ -1,5 +1,9 @@
 import { fetcher } from '@/app/apis/fetcher'
 import type {
+  CreateDepartmentResponse,
+  UpdateDepartmentResponse
+} from '@/app/modules/AdminWs/MyDepartment/models/MydepartmentInterface'
+import type {
   AdminWsResponse,
   CreateEmployeePayload,
   UpdateEmployeePayload
@@ -42,6 +46,44 @@ export const AdminWsApi = {
   updateUser: async (id: string, userData: UpdateEmployeePayload) => {
     try {
       const response = await fetcher.put(`/user/admin/${id}`, userData)
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+  getAllDepartments: async (page: number, pageSize: number) => {
+    try {
+      const response = await fetcher.get(`/department?page=${page}&pageSize=${pageSize}`)
+      console.log('API Raw Response:', response.data) // Debug log
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      console.error('API Error:', axiosError) // Debug log
+      throw axiosError
+    }
+  },
+  createDepartment: async (name: string, description: string) => {
+    try {
+      const response = await fetcher.post('/department', { name, description })
+      return response.data as CreateDepartmentResponse
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+  updateDepartment: async (name: string, description: string, status: string, id: number) => {
+    try {
+      const response = await fetcher.put(`/department/${id}`, { name, description, status })
+      return response.data as UpdateDepartmentResponse
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+  deleteDepartment: async (id: number) => {
+    try {
+      const response = await fetcher.delete(`/department/${id}`)
       return response.data
     } catch (error) {
       const axiosError = error as AxiosError

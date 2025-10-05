@@ -1,41 +1,49 @@
 import { Card } from '@/app/components/ui/card'
 import { ShieldCheck, Tally3, UserCheck, Users } from 'lucide-react'
-const metrics = [
-  {
-    title: 'Total Employees',
-    value: '2,350',
-    change: '+4.2% from last year',
-    subtext: 'Current active workforce',
-    icon: Users,
-    color: 'text-blue-600'
-  },
-  {
-    title: 'Active account',
-    value: '3.7/10',
-    change: '+0.3 since last review',
-    subtext: 'Average score across all evaluations',
-    icon: UserCheck,
-    color: 'text-green-600'
-  },
-  {
-    title: 'Role Assign',
-    value: '92%',
-    change: '+1.5% compared to Q1',
-    subtext: 'Percentage of employees retained',
-    icon: ShieldCheck,
-    color: 'text-purple-600'
-  },
-  {
-    title: 'New Hires',
-    value: '78%',
-    change: '+16% from last month',
-    subtext: 'Average training module completion',
-    icon: Tally3,
-    color: 'text-orange-600'
-  }
-]
+import type { OrganizationDashboardSummary, OrganizationPerformanceEvaluation } from '@/app/modules/AdminWs/models/performanceInterface'
 
-export function MetricsCardsForReports() {
+interface MetricsCardsProps {
+  dashboardData: OrganizationDashboardSummary | null
+  evaluation: OrganizationPerformanceEvaluation | null
+  loading?: boolean
+}
+
+export function MetricsCardsForReports({ dashboardData, evaluation, loading }: MetricsCardsProps) {
+  const metrics = [
+    {
+      title: 'Total Employees',
+      value: loading ? '-' : dashboardData?.totalEmployees?.toLocaleString() || '0',
+      change: loading ? '-' : `${dashboardData?.period || 'current period'}`,
+      subtext: 'Current active workforce',
+      icon: Users,
+      color: 'text-blue-600'
+    },
+    {
+      title: 'Performance Score',
+      value: loading ? '-' : `${dashboardData?.activeAccountScore || evaluation?.overallPerformanceScore || 0}/10`,
+      change: loading ? '-' : '+0.3 since last review',
+      subtext: 'Average score across all evaluations',
+      icon: UserCheck,
+      color: 'text-green-600'
+    },
+    {
+      title: 'Role Assignment',
+      value: loading ? '-' : `${dashboardData?.roleAssignPercentage || 0}%`,
+      change: loading ? '-' : '+1.5% compared to Q1',
+      subtext: 'Percentage of employees with assigned roles',
+      icon: ShieldCheck,
+      color: 'text-purple-600'
+    },
+    {
+      title: 'New Hires Success',
+      value: loading ? '-' : `${dashboardData?.newHiresPercentage || 0}%`,
+      change: loading ? '-' : '+16% from last month',
+      subtext: 'New hire integration success rate',
+      icon: Tally3,
+      color: 'text-orange-600'
+    }
+  ]
+
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
       {metrics.map((metric) => (
