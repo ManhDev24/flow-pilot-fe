@@ -30,7 +30,7 @@ export function PriorityTasks() {
                 priorityOrder[b.priority as keyof typeof priorityOrder]
               )
             })
-            .slice(0, 4) // Chỉ lấy 4 task đầu tiên
+            .slice(0, 5) // Chỉ lấy 4 task đầu tiên
 
           setTasks(sortedTasks)
         }
