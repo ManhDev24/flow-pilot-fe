@@ -155,7 +155,7 @@ const Footer = () => {
       {/* Bottom */}
       <div className='max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center mt-8 border-t border-gray-200 pt-4 gap-4 px-2 sm:px-0'>
         <div className='text-xs text-gray-500 text-center sm:text-left'>
-          © 2025 FlowPilot. Tất cả quyền được bảo lưu.
+          © 2025 FLOWPILOT. Tất cả quyền được bảo lưu.
         </div>
       </div>
     </footer>

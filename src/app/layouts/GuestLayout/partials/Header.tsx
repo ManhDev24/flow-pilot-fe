@@ -58,7 +58,7 @@ const Header = () => {
       </li>
       <li className='lg:hidden mt-2 pt-3 border-t border-gray-200'>
         <Link to='/auth/login' onClick={() => setMobileMenuOpen(false)}>
-          <button className='w-full flex items-center justify-center gap-1 text-base font-medium rounded-xl transition-all duration-300 ease-in-out bg-[#0094FF] text-white hover:bg-[#07c] hover:scale-105 hover:shadow-lg px-4 py-3'>
+          <button className='w-full flex items-center justify-center gap-1 text-base font-medium rounded-xl transition-all duration-300 ease-in-out bg-gradient-to-r from-pink-500 via-purple-600 to-blue-500 text-white hover:shadow-lg hover:scale-105 px-4 py-3'>
             Đăng nhập
           </button>
         </Link>
@@ -88,7 +88,7 @@ const Header = () => {
 
         <div className='Navbar-account-menu flex items-center gap-2 sm:gap-3 lg:gap-4 flex-shrink-0'>
           <Link to='/auth/login' className='hidden lg:block'>
-            <button className='text-base font-medium px-[30px] py-[8px] bg-[#0094FF] text-white border-[#0094FF] rounded-md hover:bg-[#07c] hover:scale-105 hover:shadow-lg transition-all duration-300 ease-in-out whitespace-nowrap'>
+            <button className='text-base font-medium px-[30px] py-[8px] bg-gradient-to-r from-pink-500 via-purple-600 to-blue-500 text-white rounded-md hover:scale-105 hover:shadow-lg transition-all duration-300 ease-in-out whitespace-nowrap'>
               Đăng nhập
             </button>
           </Link>
