@@ -1,21 +1,21 @@
-import type { IUserState } from '@/app/models'
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent } from '@/app/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form'
 import { Input } from '@/app/components/ui/input'
 import { PATH } from '@/app/routes/path'
-import { removeLocalStorage } from '@/app/utils'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { object, ref, string } from 'yup'
-import { useFirstLogin } from './hooks/useFirstLogin'
-import type { FirstLoginForm } from './models/FirstLoginFormInterface'
+import { useResetPassword, useResendOtp } from './hooks/useResetPassword'
+import type { ResetPasswordForm } from './models/ResetPasswordFormInterface'
 
-const firstLoginFormSchema = object({
+const resetPasswordFormSchema = object({
+  code: string()
+    .required('OTP code is required')
+    .length(6, 'OTP code must be 6 characters'),
   newPassword: string()
     .min(6, 'Password must be at least 6 characters')
     .max(100, 'Password cannot exceed 100 characters')
@@ -29,44 +29,67 @@ const firstLoginFormSchema = object({
     .required('Confirm password is required')
 })
 
-const FirstLogin = () => {
+const ResetPassword = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
   const [email, setEmail] = useState<string>(location.state?.email || '')
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  const [countdown, setCountdown] = useState<number>(300) // Start with 5 minutes (300 seconds)
 
-  const { currentUser } = useSelector((state: { user: IUserState }) => state.user)
-  const firstLoginMutation = useFirstLogin(email)
-  const isLoading = firstLoginMutation.status === 'pending'
+  const resetPasswordMutation = useResetPassword(email)
+  const resendOtpMutation = useResendOtp(email)
+  const isLoading = resetPasswordMutation.status === 'pending'
+  const isResendingOtp = resendOtpMutation.status === 'pending'
 
   useEffect(() => {
-    if (!email || !currentUser) {
-      // Redirect to login if email is not available
+    if (!email) {
+      // Redirect to forgot password if email is not available
       setEmail('')
-      navigate(PATH.LOGIN)
-      removeLocalStorage('user')
-      removeLocalStorage('role')
+      navigate(PATH.FORGOT_PASSWORD)
     }
-  }, [email, currentUser, navigate])
+  }, [email, navigate])
 
-  const form = useForm<FirstLoginForm>({
+  // Countdown timer for resend OTP
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [countdown])
+
+  const form = useForm<ResetPasswordForm>({
     mode: 'onBlur',
     defaultValues: {
+      code: '',
       newPassword: '',
       confirmPassword: ''
     },
-    resolver: yupResolver(firstLoginFormSchema)
+    resolver: yupResolver(resetPasswordFormSchema)
   })
 
   const { control, handleSubmit } = form
 
-  const onSubmit: SubmitHandler<FirstLoginForm> = (data) => {
-    firstLoginMutation.mutate({
+  const onSubmit: SubmitHandler<ResetPasswordForm> = (data) => {
+    resetPasswordMutation.mutate({
+      code: data.code,
       newPassword: data.newPassword,
       confirmPassword: data.confirmPassword
     })
+  }
+
+  const handleResendOtp = () => {
+    if (countdown === 0) {
+      resendOtpMutation.mutate()
+      setCountdown(300) // 5 minutes = 300 seconds
+    }
+  }
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
   return (
@@ -78,10 +101,32 @@ const FirstLogin = () => {
         <CardContent className='w-full flex flex-col items-center p-0'>
           <div className='flex flex-col items-center mb-8'>
             <img className='w-28 h-28 object-contain drop-shadow-lg' src={logoFlowpilot} alt='flow-pilot-logo' />
-            <p className='text-gray-400 text-sm'>Set Your New Password</p>
+            <p className='text-gray-400 text-sm text-center'>Reset Your Password</p>
+            <p className='text-gray-500 text-xs mt-2 text-center'>
+              Enter the OTP code sent to <span className='font-semibold text-blue-600'>{email}</span>
+            </p>
           </div>
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className='w-full flex flex-col items-center gap-4'>
+              <FormField
+                control={control}
+                name='code'
+                render={({ field }) => (
+                  <FormItem className='w-full max-w-sm'>
+                    <FormLabel className='text-base font-medium text-gray-700'>OTP Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type='text'
+                        placeholder='Enter 6-digit OTP code'
+                        maxLength={6}
+                        autoComplete='off'
+                      />
+                    </FormControl>
+                    <FormMessage className='text-red-500 text-xs mt-1' />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={control}
                 name='newPassword'
@@ -212,13 +257,29 @@ const FirstLogin = () => {
                   </FormItem>
                 )}
               />
-              <Button
-                type='submit'
-                className='w-full max-w-sm bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-full text-lg transition mb-4 border-0 shadow-md'
-                disabled={isLoading}
-              >
-                {isLoading ? 'Loading...' : 'Set Password'}
-              </Button>
+              
+              <div className='w-full max-w-sm flex flex-col gap-3'>
+                <Button
+                  type='submit'
+                  className='w-full bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-full text-lg transition border-0 shadow-md'
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Resetting...' : 'Reset Password'}
+                </Button>
+
+                <Button
+                  type='button'
+                  onClick={handleResendOtp}
+                  className='w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-full text-base transition border border-gray-300'
+                  disabled={countdown > 0 || isResendingOtp}
+                >
+                  {isResendingOtp
+                    ? 'Sending...'
+                    : countdown > 0
+                      ? `Resend OTP (${formatTime(countdown)})`
+                      : 'Resend OTP'}
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
@@ -227,4 +288,4 @@ const FirstLogin = () => {
   )
 }
 
-export default FirstLogin
+export default ResetPassword

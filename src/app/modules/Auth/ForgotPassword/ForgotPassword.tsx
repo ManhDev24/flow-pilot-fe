@@ -5,7 +5,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/app/components/ui/input'
 import { PATH } from '@/app/routes/path'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { object, string } from 'yup'
@@ -13,13 +12,13 @@ import type { ForgotPasswordForm } from './models/ForgetPasswordFormInterface'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '@/app/apis/AUTH/Auth.api'
 import { toast } from 'react-toastify'
+import type { LoginResponse } from '../Login/models/LoginFormInterface'
 
 const forgotPasswordSchema = object({
   email: string().email('Invalid email address').required('Email is required')
 })
 
 const ForgotPassword = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const form = useForm<ForgotPasswordForm>({
@@ -32,24 +31,32 @@ const ForgotPassword = () => {
 
   const { control, handleSubmit } = form
 
-  const { mutate: handleSendOtp } = useMutation({
+  const sendOtpMutation = useMutation<LoginResponse, { data?: LoginResponse; message?: string }, { email: string }>({
     mutationFn: (payload: { email: string }) => authApi.sendOtpForgotPassword(payload.email),
     onSuccess: (data) => {
-      console.log('🚀 ~ ForgotPassword ~ data:', data)
-      toast.success('Đã gửi OTP thành công!')
-      navigate(PATH.RESET_PASSWORD, { state: { email: form.getValues('email') } })
+      if (data && data.success) {
+        toast.success('OTP sent successfully!')
+        navigate(PATH.RESET_PASSWORD, { state: { email: form.getValues('email') } })
+      } else {
+        const errorMessage = typeof data.message === 'string' ? data.message : data.message?.message || 'Failed to send OTP!'
+        toast.error(errorMessage)
+      }
     },
-    onError: (error: { data: { message: string } }) => {
-      const errorMessage = error?.data?.message || 'Error sending OTP'
+    onError: (error: { data?: LoginResponse; message?: string }) => {
+      let errorMessage = 'Failed to send OTP!'
+      if (error?.data?.message) {
+        errorMessage = typeof error.data.message === 'string' ? error.data.message : error.data.message.message
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
       toast.error(errorMessage)
-      setIsLoading(false)
     }
   })
 
+  const isLoading = sendOtpMutation.status === 'pending'
+
   const onSubmit: SubmitHandler<ForgotPasswordForm> = (data) => {
-    setIsLoading(true)
-    console.log(data)
-    handleSendOtp({ email: data.email })
+    sendOtpMutation.mutate({ email: data.email })
   }
 
   return (

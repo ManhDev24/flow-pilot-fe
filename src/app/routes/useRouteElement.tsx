@@ -41,6 +41,7 @@ import ProjectReport from '@/app/modules/Manager/ProjectReport/ProjectReport'
 import { useSelector } from 'react-redux'
 import type { IRoleState } from '../models'
 import FirstLogin from '../modules/Auth/FirstLogin/FirstLogin'
+import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -195,6 +196,14 @@ const useRouteElement = () => {
           element: (
             <AuthLayout>
               <ForgotPassword />
+            </AuthLayout>
+          )
+        },
+        {
+          path: PATH.RESET_PASSWORD,
+          element: (
+            <AuthLayout>
+              <ResetPassword />
             </AuthLayout>
           )
         }
