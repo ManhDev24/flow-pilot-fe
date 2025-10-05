@@ -43,6 +43,7 @@ import type { IRoleState } from '../models'
 import FirstLogin from '../modules/Auth/FirstLogin/FirstLogin'
 import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
 import ContactPage from '../modules/Guest/ContactPage/ContactPage'
+import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -291,6 +292,14 @@ const useRouteElement = () => {
           element: (
             <AdminWsLayout>
               <MyWorkspace />
+            </AdminWsLayout>
+          )
+        },
+        {
+          path: PATH.ADMIN_DEPARTMENTS,
+          element: (
+            <AdminWsLayout>
+              <MyDepartment />
             </AdminWsLayout>
           )
         },
