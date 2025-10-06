@@ -45,6 +45,11 @@ import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
 import ContactPage from '../modules/Guest/ContactPage/ContactPage'
 import NotificationManagement from '@/app/modules/Manager/NotificationManagement/NotificationManagement'
 import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
+import ConsultationReqManagement from '../modules/SuperAdmin/ConsultationReqManagement/ConsultationReqManagement'
+import OrderManagement from '../modules/SuperAdmin/OrderManagement/OrderManagement'
+import PaymentManagement from '../modules/SuperAdmin/PaymentManagement/PaymentManagement'
+import PackageManagement from '../modules/SuperAdmin/PackageManagement/PackageManagement'
+import FeatureManagement from '../modules/SuperAdmin/FeatureManagement/FeatureManagement'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -234,6 +239,46 @@ const useRouteElement = () => {
           element: (
             <SuperAdminLayout>
               <Dashboard />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_CONSULTATION_REQ,
+          element: (
+            <SuperAdminLayout>
+              <ConsultationReqManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_ORDERS,
+          element: (
+            <SuperAdminLayout>
+              <OrderManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PAYMENTS,
+          element: (
+            <SuperAdminLayout>
+              <PaymentManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PACKAGES,
+          element: (
+            <SuperAdminLayout>
+              <PackageManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_FEATURES,
+          element: (
+            <SuperAdminLayout>
+              <FeatureManagement />
             </SuperAdminLayout>
           )
         },
