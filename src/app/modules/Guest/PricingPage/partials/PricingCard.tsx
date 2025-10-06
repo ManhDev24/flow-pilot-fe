@@ -31,10 +31,11 @@ export function PricingCard(props: PricingCardProps) {
         </h3>
 
         <div className='mt-2 sm:mt-4 flex items-baseline justify-center gap-2'>
+          <span className='text-sm sm:text-base opacity-80'>Chỉ từ</span>
           <span className='text-xl sm:text-3xl font-bold'>
             {typeof price === 'number' ? `${Math.round(price).toLocaleString('vi-VN')} ₫` : price}
           </span>
-          <span className='text-[11px] sm:text-xs opacity-80'>/ {period}</span>
+          <span className='text-xs sm:text-sm opacity-80'>/ {period}</span>
         </div>
 
         <p className='text-xs sm:text-sm opacity-90 mt-1 sm:mt-2'>{users}</p>

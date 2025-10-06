@@ -17,7 +17,7 @@ import {
   ShoppingCart,
   CreditCard,
   Package,
-  Settings
+  Zap
 } from 'lucide-react'
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import { authApi } from '@/app/apis/AUTH/Auth.api'
@@ -53,7 +53,7 @@ function SuperAdminSidebar() {
     { icon: ShoppingCart, label: 'Orders', to: `${PATH.SUPER_ADMIN_ORDERS}` },
     { icon: CreditCard, label: 'Payments', to: `${PATH.SUPER_ADMIN_PAYMENTS}` },
     { icon: Package, label: 'Packages', to: `${PATH.SUPER_ADMIN_PACKAGES}` },
-    { icon: Settings, label: 'Features', to: `${PATH.SUPER_ADMIN_FEATURES}` }
+    { icon: Zap, label: 'Features', to: `${PATH.SUPER_ADMIN_FEATURES}` }
   ]
 
   return (
