@@ -117,6 +117,16 @@ fetcher.interceptors.response.use(
         }
       }
     }
+
+    if (
+      error.response?.status === 400 &&
+      error.response?.data?.code == 'ACCESS_TOKEN_IS_REQUIRED' &&
+      !originalRequest._retry
+    ) {
+      removeLocalStorage('user')
+      removeLocalStorage('role')
+    }
+    
     return Promise.reject(error)
   }
 )
