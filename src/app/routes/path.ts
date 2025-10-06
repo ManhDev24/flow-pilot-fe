@@ -15,6 +15,11 @@ export const PATH = {
   SUPER_ADMIN: '/super-admin',
   SUPER_ADMIN_DASHBOARD: '/super-admin/dashboard',
   SUPER_ADMIN_USERS: '/super-admin/users',
+  SUPER_ADMIN_ORDERS: '/super-admin/orders',
+  SUPER_ADMIN_PAYMENTS: '/super-admin/payments',
+  SUPER_ADMIN_PACKAGES: '/super-admin/packages',
+  SUPER_ADMIN_FEATURES: '/super-admin/features',
+  SUPER_ADMIN_CONSULTATION_REQ: '/super-admin/consultation-requests',
   SUPER_ADMIN_WORKSPACES: '/super-admin/workspaces',
   SUPER_ADMIN_WORKSPACE_DETAIL: '/super-admin/workspace-detail/:id',
   // HR - ADMIN WORKSPACE (admin-ws)
