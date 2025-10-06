@@ -1,5 +1,7 @@
 import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
+import { Link } from 'react-router-dom'
+import { PATH } from '@/app/routes/path'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
 import { Checkbox } from '@/app/components/ui/checkbox'
@@ -39,6 +41,12 @@ function MyEmployees() {
     queryFn: AdminWsApi.getAllUsers
   })
 
+  // Fetch departments from API instead of deriving from users
+  const { data: departmentsData } = useQuery<any, AxiosError>({
+    queryKey: ['admin-ws-departments'],
+    queryFn: () => AdminWsApi.getAllDepartments(1, 100)
+  })
+
   // Filter employees based on search query and filters
   const filteredEmployees = (data?.data.items || []).filter((employee: ApiEmployee) => {
     const matchesSearch =
@@ -50,14 +58,32 @@ function MyEmployees() {
     const matchesDepartment = selectedDepartment === 'all' || employee.department?.name === selectedDepartment
     const matchesRole = selectedRole === 'all' || employee.role?.role === selectedRole
     const matchesStatus = selectedStatus === 'all' || employee.status === selectedStatus
+    // project filter: selectedProject can be 'all', a project name, or 'Not assigned'
+    const employeeProjectNames = (employee.projectUsers || []).map((pu) => pu.project?.name).filter(Boolean) as string[]
+    const matchesProject =
+      selectedProject === 'all' ||
+      (selectedProject === 'Not assigned' && employeeProjectNames.length === 0) ||
+      employeeProjectNames.includes(selectedProject)
 
-    return matchesSearch && matchesDepartment && matchesRole && matchesStatus
+    return matchesSearch && matchesDepartment && matchesRole && matchesStatus && matchesProject
   })
 
   // Get unique values for filter options
-  const departments = Array.from(new Set((data?.data.items || []).map((emp) => emp.department?.name).filter(Boolean)))
+  // Prefer department list from API if available
+  const departments: string[] =
+    (departmentsData?.data?.items?.map((d: { name: string }) => d.name).filter(Boolean) as string[]) ??
+    Array.from(new Set((data?.data.items || []).map((emp) => emp.department?.name).filter(Boolean)))
   const roles = Array.from(new Set((data?.data.items || []).map((emp) => emp.role?.role).filter(Boolean)))
   const statuses = Array.from(new Set((data?.data.items || []).map((emp) => emp.status).filter(Boolean)))
+
+  // derive unique project names from users' projectUsers
+  const projects: string[] = Array.from(
+    new Set(
+      (data?.data.items || [])
+        .flatMap((emp) => (emp.projectUsers || []).map((pu) => pu.project?.name).filter(Boolean) as string[])
+        .filter(Boolean) as string[]
+    )
+  )
 
   const clearAllFilters = () => {
     setSearchQuery('')
@@ -159,14 +185,16 @@ function MyEmployees() {
             </div>
 
             <Select value={selectedProject} onValueChange={setSelectedProject}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-[160px]'>
                 <SelectValue placeholder='All Projects' />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='all'>All Projects</SelectItem>
-                <SelectItem value='Alpha system'>Alpha system</SelectItem>
-                <SelectItem value='Beta system'>Beta system</SelectItem>
-                <SelectItem value='Delta system'>Delta system</SelectItem>
+                {projects.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {p}
+                  </SelectItem>
+                ))}
                 <SelectItem value='Not assigned'>Not assigned</SelectItem>
               </SelectContent>
             </Select>
@@ -253,6 +281,7 @@ function MyEmployees() {
                   </TableHead>
                   <TableHead className='text-gray-500 font-medium text-xs uppercase'>AVATAR</TableHead>
                   <TableHead className='text-gray-500 font-medium text-xs uppercase'>NAME</TableHead>
+                  <TableHead className='text-gray-500 font-medium text-xs uppercase'>EMAIL</TableHead>
                   <TableHead className='text-gray-500 font-medium text-xs uppercase'>ROLE</TableHead>
                   <TableHead className='text-gray-500 font-medium text-xs uppercase'>DEPARTMENT</TableHead>
                   <TableHead className='text-gray-500 font-medium text-xs uppercase'>PROJECT</TableHead>
@@ -270,21 +299,46 @@ function MyEmployees() {
                       />
                     </TableCell>
                     <TableCell>
-                      <Avatar className='w-8 h-8'>
-                        <AvatarImage src={employee.avatar_url || '/placeholder.svg'} />
-                        <AvatarFallback>
-                          {employee.name
-                            .split(' ')
-                            .map((n: string) => n[0])
-                            .join('')}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Link
+                        to={PATH.ADMIN_MY_EMPLOYEE_DETAIL.replace(':id', employee.id)}
+                        className='inline-flex items-center'
+                      >
+                        <Avatar className='w-8 h-8'>
+                          <AvatarImage src={employee.avatar_url || '/placeholder.svg'} />
+                          <AvatarFallback>
+                            {employee.name
+                              .split(' ')
+                              .map((n: string) => n[0])
+                              .join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
                     </TableCell>
-                    <TableCell className='font-medium text-gray-900'>{employee.name}</TableCell>
+                    <TableCell className='font-medium text-gray-900'>
+                      <Link to={PATH.ADMIN_MY_EMPLOYEE_DETAIL.replace(':id', employee.id)} className='hover:underline'>
+                        {employee.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell className='text-gray-600'>{employee.email}</TableCell>
                     <TableCell className='text-gray-600'>{employee.role?.role || 'Employee'}</TableCell>
                     <TableCell className='text-gray-600'>{employee.department?.name || 'Products'}</TableCell>
                     <TableCell className='text-gray-600'>
-                      {selectedProject !== 'all' ? selectedProject : 'No Assign Project'}
+                      {employee.projectUsers && employee.projectUsers.length > 0 ? (
+                        // join project names, show up to 3 and indicate if more
+                        (() => {
+                          const names = employee.projectUsers
+                            .map((pu) => pu.project?.name)
+                            .filter(Boolean) as string[]
+                          const first = names.slice(0, 3)
+                          return (
+                            <span>
+                              {first.join(', ')}{names.length > 3 ? ` +${names.length - 3} more` : ''}
+                            </span>
+                          )
+                        })()
+                      ) : (
+                        <span>Not assigned</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge

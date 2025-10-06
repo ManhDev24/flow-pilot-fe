@@ -7,6 +7,7 @@ import App from './App.tsx'
 import './index.css'
 import { Provider } from 'react-redux'
 import store from './app/redux/store.ts'
+import { SocketProvider } from './app/components/Notification/hooks/SocketProvider.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,8 +22,10 @@ createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <App />
-        <ToastContainer />
+        <SocketProvider>
+          <App />
+          <ToastContainer />
+        </SocketProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </Provider>

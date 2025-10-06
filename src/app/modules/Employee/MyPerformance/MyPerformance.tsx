@@ -1,26 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  Timer,
-  Play,
-  RotateCcw,
-  Settings,
-  Bell,
-  User,
-  Users,
-  BarChart3,
-  Folder,
-  Star
-} from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
-import { Button } from '@/app/components/ui/button'
-import { Badge } from '@/app/components/ui/badge'
-import { Slider } from '@/app/components/ui/slider'
-import { Switch } from '@/app/components/ui/switch'
+import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
+import type { FocusLog } from './models/perfomance.type'
+import { AlertPopup } from './partials/AlertPopup'
+import { MetricsCards } from './partials/MetricsCards'
+import { PersonalNotifications } from './partials/PersonalNotifications'
+import { PriorityTasks } from './partials/PriorityTasks'
+import { TimerSection } from './partials/TimerSection'
+import { TimerSettings } from './partials/TimerSettings'
+import { TodaySchedule } from './partials/TodaySchedule'
+import { WeeklyFocusHistory } from './partials/WeeklyFocusHistory'
 
 export default function FlowpilotDashboard() {
   const [focusDuration, setFocusDuration] = useState([25])
@@ -32,6 +21,27 @@ export default function FlowpilotDashboard() {
   const [selectedMode, setSelectedMode] = useState('pomodoro')
   const [isBreakMode, setIsBreakMode] = useState(false)
   const [showAlert, setShowAlert] = useState(false)
+  const [focusStartTime, setFocusStartTime] = useState<number | null>(null)
+  const [focusLogData, setFocusLogData] = useState<FocusLog[]>([])
+  const [loadingFocusLog, setLoadingFocusLog] = useState(true)
+
+  useEffect(() => {
+    const fetchFocusLog = async () => {
+      try {
+        setLoadingFocusLog(true)
+        const response = await MyTaskApi.getFocusMe()
+        if (response.success) {
+          setFocusLogData(response.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch focus log:', error)
+      } finally {
+        setLoadingFocusLog(false)
+      }
+    }
+
+    fetchFocusLog()
+  }, [])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -41,6 +51,13 @@ export default function FlowpilotDashboard() {
           if (time <= 1) {
             setShowAlert(true)
             setIsRunning(false)
+
+            // Nếu là focus mode (không phải break mode), ghi lại focus time
+            if (!isBreakMode && focusStartTime) {
+              const focusedMinutes = Math.round((initialTime - 1) / 60) // Tính số phút đã focus
+              postFocusTime(focusedMinutes)
+            }
+
             return 0
           }
           return time - 1
@@ -48,7 +65,7 @@ export default function FlowpilotDashboard() {
       }, 1000)
     }
     return () => clearInterval(interval)
-  }, [isRunning, currentTime])
+  }, [isRunning, currentTime, isBreakMode, focusStartTime, initialTime])
 
   useEffect(() => {
     if (!isRunning && !isCompleted) {
@@ -64,10 +81,31 @@ export default function FlowpilotDashboard() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
+  // Hàm gửi focus time lên server
+  const postFocusTime = async (focusedMinutes: number) => {
+    try {
+      await MyTaskApi.postFocusTime(focusedMinutes)
+      console.log(`Focus time logged: ${focusedMinutes} minutes`)
+      // Refresh focus log data after logging
+      const response = await MyTaskApi.getFocusMe()
+      if (response.success) {
+        setFocusLogData(response.data)
+      }
+    } catch (error) {
+      console.error('Failed to log focus time:', error)
+    }
+  }
+
   const handleStart = () => {
     if (isCompleted) {
       handleReset()
     }
+
+    // Nếu bắt đầu focus session (không phải break mode)
+    if (!isRunning && !isBreakMode) {
+      setFocusStartTime(Date.now())
+    }
+
     setIsRunning(!isRunning)
   }
 
@@ -76,6 +114,7 @@ export default function FlowpilotDashboard() {
     setIsCompleted(false)
     setIsBreakMode(false)
     setShowAlert(false)
+    setFocusStartTime(null)
     const newTime = getTimeForMode(selectedMode)
     setCurrentTime(newTime)
     setInitialTime(newTime)
@@ -126,510 +165,78 @@ export default function FlowpilotDashboard() {
     setInitialTime(newTime)
   }
 
-  // Sửa tính toán circle progress để đồng bộ với thời gian
   const getCircleProgress = () => {
     if (isCompleted) {
-      return 2 * Math.PI * 45 // Full circle when completed
+      return 2 * Math.PI * 45
     }
-    const progress = (initialTime - currentTime) / initialTime // Tính theo thời gian đã trôi qua
+    const progress = (initialTime - currentTime) / initialTime
     return 2 * Math.PI * 45 * progress
   }
 
-  // Handle continue break time
   const handleContinueBreak = () => {
     setShowAlert(false)
     if (!isBreakMode) {
+      // Chuyển sang break mode
       setIsBreakMode(true)
+      setFocusStartTime(null) // Clear focus tracking khi chuyển sang break
       const breakTime = breakDuration[0] * 60
       setCurrentTime(breakTime)
       setInitialTime(breakTime)
       setIsRunning(true)
     } else {
+      // Kết thúc break, reset để bắt đầu session mới
       setIsBreakMode(false)
       setIsCompleted(true)
       handleReset()
     }
   }
 
-  const weeklyData = [
-    { day: 'Mon', hours: 4 },
-    { day: 'Tue', hours: 5 },
-    { day: 'Wed', hours: 6 },
-    { day: 'Thu', hours: 7 },
-    { day: 'Fri', hours: 8 },
-    { day: 'Sat', hours: 6 },
-    { day: 'Sun', hours: 5 }
-  ]
-
-  const maxHours = Math.max(...weeklyData.map((d) => d.hours))
-
   return (
     <div className=''>
-      {/* Alert Popup - Updated */}
-      {showAlert && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg p-6 max-w-sm mx-4 text-center shadow-xl'>
-            <div className='mb-4'>
-              <div className='w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3'>
-                <CheckCircle className='w-8 h-8 text-indigo-600' />
-              </div>
-              <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-                {!isBreakMode ? 'Focus Time Complete!' : 'Break Time Complete!'}
-              </h3>
-              <p className='text-gray-600'>
-                {!isBreakMode
-                  ? `Great work! Ready for a ${breakDuration[0]} minute break?`
-                  : 'Break is over! Ready for another focus session?'}
-              </p>
-            </div>
-            <div className='flex gap-3 justify-center'>
-              <Button onClick={handleContinueBreak} className='bg-indigo-600 hover:bg-indigo-700 text-white px-6'>
-                {!isBreakMode ? 'Start Break' : 'New Session'}
-              </Button>
-              <Button
-                variant='outline'
-                onClick={() => {
-                  setShowAlert(false)
-                  handleReset()
-                }}
-              >
-                Reset
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AlertPopup
+        showAlert={showAlert}
+        isBreakMode={isBreakMode}
+        breakDuration={breakDuration}
+        onContinueBreak={handleContinueBreak}
+        onReset={handleReset}
+        onClose={() => setShowAlert(false)}
+      />
 
-      {/* Main Content */}
-      <div className=' p-6'>
-        {/* Metrics Cards */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-          <Card>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm text-gray-500 mb-1'>Today's Tasks</p>
-                  <p className='text-2xl font-bold'>12</p>
-                  <p className='text-xs text-gray-400'>Total tasks assigned</p>
-                  <p className='text-xs text-green-600 mt-1'>↗ 7% vs yesterday</p>
-                </div>
-                <Calendar className='w-8 h-8 text-orange-500' />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm text-gray-500 mb-1'>Completion Rate</p>
-                  <p className='text-2xl font-bold'>85%</p>
-                  <p className='text-xs text-gray-400'>Tasks completed today</p>
-                  <p className='text-xs text-green-600 mt-1'>↗ 5% vs yesterday</p>
-                </div>
-                <CheckCircle className='w-8 h-8 text-green-500' />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm text-gray-500 mb-1'>Overdue Tasks</p>
-                  <p className='text-2xl font-bold'>3</p>
-                  <p className='text-xs text-gray-400'>Past deadline</p>
-                  <p className='text-xs text-red-600 mt-1'>↗ 1% vs yesterday</p>
-                </div>
-                <AlertCircle className='w-8 h-8 text-red-500' />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm text-gray-500 mb-1'>Focus Hours</p>
-                  <p className='text-2xl font-bold'>6.5h</p>
-                  <p className='text-xs text-gray-400'>Logged today</p>
-                  <p className='text-xs text-green-600 mt-1'>↗ 10% vs yesterday</p>
-                </div>
-                <Timer className='w-8 h-8 text-purple-500' />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className='p-6'>
+        <MetricsCards />
 
         <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
-          {/* Timer Section */}
-          <div className='col-span-3 '>
-            {/* Timer Mode Buttons */}
-            <Card className='mb-8'>
-              <CardContent className='space-y-8 pt-6'>
-                {/* Timer Mode Buttons */}
-                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-                  <Button
-                    variant={selectedMode === 'pomodoro' ? 'default' : 'outline'}
-                    onClick={() => handleModeChange('pomodoro')}
-                    className={selectedMode === 'pomodoro' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}
-                  >
-                    Pomodoro (25/5)
-                  </Button>
-                  <Button
-                    variant={selectedMode === 'deep' ? 'default' : 'outline'}
-                    onClick={() => handleModeChange('deep')}
-                    className={selectedMode === 'deep' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}
-                  >
-                    Deep Work (45/10)
-                  </Button>
-                  <Button
-                    variant={selectedMode === 'marathon' ? 'default' : 'outline'}
-                    onClick={() => handleModeChange('marathon')}
-                    className={selectedMode === 'marathon' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}
-                  >
-                    Marathon (60/15)
-                  </Button>
-                </div>
-
-                {/* Timer Circle - Updated */}
-                <div className='flex justify-center'>
-                  <div className='relative w-72 h-72'>
-                    <svg className='w-full h-full' viewBox='0 0 100 100'>
-                      {/* Background Circle */}
-                      <circle cx='50' cy='50' r='45' stroke='#e5e7eb' strokeWidth='3' fill='none' />
-
-                      {/* Countdown Circle - Updated to use indigo-600 only */}
-                      <circle
-                        cx='50'
-                        cy='50'
-                        r='45'
-                        stroke='#4f46e5'
-                        strokeWidth='4'
-                        fill='none'
-                        strokeDasharray={`${2 * Math.PI * 45}`}
-                        strokeDashoffset={2 * Math.PI * 45 - getCircleProgress()}
-                        strokeLinecap='round'
-                        style={{
-                          transform: 'rotate(-90deg)',
-                          transformOrigin: '50% 50%',
-                          transition: 'stroke-dashoffset 1s linear'
-                        }}
-                      />
-
-                      {/* Glow effect when running */}
-                      {/* {isRunning && (
-                        <circle
-                          cx='50'
-                          cy='50'
-                          r='45'
-                          stroke='#4f46e5'
-                          strokeWidth='2'
-                          fill='none'
-                          opacity='0.3'
-                          strokeDasharray={`${2 * Math.PI * 45}`}
-                          strokeDashoffset={2 * Math.PI * 45 - getCircleProgress()}
-                          strokeLinecap='round'
-                          style={{
-                            transform: 'rotate(-90deg)',
-                            transformOrigin: '50% 50%',
-                            transition: 'stroke-dashoffset 0.1s linear'
-                          }}
-                        />
-                      )} */}
-                    </svg>
-
-                    {/* Time Text - Updated */}
-                    <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                      {isBreakMode && <span className='text-sm font-medium text-indigo-600 mb-1'>Break Time</span>}
-                      <span
-                        className={`text-5xl font-light transition-colors duration-500 ${
-                          isCompleted ? 'text-gray-400' : 'text-indigo-600'
-                        }`}
-                        style={{
-                          textShadow: isRunning ? '0 2px 4px rgba(79, 70, 229, 0.1)' : 'none'
-                        }}
-                      >
-                        {formatTime(currentTime)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Timer Controls */}
-                <div className='flex justify-center gap-4'>
-                  <Button onClick={handleStart} className='bg-indigo-600 hover:bg-indigo-700 px-8'>
-                    <Play className='w-4 h-4 mr-2' />
-                    {isCompleted ? 'Start' : isRunning ? 'Pause' : 'Start'}
-                  </Button>
-                  <Button variant='outline' onClick={handleReset}>
-                    <RotateCcw className='w-4 h-4 mr-2' />
-                    Reset
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Today's Schedule */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='text-lg'>Today's Schedule</CardTitle>
-                <p className='text-sm text-gray-500'>Your timeline for the day.</p>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-gray-500 w-16'>09:00 AM</div>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='font-medium'>Daily Standup Meeting</span>
-                      <Badge variant='secondary' className='bg-green-100 text-green-700'>
-                        Meeting
-                      </Badge>
-                    </div>
-                  </div>
-                  <CheckCircle className='w-4 h-4 text-green-500' />
-                </div>
-
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-gray-500 w-16'>10:00 AM</div>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='font-medium'>Review Q2 Project Report</span>
-                      <Badge variant='secondary' className='bg-orange-100 text-orange-700'>
-                        Task
-                      </Badge>
-                    </div>
-                  </div>
-                  <AlertCircle className='w-4 h-4 text-orange-500' />
-                </div>
-
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-gray-500 w-16'>11:30 AM</div>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='font-medium'>Prepare for Client Demo</span>
-                      <Badge variant='secondary' className='bg-blue-100 text-blue-700'>
-                        Task
-                      </Badge>
-                    </div>
-                  </div>
-                  <Clock className='w-4 h-4 text-blue-500' />
-                </div>
-
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-gray-500 w-16'>01:00 PM</div>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='font-medium'>Lunch Break</span>
-                      <Badge variant='secondary' className='bg-gray-100 text-gray-700'>
-                        Personal
-                      </Badge>
-                    </div>
-                  </div>
-                  <CheckCircle className='w-4 h-4 text-green-500' />
-                </div>
-
-                <div className='flex items-center gap-4'>
-                  <div className='text-sm text-gray-500 w-16'>02:00 PM</div>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='font-medium'>Refine UI/UX mockups</span>
-                      <Badge variant='secondary' className='bg-purple-100 text-purple-700'>
-                        Design
-                      </Badge>
-                    </div>
-                  </div>
-                  <Clock className='w-4 h-4 text-purple-500' />
-                </div>
-              </CardContent>
-            </Card>
+          <div className='col-span-3'>
+            <TimerSection
+              selectedMode={selectedMode}
+              currentTime={currentTime}
+              isRunning={isRunning}
+              isCompleted={isCompleted}
+              isBreakMode={isBreakMode}
+              onModeChange={handleModeChange}
+              onStart={handleStart}
+              onReset={handleReset}
+              formatTime={formatTime}
+              getCircleProgress={getCircleProgress}
+            />
+            <PersonalNotifications />
           </div>
 
-          {/* Right Sidebar */}
           <div className='space-y-6'>
-            {/* Weekly Focus History */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='text-lg'>Weekly Focus History</CardTitle>
-                <p className='text-sm text-gray-500'>Your focus over the last 7 days</p>
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-3'>
-                  {weeklyData.map((day, index) => (
-                    <div key={index} className='flex items-center gap-3'>
-                      <span className='text-xs text-gray-500 w-8'>{day.day}</span>
-                      <div className='flex-1 bg-gray-200 rounded-full h-2'>
-                        <div
-                          className='bg-indigo-600 h-2 rounded-full transition-all duration-500'
-                          style={{ width: `${(day.hours / maxHours) * 100}%` }}
-                        />
-                      </div>
-                      <span className='text-xs text-gray-500 w-4'>{day.hours}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className='mt-4 text-center'>
-                  <div className='flex justify-between text-xs text-gray-400'>
-                    <span>0</span>
-                    <span>2</span>
-                    <span>4</span>
-                    <span>6</span>
-                    <span>8</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <WeeklyFocusHistory focusLogData={focusLogData} loading={loadingFocusLog} />
 
-            {/* Timer Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='text-lg'>Timer Settings</CardTitle>
-                <p className='text-sm text-gray-500'>Customize your focus and break durations</p>
-              </CardHeader>
-              <CardContent className='space-y-6'>
-                <div>
-                  <div className='flex justify-between items-center mb-2'>
-                    <span className='text-sm font-medium'>Focus Duration: {focusDuration[0]} min</span>
-                  </div>
-                  <Slider
-                    value={focusDuration}
-                    onValueChange={(value) => {
-                      setFocusDuration(value)
-                      if (selectedMode !== 'custom') {
-                        setSelectedMode('custom')
-                      }
-                    }}
-                    max={60}
-                    min={15}
-                    step={5}
-                    className='w-full'
-                  />
-                </div>
+            <TimerSettings
+              focusDuration={focusDuration}
+              breakDuration={breakDuration}
+              selectedMode={selectedMode}
+              onFocusDurationChange={setFocusDuration}
+              onBreakDurationChange={setBreakDuration}
+              onModeChange={setSelectedMode}
+            />
 
-                <div>
-                  <div className='flex justify-between items-center mb-2'>
-                    <span className='text-sm font-medium'>Break Duration: {breakDuration[0]} min</span>
-                  </div>
-                  <Slider
-                    value={breakDuration}
-                    onValueChange={(value) => {
-                      setBreakDuration(value)
-                      if (selectedMode !== 'custom') {
-                        setSelectedMode('custom')
-                      }
-                    }}
-                    max={30}
-                    min={5}
-                    step={5}
-                    className='w-full'
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Priority Tasks */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='text-lg'>Priority Tasks</CardTitle>
-                <p className='text-sm text-gray-500'>Urgent tasks requiring immediate attention.</p>
-              </CardHeader>
-              <CardContent className='space-y-3'>
-                <div className='flex items-center gap-3'>
-                  <Star className='w-4 h-4 text-yellow-500' />
-                  <div className='flex-1'>
-                    <p className='text-sm font-medium'>Finalize Q3 Budget Proposal</p>
-                    <p className='text-xs text-red-600'>Today, 5 PM</p>
-                  </div>
-                </div>
-
-                <div className='flex items-center gap-3'>
-                  <Star className='w-4 h-4 text-yellow-500' />
-                  <div className='flex-1'>
-                    <p className='text-sm font-medium'>Submit Expense Reports</p>
-                    <p className='text-xs text-orange-600'>Tomorrow</p>
-                  </div>
-                </div>
-
-                <div className='flex items-center gap-3'>
-                  <Star className='w-4 h-4 text-yellow-500' />
-                  <div className='flex-1'>
-                    <p className='text-sm font-medium'>Onboard new intern - Session 1</p>
-                    <p className='text-xs text-gray-500'>Aug 25, 2024</p>
-                  </div>
-                </div>
-
-                <div className='flex items-center gap-3'>
-                  <Star className='w-4 h-4 text-yellow-500' />
-                  <div className='flex-1'>
-                    <p className='text-sm font-medium'>Follow up with HR on policy update</p>
-                    <p className='text-xs text-gray-500'>Aug 19, 2024</p>
-                  </div>
-                </div>
-
-                <Button variant='link' className='text-sm text-indigo-600 p-0 h-auto'>
-                  View All Priority Tasks
-                </Button>
-              </CardContent>
-            </Card>
+            <PriorityTasks />
           </div>
         </div>
-
-        {/* Personal Notifications */}
-        <Card className='mt-6'>
-          <CardHeader>
-            <CardTitle className='text-lg'>Personal Notifications</CardTitle>
-            <p className='text-sm text-gray-500'>Your latest updates and alerts.</p>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <div className='flex items-start gap-3'>
-              <div className='w-2 h-2 bg-green-500 rounded-full mt-2'></div>
-              <div className='flex-1'>
-                <p className='text-sm'>Task "Review Q2 Report" is due in 2 hours.</p>
-                <p className='text-xs text-gray-500'>5 min ago</p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-2 h-2 bg-green-500 rounded-full mt-2'></div>
-              <div className='flex-1'>
-                <p className='text-sm'>New assignment: "Client Feedback Analysis".</p>
-                <p className='text-xs text-gray-500'>1 hour ago</p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-2 h-2 bg-gray-400 rounded-full mt-2'></div>
-              <div className='flex-1'>
-                <p className='text-sm text-gray-600'>Meeting with Marketing Team at 3 PM today.</p>
-                <p className='text-xs text-gray-500'>2 hours ago</p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-2 h-2 bg-gray-400 rounded-full mt-2'></div>
-              <div className='flex-1'>
-                <p className='text-sm text-gray-600'>Your weekly performance summary is ready.</p>
-                <p className='text-xs text-gray-500'>Yesterday</p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-2 h-2 bg-gray-400 rounded-full mt-2'></div>
-              <div className='flex-1'>
-                <p className='text-sm text-gray-600'>Reminder: Friday is a company holiday.</p>
-                <p className='text-xs text-gray-500'>3 days ago</p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-2 h-2 bg-gray-400 rounded-full mt-2'></div>
-              <div className='flex-1'>
-                <p className='text-sm text-gray-600'>Your report for "Website Redesign" has been approved.</p>
-                <p className='text-xs text-gray-500'>3 days ago</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )

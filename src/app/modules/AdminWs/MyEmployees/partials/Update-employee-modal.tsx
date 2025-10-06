@@ -1,6 +1,7 @@
 import type React from 'react'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
@@ -8,6 +9,8 @@ import { Label } from '@/app/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
 import type { Employee, UpdateEmployeePayload } from '@/app/modules/AdminWs/MyEmployees/models/AdminwsInterface'
+import { toast } from 'react-toastify'
+import type { AxiosError } from 'axios'
 
 interface UpdateEmployeeModalProps {
   isOpen: boolean
@@ -30,9 +33,23 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
     email: '',
     avatar_url: '',
     department_id: 0,
-    role_id: 0
+    // default role to Employee (4) until we initialize from employee prop
+    role_id: 4
   })
   const [isLoading, setIsLoading] = useState(false)
+
+  // Fetch departments to populate select
+  const { data: departmentsData } = useQuery<any, AxiosError>({
+    queryKey: ['admin-ws-departments'],
+    queryFn: () => AdminWsApi.getAllDepartments(1, 100)
+  })
+
+  // Memoize department list so reference is stable for useEffect dependencies
+  const departments = useMemo(
+    () => (departmentsData?.data?.items as { id: number; name: string }[]) || [],
+    // depend on the raw items array so memo updates only when API data changes
+    [departmentsData?.data?.items]
+  )
 
   useEffect(() => {
     if (employee) {
@@ -40,35 +57,55 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
         name: employee.name || '',
         email: employee.email || '',
         avatar_url: employee.avatar_url || '',
+        // initialize with employee's current values when available
         department_id: employee.department_id || 0,
-        role_id: employee.role_id || 0
+        role_id: employee.role_id || 4
       })
     }
   }, [employee])
+
+  // When departments are loaded, if formData.department_id is not set,
+  // prefer the employee's department if available, otherwise pick the first department
+  useEffect(() => {
+    if (!departments || departments.length === 0) return
+
+    setFormData((prev) => {
+      // If department is already set (non-zero), keep it
+      if (prev.department_id && prev.department_id !== 0) return prev
+
+      // If employee has a department_id, use it
+      if (employee && employee.department_id) {
+        return { ...prev, department_id: employee.department_id }
+      }
+
+      // Fallback to first department in the list
+      return { ...prev, department_id: departments[0].id }
+    })
+  }, [departments, employee])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!employee) return
 
     setIsLoading(true)
-    
+
     try {
       const updatePayload: UpdateEmployeePayload = {
         name: formData.name,
         email: formData.email,
-        avatar_url: formData.avatar_url,
         department_id: formData.department_id,
         role_id: formData.role_id
       }
 
       await AdminWsApi.updateUser(employee.id, updatePayload)
-      
+
       if (onUpdate) {
         onUpdate()
       }
       onClose()
     } catch (error) {
       console.error('Error updating employee:', error)
+      toast.error('Failed to update employee.')
     } finally {
       setIsLoading(false)
     }
@@ -124,16 +161,15 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label>Role ID</Label>
-              <Select 
-                value={formData.role_id.toString()} 
+              <Select
+                value={formData.role_id.toString()}
                 onValueChange={(value) => handleInputChange('role_id', parseInt(value))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder='Select Role' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='1'>Super Admin</SelectItem>
-                  <SelectItem value='2'>Admin</SelectItem>
+                  {/* Only Project Manager and Employee are allowed for updates */}
                   <SelectItem value='3'>Project Manager</SelectItem>
                   <SelectItem value='4'>Employee</SelectItem>
                 </SelectContent>
@@ -142,18 +178,23 @@ export function UpdateEmployeeModal({ isOpen, onClose, employee, onUpdate }: Upd
 
             <div className='space-y-2'>
               <Label>Department ID</Label>
-              <Select 
-                value={formData.department_id.toString()} 
+              <Select
+                value={formData.department_id.toString()}
                 onValueChange={(value) => handleInputChange('department_id', parseInt(value))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder='Select Department' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='1'>IT Dept</SelectItem>
-                  <SelectItem value='2'>Products</SelectItem>
-                  <SelectItem value='3'>Marketing</SelectItem>
-                  <SelectItem value='4'>Growth</SelectItem>
+                  {departments.length === 0 ? (
+                    <SelectItem value='0'>No departments</SelectItem>
+                  ) : (
+                    departments.map((d) => (
+                      <SelectItem key={d.id} value={d.id.toString()}>
+                        {d.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

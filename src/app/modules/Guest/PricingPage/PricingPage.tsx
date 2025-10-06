@@ -1,92 +1,87 @@
+import { useEffect, useMemo, useState } from 'react'
 import { PricingCard } from './partials/PricingCard'
-
-import type { PricingCardProps } from './models/PricingPlan'
-
-const pricingPlans: Omit<PricingCardProps, 'key'>[] = [
-  {
-    name: 'INDIVIDUALS',
-    price: 10,
-    period: 'Month',
-    users: 'Limited users',
-    usage: 'PERSONAL USAGE',
-    features: [
-      'Basic task and project management',
-      'Personal dashboard',
-      'Limited file storage',
-      'Email support',
-      'Access on web and mobile'
-    ],
-    buttonText: 'GET STARTED',
-    buttonColor: 'blue',
-    featured: false
-  },
-  {
-    name: 'PRO',
-    price: 100,
-    period: 'Month',
-    users: 'Limited users',
-    usage: 'PROFESSIONAL USAGE',
-    features: [
-      'All Individual features',
-      'Advanced analytics',
-      'Priority email support',
-      'Customizable workflows',
-      '500GB file storage'
-    ],
-    buttonText: 'GET STARTED',
-    buttonColor: 'purple',
-    featured: true
-  },
-  {
-    name: 'BUSINESS',
-    price: 150,
-    period: 'Month',
-    users: 'Limited users',
-    usage: 'AGENCY OR TEAM',
-    features: [
-      'All Pro features',
-      'Team collaboration tools',
-      'Role-based access control',
-      '1TB file storage',
-      'Dedicated onboarding support'
-    ],
-    buttonText: 'GET STARTED',
-    buttonColor: 'orange',
-    featured: false
-  },
-  {
-    name: 'ENTERPRISE',
-    price: 300,
-    period: 'Month',
-    users: 'Limited users',
-    usage: 'COMMERCIAL USAGE',
-    features: [
-      'All Business features',
-      'Custom integrations',
-      '5TB file storage',
-      'Premium support (24/7)',
-      'Service Level Agreement (SLA)'
-    ],
-    buttonText: 'GET STARTED',
-    buttonColor: 'red',
-    featured: false
-  }
-]
+import { guestApi } from '@/app/apis/AUTH/guest.api'
+import type { GetAllPackagesResponse, Package as PackageModel } from './models'
+import type { PricingCardProps } from './models'
 
 function PricingPage() {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [packages, setPackages] = useState<PackageModel[]>([])
+
+  useEffect(() => {
+    let mounted = true
+
+    const fetchPackages = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const res: GetAllPackagesResponse = await guestApi.getAllPackages()
+        if (!mounted) return
+        const data = res.data?.data || []
+        // filter packages that have at least one feature
+        const withFeatures = data.filter((p) => Array.isArray(p.features) && p.features.length > 0)
+        setPackages(withFeatures.reverse()) // show latest packages first
+      } catch (err: any) {
+        setError(err?.data?.message || err?.message || 'Failed to load packages')
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+
+    fetchPackages()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const cards: PricingCardProps[] = useMemo(() => {
+    // take first 3 packages and map to UI props
+    // gentle modern accent colors for stripe (top of card)
+    const bgClasses = [
+      'bg-teal-300',
+      'bg-amber-300',
+      'bg-violet-300'
+    ]
+
+    return packages.slice(0, 3).map((p, idx) => {
+      const period = `tháng`
+      return {
+        packageId: p.id,
+        name: p.name,
+        price: p.price,
+        period,
+        users: p.description || 'Limited users',
+        usage: p.name.toUpperCase(),
+        features: p.features.map((f) => f.name),
+        buttonText: 'Tư vấn ngay',
+        buttonColor: 'bg-gradient-to-r from-pink-500 via-purple-600 to-blue-500',
+        featured: false,
+        bgClass: bgClasses[idx] ?? undefined
+      }
+    })
+  }, [packages])
+
   return (
     <>
-      <div className='max-w-full w-full px-2 sm:px-4 md:px-8 mb-16 sm:mb-20 mx-auto'>
+      <div className='min-h-screen max-w-full w-full px-2 sm:px-4 md:px-8 mb-16 sm:mb-20 mx-auto'>
         <div className='text-center mb-8 sm:mb-12'>
-          <p className='text-xs sm:text-sm font-medium text-muted-foreground mb-1 sm:mb-2 tracking-wider'>PRICING</p>
-          <h1 className='text-2xl sm:text-4xl font-bold text-foreground'>Choose Your Best Plan</h1>
+          <p className='text-xs sm:text-sm font-medium text-muted-foreground mb-1 sm:mb-2 tracking-wider'>BẢNG GIÁ</p>
+          <h1 className='text-2xl sm:text-4xl font-bold text-foreground'>Chọn gói phù hợp nhất</h1>
         </div>
 
-        <div className='grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto'>
-          {pricingPlans.map((plan, index) => (
-            <PricingCard key={index} {...plan} />
-          ))}
-        </div>
+        {loading ? (
+          <div className='text-center py-8'>Đang tải các gói...</div>
+        ) : error ? (
+          <div className='text-center text-destructive py-8'>Lỗi: {error}</div>
+        ) : (
+          <div className='grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto'>
+            {cards.map((plan, index) => (
+              <PricingCard key={plan.name || index} {...plan} buttonText={'Tư vấn ngay'} />
+            ))}
+          </div>
+        )}
       </div>
     </>
   )

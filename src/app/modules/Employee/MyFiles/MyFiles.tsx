@@ -1,7 +1,7 @@
-function MyFiles() {
-  return (
-    <div>MyFiles</div>
-  )
+import { FileManagerDashboard } from '@/app/modules/Employee/MyFiles/partials/FileManagerDashboard'
+
+function MyFileManager() {
+  return <FileManagerDashboard />
 }
 
-export default MyFiles
+export default MyFileManager

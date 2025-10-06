@@ -2,6 +2,9 @@ import { FilterDialog } from '@/app/modules/Employee/KanbanBoard/partials/Filter
 import { KanbanCard } from '@/app/modules/Employee/KanbanBoard/partials/KanbanCard'
 import { KanbanColumn } from '@/app/modules/Employee/KanbanBoard/partials/KanbanColumn'
 import { SortDialog } from '@/app/modules/Employee/KanbanBoard/partials/SortDialog'
+import { TaskDetailModal } from '@/app/modules/Employee/KanbanBoard/partials/TaskDetailModal'
+import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
+import type { MyTask, TaskStatus } from '@/app/modules/Employee/MyTasks/models/myTask.type'
 import {
   closestCorners,
   DndContext,
@@ -12,7 +15,7 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export interface Tag {
   label: string
@@ -27,201 +30,74 @@ export interface Card {
   subtasks: number
   comments: number
   avatars: string[]
+  originalTask: MyTask
 }
 
 export interface Column {
-  id: string
+  id: TaskStatus
   title: string
   cards: Card[]
 }
 
 const initialColumns: Column[] = [
   {
-    id: 'not-ready',
-    title: 'Not Ready',
-    cards: [
-      {
-        id: '1',
-        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
-        title: 'Commodo ex esse in no',
-        tags: [
-          { label: 'Research', color: 'purple' },
-          { label: 'Urgent', color: 'yellow' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: [
-          'https://i.pravatar.cc/150?img=1',
-          'https://i.pravatar.cc/150?img=2',
-          'https://i.pravatar.cc/150?img=3'
-        ]
-      },
-      {
-        id: '2',
-        title: 'Reprehenderit adipisicing irur',
-        tags: [{ label: 'Improvement', color: 'pink' }],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=4', 'https://i.pravatar.cc/150?img=5']
-      },
-      {
-        id: '3',
-        title: 'Cupidatat commodo incididun',
-        tags: [
-          { label: 'Improvement', color: 'yellow' },
-          { label: 'Backend', color: 'red' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=6', 'https://i.pravatar.cc/150?img=7']
-      },
-      {
-        id: '4',
-        title:
-          'Voluptate amet nostrud veniam aliqua voluptate eu laboris non incididunt enim aute aliqua aliqua esse cillum',
-        tags: [{ label: 'Frontend', color: 'yellow' }],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=8', 'https://i.pravatar.cc/150?img=9']
-      }
-    ]
-  },
-  {
     id: 'todo',
     title: 'To Do',
-    cards: [
-      {
-        id: '5',
-        title: 'Lorem labore ullamco a',
-        tags: [
-          { label: 'Testing', color: 'green' },
-          { label: 'Backlog', color: 'red' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: [
-          'https://i.pravatar.cc/150?img=10',
-          'https://i.pravatar.cc/150?img=11',
-          'https://i.pravatar.cc/150?img=12'
-        ]
-      },
-      {
-        id: '6',
-        title: 'Incididunt cillum non aliquip reprehenderit pariatur',
-        tags: [{ label: 'Feature', color: 'purple' }],
-        subtasks: 3,
-        comments: 1,
-        avatars: [
-          'https://i.pravatar.cc/150?img=13',
-          'https://i.pravatar.cc/150?img=14',
-          'https://i.pravatar.cc/150?img=15'
-        ]
-      },
-      {
-        id: '7',
-        title: 'Occaecat nulla qui voluptate',
-        tags: [
-          { label: 'Research', color: 'purple' },
-          { label: 'Testing', color: 'green' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=16', 'https://i.pravatar.cc/150?img=17']
-      }
-    ]
+    cards: []
   },
   {
-    id: 'in-progress',
+    id: 'doing',
     title: 'In Progress',
-    cards: [
-      {
-        id: '8',
-        title: 'Ipsum amet nostrud exc',
-        tags: [{ label: 'Backlog', color: 'purple' }],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=18', 'https://i.pravatar.cc/150?img=19']
-      },
-      {
-        id: '9',
-        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
-        title: 'In sunt proident officia pariatur lorem magna ex consequat',
-        tags: [{ label: 'Medium', color: 'purple' }],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=20', 'https://i.pravatar.cc/150?img=21']
-      },
-      {
-        id: '10',
-        title: 'Duis ea aute ipsum nostrud laboris quis dolore consectetur cupidatat esse aute aliqua',
-        tags: [
-          { label: 'Design', color: 'purple' },
-          { label: 'Improvement', color: 'pink' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: [
-          'https://i.pravatar.cc/150?img=22',
-          'https://i.pravatar.cc/150?img=23',
-          'https://i.pravatar.cc/150?img=24'
-        ]
-      },
-      {
-        id: '11',
-        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
-        title: 'Duis irure aliqua officia tempor in excepteur quis',
-        tags: [{ label: 'Improvement', color: 'pink' }],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=25', 'https://i.pravatar.cc/150?img=26']
-      }
-    ]
+    cards: []
   },
   {
     id: 'completed',
     title: 'Completed',
-    cards: [
-      {
-        id: '12',
-        image: 'https://www.sweetprocess.com/wp-content/uploads/2022/10/task-management-20.png',
-        title: 'Duis ea aute ipsum nostrud laboris quis dolore consectetur cupidatat esse aute aliqua',
-        tags: [
-          { label: 'Backlog', color: 'red' },
-          { label: 'Backlog', color: 'pink' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: [
-          'https://i.pravatar.cc/150?img=27',
-          'https://i.pravatar.cc/150?img=28',
-          'https://i.pravatar.cc/150?img=29'
-        ]
-      },
-      {
-        id: '13',
-        title: 'Mollit elit enim reprehenderit non exercitation mollit',
-        tags: [
-          { label: 'Design', color: 'blue' },
-          { label: 'Backlog', color: 'pink' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=30', 'https://i.pravatar.cc/150?img=31']
-      },
-      {
-        id: '14',
-        title: 'Aute incididunt nisi eiusmod duis duis officia nostrud',
-        tags: [
-          { label: 'Design', color: 'green' },
-          { label: 'Improvement', color: 'pink' }
-        ],
-        subtasks: 3,
-        comments: 1,
-        avatars: ['https://i.pravatar.cc/150?img=32', 'https://i.pravatar.cc/150?img=33']
-      }
-    ]
+    cards: []
+  },
+  {
+    id: 'rejected',
+    title: 'Rejected',
+    cards: []
   }
 ]
+
+// Helper function to get priority color
+const getPriorityColor = (priority: string): string => {
+  switch (priority.toLowerCase()) {
+    case 'low':
+      return 'green'
+    case 'medium':
+      return 'yellow'
+    case 'high':
+      return 'red'
+    default:
+      return 'gray'
+  }
+}
+
+// Helper function to convert MyTask to Card
+const convertTaskToCard = (task: MyTask): Card => {
+  const tags: Tag[] = [
+    {
+      label: task.priority.charAt(0).toUpperCase() + task.priority.slice(1),
+      color: getPriorityColor(task.priority)
+    }
+  ]
+
+  return {
+    id: task.id,
+    image: task.image_url || undefined,
+    title: task.name,
+    tags,
+    subtasks: task.checklists.length,
+    comments: task.contents.length,
+    avatars: task.assignees.map(
+      (assignee) => assignee.user.avatar_url || `https://i.pravatar.cc/150?u=${assignee.user.id}`
+    ),
+    originalTask: task
+  }
+}
 
 export function KanbanBoardForm() {
   const [columns, setColumns] = useState<Column[]>(initialColumns)
@@ -231,6 +107,10 @@ export function KanbanBoardForm() {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<'title' | 'subtasks' | 'comments'>('title')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [selectedTaskForDetail, setSelectedTaskForDetail] = useState<MyTask | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -239,6 +119,69 @@ export function KanbanBoardForm() {
       }
     })
   )
+
+  // Fetch tasks from API
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await MyTaskApi.getMyTask()
+
+        if (response.success && response.data) {
+          // Group tasks by column based on status mapping
+          const tasksByColumn: Record<string, Card[]> = {
+            todo: [],
+            doing: [],
+            completed: [],
+            rejected: []
+          }
+
+          response.data.forEach((task) => {
+            const card = convertTaskToCard(task)
+
+            // Map task status to kanban columns
+            switch (task.status) {
+              case 'todo':
+              case 'overdued':
+                tasksByColumn.todo.push(card)
+                break
+              case 'doing':
+                tasksByColumn.doing.push(card)
+                break
+              case 'reviewing':
+              case 'completed':
+              case 'feedbacked':
+                tasksByColumn.completed.push(card)
+                break
+              case 'rejected':
+                tasksByColumn.rejected.push(card)
+                break
+              default:
+                // Default to todo if status is unknown
+                tasksByColumn.todo.push(card)
+                break
+            }
+          })
+
+          // Update columns with tasks
+          setColumns((prevColumns) =>
+            prevColumns.map((column) => ({
+              ...column,
+              cards: tasksByColumn[column.id] || []
+            }))
+          )
+        }
+      } catch (err) {
+        setError('Failed to fetch tasks')
+        console.error('Error fetching tasks:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTasks()
+  }, [])
 
   const filteredAndSortedColumns = useMemo(() => {
     return columns.map((column) => {
@@ -276,20 +219,28 @@ export function KanbanBoardForm() {
     return Array.from(tags).sort()
   }, [columns])
 
+  const handleViewDetail = (taskId: string) => {
+    const task = columns.flatMap((col) => col.cards).find((card) => card.id === taskId)?.originalTask
+    if (task) {
+      setSelectedTaskForDetail(task)
+      setDetailModalOpen(true)
+    }
+  }
+
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event
     const card = columns.flatMap((col) => col.cards).find((card) => card.id === active.id)
     setActiveCard(card || null)
   }
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
     setActiveCard(null)
 
     if (!over) return
 
     const activeCardId = active.id as string
-    const overColumnId = over.id as string
+    const overColumnId = over.id as TaskStatus
 
     // Find source column and card
     let sourceColumn: Column | undefined
@@ -313,7 +264,10 @@ export function KanbanBoardForm() {
     // Don't do anything if dropping in the same column
     if (sourceColumn.id === targetColumn.id) return
 
-    // Update columns state
+    // Map column ID to task status for API
+    const newTaskStatus = overColumnId // This will be 'todo', 'doing', 'completed', or 'rejected'
+
+    // Update columns state optimistically
     setColumns((prevColumns) => {
       return prevColumns.map((column) => {
         if (column.id === sourceColumn.id) {
@@ -323,106 +277,163 @@ export function KanbanBoardForm() {
             cards: column.cards.filter((c) => c.id !== activeCardId)
           }
         } else if (column.id === targetColumn.id) {
-          // Add card to target column
+          // Add card to target column with updated status
+          const updatedCard = {
+            ...cardToMove,
+            originalTask: {
+              ...cardToMove.originalTask,
+              status: newTaskStatus
+            }
+          }
           return {
             ...column,
-            cards: [...column.cards, cardToMove]
+            cards: [...column.cards, updatedCard]
           }
         }
         return column
       })
     })
+
+    // Call API to update task status
+    try {
+      await MyTaskApi.updateTaskStatus(activeCardId, newTaskStatus)
+      console.log(`Task ${activeCardId} status updated to ${newTaskStatus}`)
+    } catch (error) {
+      console.error('Failed to update task status:', error)
+
+      // Revert the optimistic update if API call fails
+      setColumns((prevColumns) => {
+        return prevColumns.map((column) => {
+          if (column.id === targetColumn.id) {
+            // Remove card from target column
+            return {
+              ...column,
+              cards: column.cards.filter((c) => c.id !== activeCardId)
+            }
+          } else if (column.id === sourceColumn.id) {
+            // Add card back to source column
+            return {
+              ...column,
+              cards: [...column.cards, cardToMove]
+            }
+          }
+          return column
+        })
+      })
+
+      // Show error message to user
+      alert('Failed to update task status. Please try again.')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className='flex h-full bg-background items-center justify-center'>
+        <div className='text-lg'>Loading tasks...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-full bg-background items-center justify-center'>
+        <div className='text-lg text-red-500'>{error}</div>
+      </div>
+    )
   }
 
   return (
-    <div className='flex h-screen bg-background'>
-      <div className='flex flex-1 flex-col'>
-        <main className='flex-1 p-6'>
-          <div className='mb-6 flex items-center justify-between'>
-            <h1 className='text-3xl font-bold'>Kanban Board</h1>
-            <div className='flex items-center gap-3'>
-              <button className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'>
-                <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-                  />
-                </svg>
-                My tickets
-              </button>
-              <button
-                onClick={() => setFilterOpen(true)}
-                className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'
-              >
-                <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z'
-                  />
-                </svg>
-                Filter
-                {selectedTags.length > 0 && (
-                  <span className='flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground'>
-                    {selectedTags.length}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setSortOpen(true)}
-                className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'
-              >
-                <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4'
-                  />
-                </svg>
-                Sort
-              </button>
-              <button className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'>
-                <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'
-                  />
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'
-                  />
-                </svg>
-                View
-              </button>
-              <button className='rounded-lg px-3 py-2 text-sm hover:bg-muted'>
-                <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z'
-                  />
-                </svg>
-              </button>
-            </div>
+    <div className='flex flex-col h-full bg-background'>
+      <div className='flex-1 p-6 flex flex-col'>
+        <div className='mb-6 flex items-center justify-between'>
+          <h1 className='text-3xl font-bold'>Kanban Board</h1>
+          <div className='flex items-center gap-3'>
+            <button className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'>
+              <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+                />
+              </svg>
+              My tickets
+            </button>
+            <button
+              onClick={() => setFilterOpen(true)}
+              className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'
+            >
+              <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z'
+                />
+              </svg>
+              Filter
+              {selectedTags.length > 0 && (
+                <span className='flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground'>
+                  {selectedTags.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setSortOpen(true)}
+              className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'
+            >
+              <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4'
+                />
+              </svg>
+              Sort
+            </button>
+            <button className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'>
+              <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'
+                />
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'
+                />
+              </svg>
+              View
+            </button>
+            <button className='rounded-lg px-3 py-2 text-sm hover:bg-muted'>
+              <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z'
+                />
+              </svg>
+            </button>
           </div>
+        </div>
+
+        <div className='flex-1 min-h-0'>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className='grid grid-cols-4 gap-6'>
+            <div className='grid grid-cols-4 gap-6 h-full w-full'>
               {filteredAndSortedColumns.map((column) => (
-                <KanbanColumn key={column.id} column={column} />
+                <div key={column.id} className='min-w-0'>
+                  <KanbanColumn column={column} onViewDetail={handleViewDetail} />
+                </div>
               ))}
             </div>
             <DragOverlay
@@ -438,8 +449,9 @@ export function KanbanBoardForm() {
               ) : null}
             </DragOverlay>
           </DndContext>
-        </main>
+        </div>
       </div>
+
       <FilterDialog
         open={filterOpen}
         onOpenChange={setFilterOpen}
@@ -455,6 +467,7 @@ export function KanbanBoardForm() {
         onSortByChange={setSortBy}
         onSortOrderChange={setSortOrder}
       />
+      <TaskDetailModal open={detailModalOpen} onOpenChange={setDetailModalOpen} task={selectedTaskForDetail} />
     </div>
   )
 }

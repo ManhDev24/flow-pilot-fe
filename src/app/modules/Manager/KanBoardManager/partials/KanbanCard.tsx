@@ -2,7 +2,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { Card } from '@/app/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Button } from '@/app/components/ui/button'
-import { MessageSquare, Edit2 } from 'lucide-react'
+import { MessageSquare, MoreHorizontal } from 'lucide-react'
 
 interface Tag {
   label: string
@@ -17,7 +17,7 @@ interface KanbanCardProps {
   subtasks: number
   comments: number
   avatars: string[]
-  onEdit?: () => void
+  onViewDetail?: () => void
 }
 
 const tagColors: Record<string, string> = {
@@ -29,7 +29,7 @@ const tagColors: Record<string, string> = {
   blue: 'bg-blue-100 text-blue-700'
 }
 
-export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars, onEdit }: KanbanCardProps) {
+export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars, onViewDetail }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: id
   })
@@ -52,23 +52,23 @@ export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars
     >
       {image && (
         <div className='relative h-40 w-full bg-muted'>
-          <img src={image} alt={title} className='object-cover w-full h-full' />
+          <img src={image} alt={title} className='object-cover' />
         </div>
       )}
       <div className='p-4'>
-        <div className='flex justify-between items-start mb-3'>
-          <h3 className='text-sm font-medium leading-snug text-card-foreground flex-1 pr-2'>{title}</h3>
-          {onEdit && (
+        <div className='flex items-center justify-between mb-3'>
+          <h3 className='text-sm font-medium leading-snug text-card-foreground flex-1'>{title}</h3>
+          {onViewDetail && (
             <Button
-              size='sm'
               variant='ghost'
+              size='sm'
+              className='h-6 w-6 p-0 ml-2 hover:bg-muted'
               onClick={(e) => {
                 e.stopPropagation()
-                onEdit()
+                onViewDetail()
               }}
-              className='p-1 h-6 w-6 opacity-60 hover:opacity-100'
             >
-              <Edit2 className='h-3 w-3' />
+              <MoreHorizontal className='h-4 w-4' />
             </Button>
           )}
         </div>
