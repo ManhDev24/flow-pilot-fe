@@ -158,7 +158,6 @@ export function KanbanBoardForm() {
                 tasksByColumn.rejected.push(card)
                 break
               default:
-                // Default to todo if status is unknown
                 tasksByColumn.todo.push(card)
                 break
             }

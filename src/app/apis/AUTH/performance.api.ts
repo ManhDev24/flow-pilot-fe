@@ -243,5 +243,62 @@ export const MyTaskApi = {
       throw axiosError
     }
   },
-}
 
+  // Get project overview for Manager
+  getManagerProjectOverview: async (projectId: string) => {
+    try {
+      const response: AxiosResponse<{
+        message: string
+        data: {
+          project: {
+            id: string
+            name: string
+            description: string | null
+            start_date: string
+            end_date: string
+            process: number
+            team_size: number | null
+            status: string
+          }
+          totalTasks: number
+          completedTasks: number
+          overdueTasks: number
+          inProgressTasks: number
+          completionRate: number
+        }
+      }> = await fetcher.get(`/performance/project-overview?projectId=${projectId}`)
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
+  // Get quarterly tasks chart for Manager
+  getQuarterlyTasksChart: async (projectId: string, year: number = 2025) => {
+    try {
+      const response: AxiosResponse<{
+        success: boolean
+        message: string
+        data: {
+          quarters: string[]
+          series: Array<{
+            name: string
+            data: number[]
+            color: string
+          }>
+          summary: {
+            totalTasks: number
+            completedTasks: number
+            ongoingTasks: number
+            notStartedTasks: number
+          }
+        }
+      }> = await fetcher.get(`/performance/quarterly-tasks-chart?projectId=${projectId}&year=${year}`)
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  }
+}

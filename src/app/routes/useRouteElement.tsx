@@ -47,6 +47,7 @@ import NotificationManagement from '@/app/modules/Manager/NotificationManagement
 import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
 import Order from '@/app/modules/SuperAdmin/Order/Order'
 import Payment from '@/app/modules/SuperAdmin/Payment/Payment'
+import MyTeamManagerDetail from '@/app/modules/Manager/MyTeamManagerDetail/MyTeamManagerDetail'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -442,6 +443,14 @@ const useRouteElement = () => {
           element: (
             <ManagerLayout>
               <MemberReports />
+            </ManagerLayout>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_TEAM_DETAIL,
+          element: (
+            <ManagerLayout>
+              <MyTeamManagerDetail />
             </ManagerLayout>
           )
         },
