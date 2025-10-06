@@ -9,7 +9,7 @@ import {
   SidebarProvider
 } from '@/app/components/ui/sidebar'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Briefcase, Settings } from 'lucide-react'
+import { LayoutDashboard, Users, Briefcase, Settings, Package, SquareFunctionIcon } from 'lucide-react'
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 
 import type { ReactNode } from 'react'
@@ -21,6 +21,8 @@ function SuperAdminLayout({ children }: { children: ReactNode }) {
     { icon: LayoutDashboard, label: 'Dashboard', to: `${PATH.SUPER_ADMIN_DASHBOARD}` },
     { icon: Users, label: 'Users', to: `${PATH.SUPER_ADMIN_USERS}` },
     { icon: Briefcase, label: 'Workspaces', to: `${PATH.SUPER_ADMIN_WORKSPACES}` },
+    { icon: Package, label: 'Packages', to: `${PATH.SUPER_ADMIN_PACKAGES}` },
+    { icon: SquareFunctionIcon, label: 'Features', to: `${PATH.SUPER_ADMIN_FEATURES}` },
     { icon: Settings, label: 'Settings', to: `${PATH.ADMIN_SETTINGS}` }
   ]
   return (
