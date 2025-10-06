@@ -21,7 +21,9 @@ function SuperAdminLayout({ children }: { children: ReactNode }) {
     { icon: LayoutDashboard, label: 'Dashboard', to: `${PATH.SUPER_ADMIN_DASHBOARD}` },
     { icon: Users, label: 'Users', to: `${PATH.SUPER_ADMIN_USERS}` },
     { icon: Briefcase, label: 'Workspaces', to: `${PATH.SUPER_ADMIN_WORKSPACES}` },
-    { icon: Settings, label: 'Settings', to: `${PATH.ADMIN_SETTINGS}` }
+    { icon: Settings, label: 'Settings', to: `${PATH.ADMIN_SETTINGS}` },
+    { icon: Settings, label: 'Order', to: `${PATH.SUPER_ADMIN_ORDERS}` },
+    { icon: Settings, label: 'Payment', to: `${PATH.SUPER_ADMIN_PAYMENTS}` }
   ]
   return (
     <SidebarProvider>

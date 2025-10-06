@@ -45,6 +45,8 @@ import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
 import ContactPage from '../modules/Guest/ContactPage/ContactPage'
 import NotificationManagement from '@/app/modules/Manager/NotificationManagement/NotificationManagement'
 import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
+import Order from '@/app/modules/SuperAdmin/Order/Order'
+import Payment from '@/app/modules/SuperAdmin/Payment/Payment'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -242,6 +244,22 @@ const useRouteElement = () => {
           element: (
             <SuperAdminLayout>
               <UserManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_ORDERS,
+          element: (
+            <SuperAdminLayout>
+              <Order />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PAYMENTS,
+          element: (
+            <SuperAdminLayout>
+              <Payment />
             </SuperAdminLayout>
           )
         },
