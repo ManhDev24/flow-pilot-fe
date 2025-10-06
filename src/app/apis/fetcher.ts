@@ -12,6 +12,19 @@ export const fetcher = axios.create({
   }
 })
 
+// Ensure only one refresh request is in-flight. Other requests wait via subscribers.
+let isRefreshing = false
+let refreshSubscribers: Array<(token: string | null) => void> = []
+
+const subscribeTokenRefresh = (cb: (token: string | null) => void) => {
+  refreshSubscribers.push(cb)
+}
+
+const onRefreshed = (token: string | null) => {
+  refreshSubscribers.forEach((cb) => cb(token))
+  refreshSubscribers = []
+}
+
 fetcher.interceptors.request.use((config) => {
   const userLocalStorage: IUserStatePayload = getLocalStorage('user')
 
@@ -26,7 +39,7 @@ fetcher.interceptors.response.use(
     return response
   },
   async (error) => {
-    const originalRequest = error.config
+    const originalRequest: any = error.config
 
     if (
       error.response?.status === 401 &&
@@ -40,22 +53,42 @@ fetcher.interceptors.response.use(
       const oldRefreshToken = userLocalStorage?.refreshToken
 
       if (oldAccessToken && oldRefreshToken) {
+        // If a refresh is already in progress, queue this request until it's done
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            subscribeTokenRefresh((token) => {
+              if (token) {
+                originalRequest.headers = originalRequest.headers || {}
+                originalRequest.headers.Authorization = `Bearer ${token}`
+                resolve(fetcher(originalRequest))
+              } else {
+                reject(error)
+              }
+            })
+          })
+        }
+
+        // No refresh in progress -> start one
+        isRefreshing = true
         try {
           const refreshResponse = await axios.post(`${BASE_URL}/auth/refresh-token`, {
             refreshToken: oldRefreshToken
           })
 
-          const { accessToken, refreshToken, role, wsid } = refreshResponse.data?.data as LoginResponseData
+          const { accessToken, refreshToken, role, wsid, projectId } = refreshResponse.data?.data as LoginResponseData
           setLocalStorage('role', role)
-          const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid }
+          const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid, projectId }
           setLocalStorage('user', userStatePayload)
           originalRequest.headers.Authorization = `Bearer ${accessToken}`
 
+          isRefreshing = false
           return fetcher(originalRequest)
         } catch (refreshError) {
           console.error('Token refresh failed:', refreshError)
+          isRefreshing = false
+          onRefreshed(null)
+
           // Only clear storage and redirect if we're sure tokens are invalid
-          // Check if the error is actually related to invalid refresh token
           if (
             axios.isAxiosError(refreshError) &&
             (refreshError.response?.status === 401 || refreshError.response?.status === 403)
@@ -79,6 +112,16 @@ fetcher.interceptors.response.use(
         }
       }
     }
+
+    if (
+      error.response?.status === 400 &&
+      error.response?.data?.code == 'ACCESS_TOKEN_IS_REQUIRED' &&
+      !originalRequest._retry
+    ) {
+      removeLocalStorage('user')
+      removeLocalStorage('role')
+    }
+
     return Promise.reject(error)
   }
 )

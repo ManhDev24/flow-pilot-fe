@@ -2,7 +2,8 @@ import { fetcher } from '@/app/apis/fetcher'
 import type {
   CreateDepartmentResponse,
   UpdateDepartmentResponse
-} from '@/app/modules/AdminWs/MyDepartment/models/MydepartmentInterface'
+} from '@/app/modules/AdminWs/MyDepartment/models/MyDepartmentInterface'
+
 import type {
   AdminWsResponse,
   CreateEmployeePayload,

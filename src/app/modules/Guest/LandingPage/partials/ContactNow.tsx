@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PATH } from '@/app/routes/path'
+import { ArrowRight } from 'lucide-react'
 
 const ContactNow = () => {
   const [isScrolling, setIsScrolling] = useState(false)
@@ -57,19 +58,19 @@ const ContactNow = () => {
                   }}
                   onTouchMove={(e) => {
                     if (!isDraggingRef.current || isScrolling) return
-                    
+
                     const touch = e.touches[0]
                     const container = containerRef.current
                     if (!container) return
-                    
+
                     const containerRect = container.getBoundingClientRect()
                     const buttonWidth = e.currentTarget.offsetWidth
                     const maxX = containerRect.width - buttonWidth - 16
                     const currentX = touch.clientX - containerRect.left - buttonWidth / 2
                     const clampedX = Math.max(8, Math.min(currentX, maxX))
-                    
+
                     setSliderPosition(clampedX)
-                    
+
                     if (clampedX >= maxX * 0.85) {
                       isDraggingRef.current = false
                       setIsScrolling(true)
@@ -85,15 +86,7 @@ const ContactNow = () => {
                     }
                   }}
                 >
-                  <svg
-                    className='w-7 h-7'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='3'
-                    viewBox='0 0 24 24'
-                  >
-                    <path d='M13 7l5 5m0 0l-5 5m5-5H6' />
-                  </svg>
+                  <ArrowRight className='w-7 h-7' />
                 </div>
               </div>
             </div>
@@ -131,22 +124,22 @@ const ContactNow = () => {
       `}</style>
     </section>
   )
-  
+
   // Mouse move handler
   function handleMouseMove(e: MouseEvent) {
     if (!isDraggingRef.current || isScrolling) return
-    
+
     const container = containerRef.current
     if (!container) return
-    
+
     const containerRect = container.getBoundingClientRect()
     const buttonWidth = 64 // w-16
     const maxX = containerRect.width - buttonWidth - 16
     const currentX = e.clientX - containerRect.left - buttonWidth / 2
     const clampedX = Math.max(8, Math.min(currentX, maxX))
-    
+
     setSliderPosition(clampedX)
-    
+
     if (clampedX >= maxX * 0.85) {
       isDraggingRef.current = false
       setIsScrolling(true)
@@ -157,7 +150,7 @@ const ContactNow = () => {
       }, 500)
     }
   }
-  
+
   function handleMouseUp() {
     isDraggingRef.current = false
     document.removeEventListener('mousemove', handleMouseMove)

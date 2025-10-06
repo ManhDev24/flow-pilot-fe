@@ -242,5 +242,6 @@ export const MyTaskApi = {
       const axiosError = error as AxiosError
       throw axiosError
     }
-  }
+  },
 }
+
