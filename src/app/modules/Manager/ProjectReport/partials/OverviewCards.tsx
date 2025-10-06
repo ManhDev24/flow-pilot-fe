@@ -7,22 +7,20 @@ interface OverviewCardProps {
   subtitle: string
   icon: React.ReactNode
   iconBgColor: string
-  textColor?: string
+  cardBg: string
 }
 
-function OverviewCard({ title, value, subtitle, icon, iconBgColor, textColor = 'text-foreground' }: OverviewCardProps) {
+function OverviewCard({ title, value, subtitle, icon, iconBgColor, cardBg }: OverviewCardProps) {
   return (
-    <Card className='bg-card border-border hover:shadow-md transition-shadow duration-200'>
-      <CardContent className='p-4 sm:p-6'>
-        <div className='flex items-center space-x-3 sm:space-x-4'>
-          <div className={`p-2 sm:p-3 rounded-lg ${iconBgColor} flex-shrink-0`}>{icon}</div>
-          <div className='flex-1 min-w-0'>
-            <div className='flex items-baseline space-x-2'>
-              <h3 className={`text-2xl sm:text-3xl font-bold ${textColor} truncate`}>{value}</h3>
-            </div>
-            <p className='text-sm text-muted-foreground mt-1 font-medium'>{title}</p>
-            <p className='text-xs text-muted-foreground mt-1'>{subtitle}</p>
+    <Card className={`${cardBg} border-0 hover:shadow-md transition-shadow duration-200`}>
+      <CardContent className=''>
+        <div className='flex items-start gap-3 flex-col '>
+          <div className='flex gap-4 justify-between items-center'>
+            <div className={`p-2 sm:p-3 rounded-lg ${iconBgColor} flex-shrink-0`}>{icon}</div>
+            <p className='text-sm text-gray-700 dark:text-gray-300 font-medium'>{title}</p>
           </div>
+          <h3 className='text-4xl font-bold text-gray-900 dark:text-white truncate'>{value}</h3>
+          <p className='text-sm text-gray-700 dark:text-gray-400'>{subtitle}</p>
         </div>
       </CardContent>
     </Card>
@@ -39,13 +37,14 @@ interface OverviewCardsProps {
   } | null
 }
 
-export function OverviewCards({ data }: OverviewCardsProps) {
+export default function OverviewCards({ data }: OverviewCardsProps) {
   if (!data) {
+    // Skeleton loading UI
     return (
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
         {Array.from({ length: 4 }).map((_, index) => (
-          <Card key={index} className='bg-card border-border'>
-            <CardContent className='p-4 sm:p-6'>
+          <Card key={index} className='bg-gray-100 border-0'>
+            <CardContent className='p-4'>
               <div className='animate-pulse flex items-center space-x-4'>
                 <div className='rounded-lg bg-gray-300 h-12 w-12'></div>
                 <div className='flex-1 space-y-2'>
@@ -68,28 +67,32 @@ export function OverviewCards({ data }: OverviewCardsProps) {
       value: data.completedTasks,
       subtitle: 'Increased by 6 this week',
       icon: <CheckCircle className='h-6 w-6 text-white' />,
-      iconBgColor: 'bg-pink-500'
+      iconBgColor: 'bg-pink-500',
+      cardBg: 'bg-pink-50'
     },
     {
       title: 'Incomplete tasks',
       value: incompleteTasks,
       subtitle: 'Decreased by 5 this week',
       icon: <Clock className='h-6 w-6 text-white' />,
-      iconBgColor: 'bg-teal-500'
+      iconBgColor: 'bg-teal-500',
+      cardBg: 'bg-teal-50'
     },
     {
       title: 'Overdue tasks',
       value: data.overdueTasks,
       subtitle: 'Increased by 3 this week',
       icon: <AlertCircle className='h-6 w-6 text-white' />,
-      iconBgColor: 'bg-purple-600'
+      iconBgColor: 'bg-purple-600',
+      cardBg: 'bg-purple-50'
     },
     {
       title: 'Total tasks',
       value: data.totalTasks,
       subtitle: `Completion rate: ${data.completionRate}%`,
       icon: <BarChart3 className='h-6 w-6 text-white' />,
-      iconBgColor: 'bg-indigo-600'
+      iconBgColor: 'bg-indigo-600',
+      cardBg: 'bg-indigo-50'
     }
   ]
 

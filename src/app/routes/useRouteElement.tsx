@@ -48,11 +48,14 @@ import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
 import Order from '@/app/modules/SuperAdmin/Order/Order'
 import Payment from '@/app/modules/SuperAdmin/Payment/Payment'
 import MyTeamManagerDetail from '@/app/modules/Manager/MyTeamManagerDetail/MyTeamManagerDetail'
+import ConsultationReqManagement from '@/app/modules/SuperAdmin/ConsultationReqManagement/ConsultationReqManagement'
+import PackageManagement from '@/app/modules/SuperAdmin/PackageManagement/PackageManagement'
+import FeatureManagement from '@/app/modules/SuperAdmin/FeatureManagement/FeatureManagement'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
   admin: PATH.ADMIN,
-  projectmanager: PATH.EMPLOYEE_MANAGE_MY_TASKS,
+  projectmanager: PATH.EMPLOYEE_MANAGE_PROJECTS,
   employee: PATH.EMPLOYEE_MY_TASKS
 }
 
@@ -237,6 +240,30 @@ const useRouteElement = () => {
           element: (
             <SuperAdminLayout>
               <Dashboard />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_CONSULTATION_REQ,
+          element: (
+            <SuperAdminLayout>
+              <ConsultationReqManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PACKAGES,
+          element: (
+            <SuperAdminLayout>
+              <PackageManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_FEATURES,
+          element: (
+            <SuperAdminLayout>
+              <FeatureManagement />
             </SuperAdminLayout>
           )
         },
