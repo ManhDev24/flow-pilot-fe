@@ -69,10 +69,6 @@ export function CreateProjectModal({ isOpen, onClose, onCreate, managers }: Crea
     setFormData((prev) => ({ ...prev, process: value[0] }))
   }
 
-  const handleTeamSizeChange = (value: number[]) => {
-    setFormData((prev) => ({ ...prev, team_size: value[0] }))
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='sm:max-w-[600px] p-0 max-h-[90vh] overflow-y-auto'>

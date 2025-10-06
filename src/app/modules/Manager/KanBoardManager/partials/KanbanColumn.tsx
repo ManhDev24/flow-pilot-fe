@@ -1,7 +1,6 @@
 import type { Column } from '@/app/modules/Employee/KanbanBoard/partials/KanbanBoardForm'
 import { KanbanCard } from '@/app/modules/Employee/KanbanBoard/partials/KanbanCard'
 import { useDroppable } from '@dnd-kit/core'
-import { MoreHorizontal } from 'lucide-react'
 
 interface KanbanColumnProps {
   column: Column

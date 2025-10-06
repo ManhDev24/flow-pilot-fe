@@ -5,7 +5,6 @@ import { getLocalStorage, removeLocalStorage } from '@/app/utils'
 import type { IUserStatePayload } from '@/app/models'
 
 export const authApi = {
-
   login: async (email: string, password: string): Promise<LoginResponse> => {
     try {
       const response: AxiosResponse<LoginResponse> = await fetcher.post('/auth/login', {
@@ -21,20 +20,20 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     try {
-      const userLocalStorage: IUserStatePayload = getLocalStorage('user');
+      const userLocalStorage: IUserStatePayload = getLocalStorage('user')
 
       if (userLocalStorage) {
-        const refreshToken = userLocalStorage.refreshToken;
+        const refreshToken = userLocalStorage.refreshToken
 
         await fetcher.post('/auth/logout', {
           refreshToken
         })
       }
 
-      removeLocalStorage('user');
-      removeLocalStorage('role');
+      removeLocalStorage('user')
+      removeLocalStorage('role')
 
-      return;
+      return
     } catch (error) {
       const axiosError = error as AxiosError
       throw axiosError
@@ -86,6 +85,16 @@ export const authApi = {
     } catch (error) {
       const axiosError = error as AxiosError
       throw axiosError.response
+    }
+  },
+
+  getCurrentUser: async () => {
+    try {
+      const response = await fetcher.get('/user/me')
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
     }
   }
 }
