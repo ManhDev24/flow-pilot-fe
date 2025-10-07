@@ -7,6 +7,16 @@ import type {
 } from '@/app/modules/AdminWs/MyProjects/models/ProjectInterface'
 import type { AxiosError, AxiosResponse } from 'axios'
 
+// Helper function to get workspace_id from localStorage
+const getWorkspaceId = (): string => {
+  const user = localStorage.getItem('user')
+  if (user) {
+    const userData = JSON.parse(user)
+    return userData.wsid || ''
+  }
+  return ''
+}
+
 export const projectApi = {
   getAllProjects: async (page: number, limit: number) => {
     try {
@@ -26,16 +36,21 @@ export const projectApi = {
       throw axiosError
     }
   },
-  createProject: async (projectData: CreateProjectPayload) => {
+  createProject: async (projectData: Omit<CreateProjectPayload, 'workspace_id'>) => {
     try {
-      const response = await fetcher.post('/projects', projectData)
+      const workspaceId = getWorkspaceId()
+      const payload = {
+        ...projectData,
+        workspace_id: workspaceId
+      }
+      const response = await fetcher.post('/project/create', payload) // Fixed endpoint to /project
       return response.data
     } catch (error) {
       const axiosError = error as AxiosError
       throw axiosError
     }
   },
-  updateProject : async (id: string, projectData: UpdateProjectPayload) => {
+  updateProject: async (id: string, projectData: UpdateProjectPayload) => {
     try {
       const response = await fetcher.put(`/project/${id}`, projectData)
       return response.data

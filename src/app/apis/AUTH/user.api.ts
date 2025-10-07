@@ -13,10 +13,7 @@ export class UserSuperAdminAPI {
    * Get all users (SuperAdmin)
    * GET /user/super-admin
    */
-  static async getAllUsers(params?: {
-    page?: number
-    limit?: number
-  }): Promise<UserListResponse> {
+  static async getAllUsers(params?: { page?: number; limit?: number }): Promise<UserListResponse> {
     const response = await fetcher.get('/user/super-admin', { params })
     return response.data
   }
@@ -62,17 +59,16 @@ export class UserSuperAdminAPI {
    * PATCH /user/super-admin/active-user/:id
    */
   static async activateUser(id: string): Promise<ApiResponse> {
-    const response = await fetcher.patch(`/user/super-admin/active-user/${id}`, { status: "active" })
+    const response = await fetcher.patch(`/user/super-admin/active-user/${id}`, { status: 'active' })
+    return response.data
+  }
+
+  static async getAllUserByAdmin(): Promise<UserListResponse> {
+    const response = await fetcher.get('/user/admin')
     return response.data
   }
 }
 
 // Export individual functions for easier imports
-export const {
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-  activateUser
-} = UserSuperAdminAPI
+export const { getAllUsers, getUserById, createUser, updateUser, deleteUser, activateUser, getAllUserByAdmin } =
+  UserSuperAdminAPI
