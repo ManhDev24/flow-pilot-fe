@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from '@/app/components/ui/select'
 import { Controller, useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 import { RoleAPI } from '@/app/apis/AUTH/role.api'
 import { WorkspaceAPI } from '@/app/apis/AUTH/workspace.api'
 import { updateUser as apiUpdateUser } from '@/app/apis/AUTH/user.api'
@@ -41,6 +43,14 @@ export default function EditUserDialog({ open, user, onClose, onSuccess }: Props
   const [updating, setUpdating] = useState(false)
 
   const { control, handleSubmit, reset } = useForm<UpdateUserRequest>({
+    resolver: yupResolver(
+      yup.object({
+        name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
+        email: yup.string().required('Email is required').email('Invalid email address'),
+        role_id: yup.number().required('Role is required').min(1, 'Role is required'),
+        workspace_id: yup.string().required('Workspace is required'),
+      })
+    ),
     defaultValues: {
       name: '',
       email: '',
@@ -106,8 +116,13 @@ export default function EditUserDialog({ open, user, onClose, onSuccess }: Props
             <Controller
               name="name"
               control={control}
-              render={({ field }) => (
-                <Input placeholder="Name" {...field} />
+              render={({ field, fieldState }) => (
+                <>
+                  <Input placeholder="Name" {...field} />
+                  {fieldState.error && (
+                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                  )}
+                </>
               )}
             />
           </div>
@@ -116,8 +131,13 @@ export default function EditUserDialog({ open, user, onClose, onSuccess }: Props
             <Controller
               name="email"
               control={control}
-              render={({ field }) => (
-                <Input type="email" placeholder="Email" {...field} />
+              render={({ field, fieldState }) => (
+                <>
+                  <Input type="email" placeholder="Email" {...field} />
+                  {fieldState.error && (
+                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                  )}
+                </>
               )}
             />
           </div>
@@ -126,17 +146,22 @@ export default function EditUserDialog({ open, user, onClose, onSuccess }: Props
             <Controller
               name="role_id"
               control={control}
-              render={({ field }) => (
-                <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-                  <SelectTrigger className="min-w-[200px]">
-                    <SelectValue>{roles.find((r) => r.id === field.value)?.role || 'Select Role'}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((r) => (
-                      <SelectItem key={r.id} value={String(r.id)}>{r.role}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              render={({ field, fieldState }) => (
+                <>
+                  <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                    <SelectTrigger className="min-w-[200px]">
+                      <SelectValue>{roles.find((r) => r.id === field.value)?.role || 'Select Role'}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((r) => (
+                        <SelectItem key={r.id} value={String(r.id)}>{r.role}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldState.error && (
+                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                  )}
+                </>
               )}
             />
           </div>
@@ -145,17 +170,22 @@ export default function EditUserDialog({ open, user, onClose, onSuccess }: Props
             <Controller
               name="workspace_id"
               control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={(v) => field.onChange(v)}>
-                  <SelectTrigger className="min-w-[200px]">
-                    <SelectValue>{workspaces.find((w) => w.id === field.value)?.name || 'Select Workspace'}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {workspaces.map((w) => (
-                      <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              render={({ field, fieldState }) => (
+                <>
+                  <Select value={field.value} onValueChange={(v) => field.onChange(v)}>
+                    <SelectTrigger className="min-w-[200px]">
+                      <SelectValue>{workspaces.find((w) => w.id === field.value)?.name || 'Select Workspace'}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workspaces.map((w) => (
+                        <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldState.error && (
+                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                  )}
+                </>
               )}
             />
           </div>

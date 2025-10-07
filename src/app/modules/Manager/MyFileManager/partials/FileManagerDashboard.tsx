@@ -1,9 +1,8 @@
 import { useState } from 'react'
 
-import { DropZone } from './DropZone'
+import { QuickActions } from '@/app/modules/Employee/MyFiles/partials/QuickActions'
 import { RecentUploadsList } from '@/app/modules/Employee/MyFiles/partials/RecentUploadsList'
 import { StorageUsage } from '@/app/modules/Employee/MyFiles/partials/StorageUsage'
-import { QuickActions } from '@/app/modules/Employee/MyFiles/partials/QuickActions'
 
 export function FileManagerDashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)

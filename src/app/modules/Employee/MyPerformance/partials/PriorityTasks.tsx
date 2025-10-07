@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Button } from '@/app/components/ui/button'
+import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Skeleton } from '@/app/components/ui/skeleton'
-import { AlertCircle, Star } from 'lucide-react'
-import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import type { MyTask } from '@/app/modules/Employee/MyTasks/models/myTask.type'
+import { AlertCircle, Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export function PriorityTasks() {
   const [tasks, setTasks] = useState<MyTask[]>([])
