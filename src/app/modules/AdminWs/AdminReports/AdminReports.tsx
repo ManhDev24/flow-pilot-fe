@@ -2,7 +2,9 @@ import { ChartsGridForReports } from '@/app/modules/AdminWs/AdminReports/partial
 import { MetricsCardsForReports } from '@/app/modules/AdminWs/AdminReports/partials/metrics-cards'
 import { useOrganizationDashboard } from '@/app/hooks/useOrganizationDashboard'
 import { useProjectsPerformance } from '@/app/hooks/useProjectsPerformance'
+import { Button } from '@/app/components/ui/button'
 import { Card } from '@/app/components/ui/card'
+import { RefreshCw, AlertTriangle } from 'lucide-react'
 import { useMemo } from 'react'
 
 const AdminReports = () => {
@@ -30,27 +32,9 @@ const AdminReports = () => {
   const isLoading = orgLoading || projectsLoading
   const hasError = orgError || projectsError
 
-  // Handle error display
-  if (hasError) {
-    return (
-      <div className='flex-1 space-y-6 p-6 container mx-auto'>
-        <Card className='p-6'>
-          <div className='text-center'>
-            <h3 className='text-lg font-semibold text-red-600 mb-2'>Error Loading Dashboard Data</h3>
-            <p className='text-gray-600 mb-4'>{orgError || projectsError}</p>
-            <button
-              onClick={() => {
-                refetchOrgData()
-                refetchProjectsData()
-              }}
-              className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
-            >
-              Retry
-            </button>
-          </div>
-        </Card>
-      </div>
-    )
+  const handleRefresh = () => {
+    refetchOrgData()
+    refetchProjectsData()
   }
 
   return (
@@ -58,23 +42,48 @@ const AdminReports = () => {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-2xl font-bold text-gray-900'>Organization Reports</h1>
-          <p className='text-gray-600 mt-1'>
+          <p className='text-sm text-gray-600'>
             {dashboardData?.period && `Period: ${dashboardData.period}`}
             {dashboardData?.lastUpdated &&
               ` • Last updated: ${new Date(dashboardData.lastUpdated).toLocaleDateString()}`}
           </p>
         </div>
-        {isLoading && (
-          <div className='flex items-center space-x-2'>
-            <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600'></div>
-            <span className='text-sm text-gray-600'>Loading...</span>
-          </div>
-        )}
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className='flex items-center gap-2'
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            {isLoading ? 'Loading...' : 'Refresh'}
+          </Button>
+        </div>
       </div>
+
+      {/* Error state */}
+      {hasError && (
+        <Card className='p-4 mb-6 border-red-200 bg-red-50'>
+          <div className='flex items-center gap-2 text-red-700'>
+            <AlertTriangle className='w-4 h-4' />
+            <span className='font-medium'>Error loading data</span>
+          </div>
+          <p className='text-sm text-red-600 mt-1'>Failed to load performance data. Please try again.</p>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleRefresh}
+            className='mt-2 border-red-300 text-red-700 hover:bg-red-100'
+          >
+            Try Again
+          </Button>
+        </Card>
+      )}
 
       <MetricsCardsForReports dashboardData={dashboardData} evaluation={evaluation} loading={isLoading} />
 
-      <ChartsGridForReports dashboardData={dashboardData} />
+      <ChartsGridForReports dashboardData={dashboardData} loading={isLoading} />
 
       {/* AI Analysis Summary */}
       {aiAnalysis && (

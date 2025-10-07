@@ -1,6 +1,6 @@
 function MyProjects() {
   return (
-    <div>MyProjects</div>
+    <div>MyProjects1</div>
   )
 }
 

@@ -21,7 +21,7 @@ function AdminWsLayout({ children }: { children: ReactNode }) {
     { icon: ClipboardPlus, label: 'Report', to: `${PATH.ADMIN_MY_REPORT}` },
     { icon: Hotel, label: 'Department', to: `${PATH.ADMIN_DEPARTMENTS}` },
     { icon: User, label: 'Employees', to: `${PATH.ADMIN_MY_EMPLOYEES}` },
-    { icon: Folder, label: 'Project', to: `${PATH.ADMIN_SETTINGS}` }
+    { icon: Folder, label: 'Project', to: `${PATH.ADMIN_MY_PROJECTS}` }
   ]
   return (
     <SidebarProvider>
