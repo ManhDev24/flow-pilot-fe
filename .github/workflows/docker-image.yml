@@ -37,7 +37,7 @@ jobs:
       - name: Run container (host 6868 -> container 80)
         run: |
           sudo docker run -d --name flow-pilot-fe-container \
-            -p 6868:80 \
+            -p 6868:6868 \
             --restart unless-stopped \
             tienmanh/flow-pilot-fe:latest
 
