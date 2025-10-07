@@ -6,11 +6,6 @@ import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Separator } from '@/app/components/ui/separator'
-import { Textarea } from '@/app/components/ui/textarea'
-import { CreateTaskContentForm } from './partials/CreateTaskContentForm'
-import { TaskContentItem } from './partials/TaskContentItem'
-import { ChecklistItem } from './partials/ChecklistItem'
-import { AddChecklistItem } from './partials/AddChecklistItem'
 import {
   ArrowDownWideNarrow,
   Calendar,
@@ -28,8 +23,12 @@ import {
   Upload,
   User
 } from 'lucide-react'
-import { useEffect, useState, useRef } from 'react'
-import type { MyTask, FileByTask } from './models/myTask.type'
+import { useEffect, useRef, useState } from 'react'
+import type { FileByTask, MyTask } from './models/myTask.type'
+import { AddChecklistItem } from './partials/AddChecklistItem'
+import { ChecklistItem } from './partials/ChecklistItem'
+import { CreateTaskContentForm } from './partials/CreateTaskContentForm'
+import { TaskContentItem } from './partials/TaskContentItem'
 
 const getStatusStyles = (status: string) => {
   switch (status) {

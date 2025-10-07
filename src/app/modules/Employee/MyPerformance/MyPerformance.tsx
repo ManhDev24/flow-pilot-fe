@@ -8,7 +8,6 @@ import { PersonalNotifications } from './partials/PersonalNotifications'
 import { PriorityTasks } from './partials/PriorityTasks'
 import { TimerSection } from './partials/TimerSection'
 import { TimerSettings } from './partials/TimerSettings'
-import { TodaySchedule } from './partials/TodaySchedule'
 import { WeeklyFocusHistory } from './partials/WeeklyFocusHistory'
 
 export default function FlowpilotDashboard() {
