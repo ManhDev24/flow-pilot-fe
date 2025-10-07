@@ -23,15 +23,6 @@ export interface PackageData {
   features: Feature[]
 }
 
-export interface Feature {
-  id: string
-  name: string
-  description: string
-  created_at: string
-  updated_at: string
-  status: string
-}
-
 export interface PackageDetailsResponse {
   success: boolean
   message: string
@@ -44,6 +35,7 @@ export interface CreatePackageData {
   price: number
   description: string
   status: 'active' | 'inactive'
+  featureIds: string[]
 }
 
 export interface UpdatePackageData {
@@ -52,4 +44,5 @@ export interface UpdatePackageData {
   price?: number
   description?: string
   status?: 'active' | 'inactive'
+  featureIds?: string[]
 }

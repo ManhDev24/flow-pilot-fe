@@ -1,21 +1,23 @@
-import { useEffect, useState } from 'react'
+import { FeatureApi } from '@/app/apis/AUTH/feature.api'
+import { PackageApi } from '@/app/apis/AUTH/package.api'
+import { Button } from '@/app/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose
+  DialogHeader,
+  DialogTitle
 } from '@/app/components/ui/dialog'
-import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Textarea } from '@/app/components/ui/textarea'
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/app/components/ui/select'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { PackageApi } from '@/app/apis/AUTH/package.api'
-import type { PackageData, UpdatePackageData } from '../models/package.type'
 import { toast } from 'react-toastify'
+import type { PackageData, UpdatePackageData } from '../models/package.type'
+import type { Feature } from '@/app/modules/SuperAdmin/FeatureManagement/models/feature.type'
 
 interface Props {
   open: boolean
@@ -26,6 +28,8 @@ interface Props {
 
 export default function EditPackageDialog({ open, package: pkg, onClose, onSuccess }: Props) {
   const [updating, setUpdating] = useState(false)
+  const [features, setFeatures] = useState<Feature>()
+  const [loadingFeatures, setLoadingFeatures] = useState(false)
 
   const {
     control,
@@ -38,7 +42,8 @@ export default function EditPackageDialog({ open, package: pkg, onClose, onSucce
       duration_in_months: 1,
       price: 0,
       description: '',
-      status: 'active'
+      status: 'active',
+      featureIds: []
     }
   })
 
@@ -49,10 +54,26 @@ export default function EditPackageDialog({ open, package: pkg, onClose, onSucce
         duration_in_months: pkg.duration_in_months,
         price: pkg.price,
         description: pkg.description,
-        status: pkg.status as 'active' | 'inactive'
+        status: pkg.status as 'active' | 'inactive',
+        featureIds: pkg.features?.map((f) => f.id) || []
       })
     }
   }, [open, pkg, reset])
+
+  useEffect(() => {
+    if (open) {
+      setLoadingFeatures(true)
+      FeatureApi.getAllFeaturesForSelect()
+        .then((featuresData) => {
+          setFeatures(featuresData || [])
+        })
+        .catch((err) => {
+          toast.error('Failed to load features')
+          console.error(err)
+        })
+        .finally(() => setLoadingFeatures(false))
+    }
+  }, [open])
 
   const onSubmit = async (data: UpdatePackageData) => {
     if (!pkg) return
@@ -174,6 +195,48 @@ export default function EditPackageDialog({ open, package: pkg, onClose, onSucce
               />
               {errors.price && <p className='text-red-500 text-xs mt-1'>{errors.price.message}</p>}
             </div>
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium mb-1'>Features</label>
+            <Controller
+              name='featureIds'
+              control={control}
+              render={({ field }) => (
+                <div className='space-y-2'>
+                  <div className='border rounded-md p-2 max-h-36 overflow-y-auto'>
+                    {loadingFeatures ? (
+                      <p className='text-sm text-gray-500'>Loading features...</p>
+                    ) : (features?.data?.length as any) > 0 ? (
+                      features?.data?.map((feature) => (
+                        <label
+                          key={feature.id}
+                          className='flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded'
+                        >
+                          <input
+                            type='checkbox'
+                            checked={field.value?.includes(feature.id) || false}
+                            onChange={(e) => {
+                              const currentIds = field.value || []
+                              if (e.target.checked) {
+                                field.onChange([...currentIds, feature.id])
+                              } else {
+                                field.onChange(currentIds.filter((id) => id !== feature.id))
+                              }
+                            }}
+                            className='rounded'
+                          />
+                          <span className='text-sm'>{feature.name}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <p className='text-sm text-gray-500'>No features available</p>
+                    )}
+                  </div>
+                  <p className='text-xs text-gray-500'>Selected: {field.value?.length || 0} feature(s)</p>
+                </div>
+              )}
+            />
           </div>
 
           <div>

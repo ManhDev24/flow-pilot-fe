@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,9 @@ import { Textarea } from '@/app/components/ui/textarea'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/app/components/ui/select'
 import { Controller, useForm } from 'react-hook-form'
 import { PackageApi } from '@/app/apis/AUTH/package.api'
+import { FeatureApi } from '@/app/apis/AUTH/feature.api'
 import type { CreatePackageData } from '../models/package.type'
+import type { FeatureData } from '@/app/modules/SuperAdmin/FeatureManagement/models/feature.type'
 import { toast } from 'react-toastify'
 
 interface Props {
@@ -25,6 +27,8 @@ interface Props {
 
 export default function CreatePackageDialog({ open, onClose, onSuccess }: Props) {
   const [creating, setCreating] = useState(false)
+  const [features, setFeatures] = useState<FeatureData[]>([])
+  const [loadingFeatures, setLoadingFeatures] = useState(false)
 
   const {
     control,
@@ -37,9 +41,25 @@ export default function CreatePackageDialog({ open, onClose, onSuccess }: Props)
       duration_in_months: 1,
       price: 0,
       description: '',
-      status: 'active'
+      status: 'active',
+      featureIds: []
     }
   })
+
+  useEffect(() => {
+    if (open) {
+      setLoadingFeatures(true)
+      FeatureApi.getAllFeaturesForSelect()
+        .then((featuresData) => {
+          setFeatures(featuresData || [])
+        })
+        .catch((err) => {
+          toast.error('Failed to load features')
+          console.error(err)
+        })
+        .finally(() => setLoadingFeatures(false))
+    }
+  }, [open])
 
   const onSubmit = async (data: CreatePackageData) => {
     setCreating(true)
@@ -159,6 +179,48 @@ export default function CreatePackageDialog({ open, onClose, onSuccess }: Props)
               />
               {errors.price && <p className='text-red-500 text-xs mt-1'>{errors.price.message}</p>}
             </div>
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium mb-1'>Features</label>
+            <Controller
+              name='featureIds'
+              control={control}
+              render={({ field }) => (
+                <div className='space-y-2'>
+                  <div className='border rounded-md p-2 max-h-32 overflow-y-auto'>
+                    {loadingFeatures ? (
+                      <p className='text-sm text-gray-500'>Loading features...</p>
+                    ) : features.length > 0 ? (
+                      features.map((feature) => (
+                        <label
+                          key={feature.id}
+                          className='flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded'
+                        >
+                          <input
+                            type='checkbox'
+                            checked={field.value?.includes(feature.id) || false}
+                            onChange={(e) => {
+                              const currentIds = field.value || []
+                              if (e.target.checked) {
+                                field.onChange([...currentIds, feature.id])
+                              } else {
+                                field.onChange(currentIds.filter((id) => id !== feature.id))
+                              }
+                            }}
+                            className='rounded'
+                          />
+                          <span className='text-sm'>{feature.name}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <p className='text-sm text-gray-500'>No features available</p>
+                    )}
+                  </div>
+                  <p className='text-xs text-gray-500'>Selected: {field.value?.length || 0} feature(s)</p>
+                </div>
+              )}
+            />
           </div>
 
           <div>

@@ -189,15 +189,6 @@ function PackageManagement() {
               <SelectItem value='inactive'>Inactive</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button
-            variant='default'
-            size='default'
-            onClick={handleAddPackage}
-            className='bg-purple-500 hover:bg-purple-600 text-white'
-          >
-            + Add New Package
-          </Button>
         </div>
       </div>
 
@@ -333,16 +324,6 @@ function PackageManagement() {
                         >
                           <Edit className='size-4' />
                         </Button>
-
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          aria-label={`Delete ${pkg.name}`}
-                          onClick={() => openDeleteDialog(pkg)}
-                          className='text-red-600 hover:text-red-700'
-                        >
-                          <Trash2 className='size-4' />
-                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -351,7 +332,7 @@ function PackageManagement() {
             </TableBody>
             <TableFooter>
               <tr>
-                <td colSpan={7} className='px-2 py-3'>
+                <td colSpan={7} className='px-2 py-3 bg-white'>
                   <div className='flex items-center justify-between'>
                     <div className='text-sm text-muted-foreground'>
                       Showing {Math.min((page - 1) * limit + 1, total)} - {Math.min(page * limit, total)} of {total}
