@@ -31,9 +31,12 @@ import {
 import { Avatar, AvatarFallback } from '@/app/components/ui/avatar'
 import { ChevronDown } from 'lucide-react'
 import { PATH } from '@/app/routes/path'
+import { useSelector } from 'react-redux'
+import type { IProfileState } from '@/app/models'
 
 function SuperAdminSidebar() {
   const location = useLocation()
+  const userProfile = useSelector((state: { profile: IProfileState }) => state.profile.currentProfile)
 
   const handleLogout = async () => {
     try {
@@ -105,13 +108,25 @@ function SuperAdminSidebar() {
                   className='group h-14 rounded-xl bg-white shadow-sm border border-gray-200 hover:bg-gradient-to-r hover:bg-gray-50 hover:shadow-md transition-all duration-200 data-[state=open]:bg-gradient-to-r data-[state=open]:bg-gray-100 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center'
                 >
                   <Avatar className='h-9 w-9 rounded-xl border-2 border-gray-300 transition-all duration-300'>
-                    <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
-                      SA
-                    </AvatarFallback>
+                    {userProfile?.avatar_url ? (
+                      <img
+                        src={userProfile.avatar_url}
+                        alt={userProfile.name || 'Avatar'}
+                        className='h-9 w-9 rounded-xl object-cover'
+                      />
+                    ) : (
+                      <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
+                        {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : 'SA'}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
-                    <span className='truncate font-semibold text-gray-900'>Super Admin</span>
-                    <span className='truncate text-xs text-gray-600'>superadmin@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>
+                      {userProfile?.name ? userProfile.name : 'Super Admin'}
+                    </span>
+                    <span className='truncate text-xs text-gray-600'>
+                      {userProfile?.email ? userProfile.email : 'superadmin@flowpilot.io.vn'}
+                    </span>
                   </div>
                   <ChevronDown className='ml-auto size-4 text-gray-500 group-data-[collapsible=icon]:hidden' />
                 </SidebarMenuButton>
@@ -124,13 +139,25 @@ function SuperAdminSidebar() {
               >
                 <div className='flex items-center justify-start gap-2 p-3 bg-gradient-to-r from-gray-50 to-gray-100'>
                   <Avatar className='h-8 w-8 rounded-lg'>
-                    <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
-                      SA
-                    </AvatarFallback>
+                    {userProfile?.avatar_url ? (
+                      <img
+                        src={userProfile.avatar_url}
+                        alt={userProfile.name || 'Avatar'}
+                        className='h-9 w-9 rounded-xl object-cover'
+                      />
+                    ) : (
+                      <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
+                        {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : 'SA'}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-semibold text-gray-900'>Super Admin</span>
-                    <span className='truncate text-xs text-gray-600'>superadmin@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>
+                      {userProfile?.name ? userProfile.name : 'Super Admin'}
+                    </span>
+                    <span className='truncate text-xs text-gray-600'>
+                      {userProfile?.email ? userProfile.email : 'superadmin@flowpilot.io.vn'}
+                    </span>
                   </div>
                 </div>
                 <DropdownMenuSeparator className='bg-gray-200' />

@@ -57,7 +57,7 @@ function Payment() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'success':
         return 'bg-green-100 text-green-800'
       case 'pending':
         return 'bg-yellow-100 text-yellow-800'
@@ -94,10 +94,10 @@ function Payment() {
   }
 
   return (
-    <div className='space-y-4 p-6'>
+    <div className='flex flex-col min-h-screen gap-6'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-bold tracking-tight'>Payments</h1>
+          <h1 className='text-4xl font-semibold'>Payment Management</h1>
           <p className='text-muted-foreground'>Manage and view all payments in the system</p>
         </div>
       </div>

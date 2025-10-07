@@ -19,3 +19,28 @@ export type IUserState = {
 export type IRoleState = {
   currentRole: string
 }
+
+export interface IRole {
+  id: number
+  role: string
+}
+
+export interface IProfile {
+  id: string
+  name: string
+  email: string
+  avatar_url: string | null
+  phone: string | null
+  address: string | null
+  bio: string | null
+  nickname: string | null
+  role: IRole | null
+  status: string
+  workspace: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type IProfileState = {
+  currentProfile: IProfile | null
+}

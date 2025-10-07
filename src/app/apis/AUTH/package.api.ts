@@ -20,8 +20,8 @@ export const PackageApi = {
   },
   getAllPackagesForSelect: async () => {
     try {
-      const response: PackageResponse = await fetcher.get('/package/superadmin?page=1&limit=1000')
-      return response.data.data
+      const response = await fetcher.get('/package/superadmin?page=1&limit=1000')
+      return response.data?.data?.data
     } catch (error) {
       const axiosError = error as AxiosError
       throw axiosError

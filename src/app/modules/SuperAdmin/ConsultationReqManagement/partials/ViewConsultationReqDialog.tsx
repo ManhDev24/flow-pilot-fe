@@ -8,12 +8,19 @@ import { STATUS_CONFIG } from '../models/ConsultationReqManagementInterface'
 
 interface Props {
   open: boolean
+  loading: boolean
   onClose: () => void
   consultationRequest: ConsultationRequest | null
   onPlaceOrder?: (consultationRequest: ConsultationRequest) => void
 }
 
-export default function ViewConsultationReqDialog({ open, onClose, consultationRequest, onPlaceOrder }: Props) {
+export default function ViewConsultationReqDialog({
+  open,
+  onClose,
+  consultationRequest,
+  onPlaceOrder,
+  loading
+}: Props) {
   const handlePlaceOrder = () => {
     if (consultationRequest && onPlaceOrder) {
       onPlaceOrder(consultationRequest)
@@ -77,7 +84,9 @@ export default function ViewConsultationReqDialog({ open, onClose, consultationR
                   <Building className='h-4 w-4 text-gray-500' />
                   <div>
                     <p className='text-sm text-gray-600'>Company</p>
-                    <p className='font-medium'>{consultationRequest.company_name}</p>
+                    <p className='font-medium'>
+                      {consultationRequest.company_name ? consultationRequest.company_name : 'N/A'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -162,10 +171,10 @@ export default function ViewConsultationReqDialog({ open, onClose, consultationR
                 Close
               </Button>
             </DialogClose>
-            {consultationRequest && onPlaceOrder && (
+            {consultationRequest.status !== 'closed' && (
               <Button type='button' onClick={handlePlaceOrder} className='bg-green-600 hover:bg-green-700'>
                 <ShoppingCart className='h-4 w-4 mr-2' />
-                Place Order
+                {loading ? 'Placing Order...' : 'Place Order'}
               </Button>
             )}
           </DialogFooter>

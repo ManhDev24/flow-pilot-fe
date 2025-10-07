@@ -63,12 +63,17 @@ export class UserSuperAdminAPI {
     return response.data
   }
 
-  static async getAllUserByAdmin(page: number,pageSize:number): Promise<UserListResponse> {
-    const response = await fetcher.get('/user/admin?page='+page+'&pageSize='+pageSize)
+  static async getAllUserByAdmin(page: number, pageSize: number): Promise<UserListResponse> {
+    const response = await fetcher.get('/user/admin?page=' + page + '&pageSize=' + pageSize)
     return response.data
+  }
+
+  static async getMe() {
+    const response = await fetcher.get('/user/me')
+    return response.data?.data
   }
 }
 
 // Export individual functions for easier imports
-export const { getAllUsers, getUserById, createUser, updateUser, deleteUser, activateUser, getAllUserByAdmin } =
+export const { getAllUsers, getUserById, createUser, updateUser, deleteUser, activateUser, getAllUserByAdmin, getMe } =
   UserSuperAdminAPI
