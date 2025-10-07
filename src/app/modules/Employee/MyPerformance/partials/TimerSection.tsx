@@ -1,6 +1,6 @@
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent } from '@/app/components/ui/card'
-import { Play, RotateCcw } from 'lucide-react'
+import { Pause, Play, RotateCcw } from 'lucide-react'
 
 interface TimerSectionProps {
   selectedMode: string
@@ -101,11 +101,27 @@ export function TimerSection({
         {/* Timer Controls */}
         <div className='flex justify-center gap-4'>
           <Button onClick={onStart} className='bg-indigo-600 hover:bg-indigo-700 px-8'>
-            <Play className='w-4 h-4 mr-2' />
-            {isCompleted ? 'Start' : isRunning ? 'Pause' : 'Start'}
+            {isCompleted ? (
+              <>
+                <Play className='w-4 h-4' />
+                Start
+              </>
+            ) : isRunning ? (
+              <>
+                <Pause className='w-4 h-4' />
+                Pause
+              </>
+            ) : (
+              <>
+                <Play className='w-4 h-4' />
+                Start
+              </>
+            )}
+            {/* <Play className='w-4 h-4 mr-2' />
+            {isCompleted ? 'Start' : isRunning ? 'Pause' : 'Start'} */}
           </Button>
           <Button variant='outline' onClick={onReset}>
-            <RotateCcw className='w-4 h-4 mr-2' />
+            <RotateCcw className='w-4 h-4' />
             Reset
           </Button>
         </div>

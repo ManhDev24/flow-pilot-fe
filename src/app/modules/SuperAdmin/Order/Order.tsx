@@ -1,0 +1,231 @@
+import { useState } from 'react'
+import { Badge } from '@/app/components/ui/badge'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
+import { orderApi } from '@/app/apis/AUTH/Order.api'
+import { useQuery } from '@tanstack/react-query'
+import type { AxiosError } from 'axios'
+import { ChevronLeft, ChevronRight, Eye, Search, X } from 'lucide-react'
+import { format } from 'date-fns'
+import type { OrderListResponse, Order as OrderType } from './models/OrderInterface'
+import { OrderDetailModal } from './partials/OrderDetailModal'
+
+function Order() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize] = useState(10)
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
+  const { data, isLoading, isError, error } = useQuery<OrderListResponse, AxiosError>({
+    queryKey: ['orders', currentPage, pageSize],
+    queryFn: () => orderApi.getAllOrders(currentPage, pageSize)
+  })
+
+  // Filter orders based on search query and filters
+  const filteredOrders = (data?.data.data || []).filter((order: OrderType) => {
+    const matchesSearch =
+      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.package_id.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus
+
+    return matchesSearch && matchesStatus
+  })
+
+  // Get unique values for filter options
+  const statuses = Array.from(new Set((data?.data.data || []).map((order) => order.status)))
+
+  const clearAllFilters = () => {
+    setSearchQuery('')
+    setSelectedStatus('all')
+  }
+
+  const hasActiveFilters = searchQuery || selectedStatus !== 'all'
+
+  const handleViewDetails = (orderId: string) => {
+    setSelectedOrderId(orderId)
+    setIsDetailModalOpen(true)
+  }
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false)
+    setSelectedOrderId(null)
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount)
+  }
+
+  const totalPages = Math.ceil((data?.data.total || 0) / pageSize)
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <div className='text-gray-500'>Loading orders...</div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <div className='text-red-500'>Error loading orders: {error?.message}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className='space-y-4 p-6'>
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-3xl font-bold tracking-tight'>Orders</h1>
+          <p className='text-muted-foreground'>Manage and view all orders in the system</p>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className='flex flex-col gap-4 md:flex-row md:items-center'>
+        <div className='flex flex-1 items-center space-x-2'>
+          <div className='relative'>
+            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+            <Input
+              placeholder='Search by order ID, email, or package ID...'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className='pl-8 w-80'
+            />
+          </div>
+        </div>
+
+        <div className='flex items-center space-x-2'>
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className='w-[150px]'>
+              <SelectValue placeholder='Status' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Status</SelectItem>
+              {statuses.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {hasActiveFilters && (
+            <Button variant='ghost' onClick={clearAllFilters} className='h-8 px-2 lg:px-3'>
+              Reset
+              <X className='ml-2 h-4 w-4' />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className='rounded-md border'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Package ID</TableHead>
+              <TableHead>Total Amount</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead className='text-right'>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredOrders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className='h-24 text-center'>
+                  No orders found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className='font-mono text-sm'>{order.id.substring(0, 8)}...</TableCell>
+                  <TableCell>{order.email}</TableCell>
+                  <TableCell className='font-mono text-sm'>{order.package_id.substring(0, 8)}...</TableCell>
+                  <TableCell className='font-medium text-green-600'>{formatCurrency(order.total_amount)}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(order.status)}>{order.status.toUpperCase()}</Badge>
+                  </TableCell>
+                  <TableCell>{format(new Date(order.created_at), 'dd/MM/yyyy HH:mm')}</TableCell>
+                  <TableCell className='text-right'>
+                    <div className='flex items-center justify-end gap-2'>
+                      <Button variant='ghost' size='icon' onClick={() => handleViewDetails(order.id)}>
+                        <Eye className='h-4 w-4' />
+                        <span className='sr-only'>View details</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center space-x-6 lg:space-x-8'>
+            <div className='flex items-center space-x-2'>
+              <p className='text-sm font-medium'>
+                Page {currentPage} of {totalPages}
+              </p>
+            </div>
+          </div>
+          <div className='flex items-center space-x-2'>
+            <Button
+              variant='outline'
+              size='icon'
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className='h-4 w-4' />
+              <span className='sr-only'>Previous page</span>
+            </Button>
+            <Button
+              variant='outline'
+              size='icon'
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className='h-4 w-4' />
+              <span className='sr-only'>Next page</span>
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Order Detail Modal */}
+      <OrderDetailModal isOpen={isDetailModalOpen} onClose={closeDetailModal} orderId={selectedOrderId} />
+    </div>
+  )
+}
+
+export default Order

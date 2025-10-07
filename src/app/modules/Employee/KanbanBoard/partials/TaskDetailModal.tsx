@@ -10,6 +10,7 @@ interface TaskDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   task: MyTask | null
+  onTaskUpdated?: () => void
 }
 
 const getStatusStyles = (status: string) => {

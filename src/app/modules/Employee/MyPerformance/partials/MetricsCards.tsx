@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/app/components/ui/card'
 import { Skeleton } from '@/app/components/ui/skeleton'
 import { AlertCircle, Calendar, CheckCircle, Timer } from 'lucide-react'
 import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
+import { authApi } from '@/app/apis/AUTH/Auth.api'
 import type { Performance } from '@/app/modules/Employee/MyPerformance/models/perfomance.type'
 
 export function MetricsCards() {
@@ -16,7 +17,11 @@ export function MetricsCards() {
       try {
         setLoading(true)
         setError(null)
-        const userId = '327e1b0b-2698-4a0f-9273-ca9729a9f0cd'
+
+        // Lấy thông tin user hiện tại để có userId
+        const currentUser = await authApi.getCurrentUser()
+        const userId = currentUser.data.id
+
         const today = new Date().toISOString().split('T')[0]
 
         // Tính ngày hôm qua

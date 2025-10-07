@@ -1,15 +1,20 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Badge } from '@/app/components/ui/badge'
+import { Button } from '@/app/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Progress } from '@/app/components/ui/progress'
 import { Separator } from '@/app/components/ui/separator'
-import { Calendar, User, Star, ClipboardList, Paperclip, Check } from 'lucide-react'
 import type { MyTask } from '@/app/modules/Employee/MyTasks/models/myTask.type'
+import { Calendar, Check, ClipboardList, Paperclip, Star, ThumbsDown, ThumbsUp, User } from 'lucide-react'
+import { useState } from 'react'
+import { RejectForm } from './RejectForm'
+import { ReviewForm } from './ReviewForm'
 
 interface TaskDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   task: MyTask | null
+  onTaskUpdated?: () => void
 }
 
 const getStatusStyles = (status: string) => {
@@ -26,13 +31,13 @@ const getStatusStyles = (status: string) => {
       }
     case 'reviewing':
       return {
-        statusColor: 'bg-purple-600',
-        displayText: 'Reviewing'
+        statusColor: 'bg-purple-600 font-bold text-white border-2 border-purple-800 shadow-lg',
+        displayText: '🔍 REVIEWING'
       }
     case 'rejected':
       return {
         statusColor: 'bg-red-600',
-        displayText: 'Rejected'
+        displayText: 'rejected'
       }
     case 'completed':
       return {
@@ -87,7 +92,7 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString('en-CA')
 }
 
-export function TaskDetailModal({ open, onOpenChange, task }: TaskDetailModalProps) {
+export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: TaskDetailModalProps) {
   if (!task) return null
 
   const statusStyles = getStatusStyles(task.status)
@@ -99,6 +104,8 @@ export function TaskDetailModal({ open, onOpenChange, task }: TaskDetailModalPro
 
   const comments = task.contents.filter((c) => c.type === 'comment' && c.status === 'active')
   const notes = task.contents.filter((c) => c.type === 'note' && c.status === 'active')
+
+  console.log('task', task.status)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,7 +124,6 @@ export function TaskDetailModal({ open, onOpenChange, task }: TaskDetailModalPro
 
           <Separator />
 
-          {/* Task Info */}
           <div className='grid grid-cols-2 gap-6'>
             <div className='space-y-4'>
               <div className='flex items-center space-x-2'>
@@ -300,8 +306,73 @@ export function TaskDetailModal({ open, onOpenChange, task }: TaskDetailModalPro
               </div>
             </>
           )}
+
+          {task.status === 'reviewing' && (
+            <>
+              <Separator />
+              <ReviewRejectActions
+                task={task}
+                onActionComplete={() => {
+                  onOpenChange(false)
+                  onTaskUpdated?.()
+                }}
+              />
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+// Review/Reject Component
+function ReviewRejectActions({ task, onActionComplete }: { task: MyTask; onActionComplete: () => void }) {
+  const [showReview, setShowReview] = useState(false)
+  const [showReject, setShowReject] = useState(false)
+
+  // Get task owner ID
+  const taskOwnerId = task.assignees[0]?.user?.id || ''
+
+  if (showReview) {
+    return (
+      <ReviewForm
+        taskId={task.id}
+        taskOwnerId={taskOwnerId}
+        onSuccess={() => {
+          setShowReview(false)
+          onActionComplete()
+        }}
+        onCancel={() => setShowReview(false)}
+      />
+    )
+  }
+
+  if (showReject) {
+    return (
+      <RejectForm
+        taskId={task.id}
+        onSuccess={() => {
+          setShowReject(false)
+          onActionComplete()
+        }}
+        onCancel={() => setShowReject(false)}
+      />
+    )
+  }
+
+  return (
+    <div>
+      <h3 className='text-lg font-semibold text-gray-900 mb-4'>Manager Actions</h3>
+      <div className='flex space-x-3'>
+        <Button onClick={() => setShowReview(true)} className='bg-green-600 hover:bg-green-700'>
+          <ThumbsUp className='w-4 h-4 mr-2' />
+          Approve & Review
+        </Button>
+        <Button variant='destructive' onClick={() => setShowReject(true)}>
+          <ThumbsDown className='w-4 h-4 mr-2' />
+          Reject Task
+        </Button>
+      </div>
+    </div>
   )
 }

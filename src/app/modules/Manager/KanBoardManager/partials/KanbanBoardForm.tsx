@@ -1,8 +1,11 @@
 import { FilterDialog } from '@/app/modules/Employee/KanbanBoard/partials/FilterDialog'
 import { KanbanCard } from '@/app/modules/Employee/KanbanBoard/partials/KanbanCard'
-import { KanbanColumn } from '@/app/modules/Employee/KanbanBoard/partials/KanbanColumn'
 import { SortDialog } from '@/app/modules/Employee/KanbanBoard/partials/SortDialog'
-import { TaskDetailModal } from '@/app/modules/Employee/KanbanBoard/partials/TaskDetailModal'
+import { TaskDetailModal } from './TaskDetailModal'
+import { TaskCreateForm } from './TaskCreateForm'
+import { ManagerKanbanColumn } from './ManagerKanbanColumn'
+import { ReviewForm } from './ReviewForm'
+import { RejectForm } from './RejectForm'
 import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import type { MyTask, TaskStatus } from '@/app/modules/Employee/MyTasks/models/myTask.type'
 import {
@@ -111,6 +114,11 @@ export function KanbanBoardForm() {
   const [error, setError] = useState<string | null>(null)
   const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState<MyTask | null>(null)
+  const [createTaskOpen, setCreateTaskOpen] = useState(false)
+  const [reviewModalOpen, setReviewModalOpen] = useState(false)
+  const [rejectModalOpen, setRejectModalOpen] = useState(false)
+  const [selectedTaskId, setSelectedTaskId] = useState<string>('')
+  const [selectedTaskOwnerId, setSelectedTaskOwnerId] = useState<string>('')
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -120,66 +128,67 @@ export function KanbanBoardForm() {
     })
   )
 
+  // Function to fetch tasks from API
+  const fetchTasks = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await MyTaskApi.getAllTasksByManager()
+
+      if (response.success && response.data) {
+        // Group tasks by column based on status mapping
+        const tasksByColumn: Record<string, Card[]> = {
+          todo: [],
+          doing: [],
+          completed: [],
+          rejected: []
+        }
+
+        response.data.forEach((task) => {
+          const card = convertTaskToCard(task)
+
+          // Map task status to kanban columns
+          switch (task.status) {
+            case 'todo':
+            case 'overdued':
+              tasksByColumn.todo.push(card)
+              break
+            case 'doing':
+              tasksByColumn.doing.push(card)
+              break
+            case 'reviewing':
+            case 'completed':
+            case 'feedbacked':
+              tasksByColumn.completed.push(card)
+              break
+            case 'rejected':
+              tasksByColumn.rejected.push(card)
+              break
+            default:
+              // Default to todo if status is unknown
+              tasksByColumn.todo.push(card)
+              break
+          }
+        })
+
+        // Update columns with tasks
+        setColumns((prevColumns) =>
+          prevColumns.map((column) => ({
+            ...column,
+            cards: tasksByColumn[column.id] || []
+          }))
+        )
+      }
+    } catch (err) {
+      setError('Failed to fetch tasks')
+      console.error('Error fetching tasks:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Fetch tasks from API
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const response = await MyTaskApi.getMyTask()
-
-        if (response.success && response.data) {
-          // Group tasks by column based on status mapping
-          const tasksByColumn: Record<string, Card[]> = {
-            todo: [],
-            doing: [],
-            completed: [],
-            rejected: []
-          }
-
-          response.data.forEach((task) => {
-            const card = convertTaskToCard(task)
-
-            // Map task status to kanban columns
-            switch (task.status) {
-              case 'todo':
-              case 'overdued':
-                tasksByColumn.todo.push(card)
-                break
-              case 'doing':
-                tasksByColumn.doing.push(card)
-                break
-              case 'reviewing':
-              case 'completed':
-              case 'feedbacked':
-                tasksByColumn.completed.push(card)
-                break
-              case 'rejected':
-                tasksByColumn.rejected.push(card)
-                break
-              default:
-                // Default to todo if status is unknown
-                tasksByColumn.todo.push(card)
-                break
-            }
-          })
-
-          // Update columns with tasks
-          setColumns((prevColumns) =>
-            prevColumns.map((column) => ({
-              ...column,
-              cards: tasksByColumn[column.id] || []
-            }))
-          )
-        }
-      } catch (err) {
-        setError('Failed to fetch tasks')
-        console.error('Error fetching tasks:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchTasks()
   }, [])
 
@@ -224,6 +233,33 @@ export function KanbanBoardForm() {
     if (task) {
       setSelectedTaskForDetail(task)
       setDetailModalOpen(true)
+    }
+  }
+
+  const handleReview = async (taskId: string, taskOwnerId: string) => {
+    // First call /task/:id to get task details
+    try {
+      const response = await MyTaskApi.getTaskById(taskId)
+      if (response.success && response.data) {
+        setSelectedTaskId(taskId)
+        setSelectedTaskOwnerId(taskOwnerId)
+        setReviewModalOpen(true)
+      }
+    } catch (error) {
+      console.error('Error fetching task details:', error)
+    }
+  }
+
+  const handleReject = async (taskId: string) => {
+    // First call /task/:id to get task details
+    try {
+      const response = await MyTaskApi.getTaskById(taskId)
+      if (response.success && response.data) {
+        setSelectedTaskId(taskId)
+        setRejectModalOpen(true)
+      }
+    } catch (error) {
+      console.error('Error fetching task details:', error)
     }
   }
 
@@ -348,6 +384,15 @@ export function KanbanBoardForm() {
         <div className='mb-6 flex items-center justify-between'>
           <h1 className='text-3xl font-bold'>Kanban Board</h1>
           <div className='flex items-center gap-3'>
+            <button
+              onClick={() => setCreateTaskOpen(true)}
+              className='flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-3 py-2 text-sm hover:bg-primary/90'
+            >
+              <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 4v16m8-8H4' />
+              </svg>
+              Create Task
+            </button>
             <button className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted'>
               <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
@@ -432,7 +477,12 @@ export function KanbanBoardForm() {
             <div className='grid grid-cols-4 gap-6 h-full w-full'>
               {filteredAndSortedColumns.map((column) => (
                 <div key={column.id} className='min-w-0'>
-                  <KanbanColumn column={column} onViewDetail={handleViewDetail} />
+                  <ManagerKanbanColumn
+                    column={column}
+                    onViewDetail={handleViewDetail}
+                    onReview={handleReview}
+                    onReject={handleReject}
+                  />
                 </div>
               ))}
             </div>
@@ -467,7 +517,60 @@ export function KanbanBoardForm() {
         onSortByChange={setSortBy}
         onSortOrderChange={setSortOrder}
       />
-      <TaskDetailModal open={detailModalOpen} onOpenChange={setDetailModalOpen} task={selectedTaskForDetail} />
+      <TaskDetailModal
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        task={selectedTaskForDetail}
+        onTaskUpdated={fetchTasks}
+      />
+
+      {/* Task Create Modal */}
+      {createTaskOpen && (
+        <div className='fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4'>
+          <div className='bg-background rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
+            <TaskCreateForm
+              onSuccess={() => {
+                setCreateTaskOpen(false)
+                fetchTasks()
+              }}
+              onCancel={() => setCreateTaskOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {reviewModalOpen && (
+        <div className='fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4'>
+          <div className='bg-background rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto'>
+            <ReviewForm
+              taskId={selectedTaskId}
+              taskOwnerId={selectedTaskOwnerId}
+              onSuccess={() => {
+                setReviewModalOpen(false)
+                fetchTasks()
+              }}
+              onCancel={() => setReviewModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {rejectModalOpen && (
+        <div className='fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4'>
+          <div className='bg-background rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto'>
+            <RejectForm
+              taskId={selectedTaskId}
+              onSuccess={() => {
+                setRejectModalOpen(false)
+                fetchTasks()
+              }}
+              onCancel={() => setRejectModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -13,6 +13,106 @@ export const MyTaskApi = {
       throw axiosError
     }
   },
+
+  // New API for Manager to get all tasks
+  getAllTasksByManager: async () => {
+    try {
+      const response: AxiosResponse<MyTaskResponse> = await fetcher.get('/task')
+      return response.data as MyTaskResponse
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
+  // Get single task by ID
+  getTaskById: async (taskId: string) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: MyTask }> = await fetcher.get(
+        `/task/${taskId}`
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
+  // Create new task
+  createTask: async (taskData: FormData) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: MyTask }> = await fetcher.post(
+        '/task/create',
+        taskData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
+  // Update task
+  updateTask: async (
+    taskId: string,
+    taskData: {
+      name?: string
+      description?: string
+      start_at?: string
+      due_at?: string
+      priority?: 'low' | 'medium' | 'high'
+      status?: 'todo' | 'doing' | 'reviewing' | 'rejected' | 'completed' | 'feedbacked' | 'overdued'
+    }
+  ) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: MyTask }> = await fetcher.put(
+        `/task/update/${taskId}`,
+        taskData
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
+  // Create review for task
+  createReview: async (reviewData: {
+    task_id: string
+    task_owner_id: string
+    quality_score: number
+    notes: string
+  }) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: any }> = await fetcher.post(
+        '/task/create-review',
+        reviewData
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
+  // Reject task
+  rejectTask: async (rejectData: { task_id: string; reason: string; notes: string }) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: any }> = await fetcher.post(
+        '/task/reject-task',
+        rejectData
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
   createTaskContent: async (task_id: string, user_id: string, content: string, type: string, status: string) => {
     try {
       const response: AxiosResponse<MyTaskResponse> = await fetcher.post(`/task/content/create`, {
