@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react'
+import { FeatureApi } from '@/app/apis/AUTH/feature.api'
+import { Button } from '@/app/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose
+  DialogHeader,
+  DialogTitle
 } from '@/app/components/ui/dialog'
-import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Textarea } from '@/app/components/ui/textarea'
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/app/components/ui/select'
+import type { PackageForm } from '@/app/modules/SuperAdmin/PackageManagement/models/package.type'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { FeatureApi } from '@/app/apis/AUTH/feature.api'
-import type { FeatureCreate } from '../models/feature.type'
-import type { PackageData, PackageForm } from '@/app/modules/SuperAdmin/PackageManagement/models/package.type'
 import { toast } from 'react-toastify'
+import type { FeatureCreate } from '../models/feature.type'
 
 interface Props {
   open: boolean

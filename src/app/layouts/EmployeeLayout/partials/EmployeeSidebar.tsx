@@ -116,8 +116,8 @@ export function EmployeeSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-semibold text-gray-900'>Super Admin</span>
-                    <span className='truncate text-xs text-gray-600'>superadmin@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>Employee</span>
+                    <span className='truncate text-xs text-gray-600'>employee@flowpilot.io.vn</span>
                   </div>
                 </div>
                 <DropdownMenuSeparator className='bg-gray-200' />

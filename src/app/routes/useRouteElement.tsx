@@ -51,6 +51,7 @@ import MyTeamManagerDetail from '@/app/modules/Manager/MyTeamManagerDetail/MyTea
 import ConsultationReqManagement from '@/app/modules/SuperAdmin/ConsultationReqManagement/ConsultationReqManagement'
 import PackageManagement from '@/app/modules/SuperAdmin/PackageManagement/PackageManagement'
 import FeatureManagement from '@/app/modules/SuperAdmin/FeatureManagement/FeatureManagement'
+import EmloyeeNotifications from '@/app/modules/Employee/Notifications/EmployeeNotifications'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -450,6 +451,16 @@ const useRouteElement = () => {
             <RoleGuard roles={['employee']}>
               <EmployeeLayout>
                 <MyPerformance />
+              </EmployeeLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_NOTIFICATIONS,
+          element: (
+            <RoleGuard roles={['employee']}>
+              <EmployeeLayout>
+                <EmloyeeNotifications />
               </EmployeeLayout>
             </RoleGuard>
           )

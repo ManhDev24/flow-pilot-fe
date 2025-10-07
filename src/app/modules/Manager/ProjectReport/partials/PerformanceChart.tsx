@@ -27,7 +27,7 @@ export function PerformanceChart() {
               paddingAngle={2}
               dataKey='value'
               labelLine={false}
-              label={({ name, percent }) => `${(Number(percent) * 100).toFixed(0)}%`}
+              label={({ percent }) => `${(Number(percent) * 100).toFixed(0)}%`}
             >
               {performanceData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />

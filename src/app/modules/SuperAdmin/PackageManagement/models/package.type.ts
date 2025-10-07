@@ -1,3 +1,5 @@
+import type { Feature } from '@/app/modules/SuperAdmin/FeatureManagement/models/feature.type'
+
 export interface PackageResponse {
   success: boolean
   message: string

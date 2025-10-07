@@ -40,6 +40,7 @@ export const PATH = {
   EMPLOYEE_KANBAN: '/emp/kanban-board',
   EMPLOYEE_MY_TEAM: '/emp/my-team',
   EMPLOYEE_MY_FILES: '/emp/my-files',
+  EMPLOYEE_NOTIFICATIONS: '/emp/notifications',
   // STAFF
   EMPLOYEE_MY_TASKS: '/emp/my-tasks',
   EMPLOYEE_MY_PERFORMANCE: '/emp/my-performance',
