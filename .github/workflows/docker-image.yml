@@ -29,10 +29,10 @@ jobs:
     runs-on: [self-hosted, linux, x64]
     steps:
       - name: Pull image from Docker Hub
-        run: docker pull tienmanh/flow-pilot-fe:latest
+        run: sudo docker pull tienmanh/flow-pilot-fe:latest
 
       - name: Delete Old Container
-        run: docker rm -f flow-pilot-fe-container || true
+        run: sudo docker rm -f flow-pilot-fe-container || true
 
       - name: Run docker container
-        run: docker run -d -p 6868:6868 --name flow-pilot-fe-container tienmanh/flow-pilot-fe:latest
+        run: sudo docker run -d -p 6868:6868 --name flow-pilot-fe-container tienmanh/flow-pilot-fe:latest
