@@ -1,28 +1,24 @@
 import logoFlowpilot from '@/app/assets/LogoFlowPilot.png'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent } from '@/app/components/ui/card'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/app/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/app/components/ui/form'
 import { Input } from '@/app/components/ui/input'
 import { PATH } from '@/app/routes/path'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { object, string } from 'yup'
 import type { ForgotPasswordForm } from './models/ForgetPasswordFormInterface'
+import { useMutation } from '@tanstack/react-query'
+import { authApi } from '@/app/apis/AUTH/Auth.api'
+import { toast } from 'react-toastify'
+import type { LoginResponse } from '../Login/models/LoginFormInterface'
+
 const forgotPasswordSchema = object({
   email: string().email('Invalid email address').required('Email is required')
 })
 
 const ForgotPassword = () => {
-  const [isLoading] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const form = useForm<ForgotPasswordForm>({
@@ -32,15 +28,35 @@ const ForgotPassword = () => {
     },
     resolver: yupResolver(forgotPasswordSchema)
   })
-  const {
-    control,
-    // register,
-    handleSubmit,
-    // formState: { errors }
-  } = form
+
+  const { control, handleSubmit } = form
+
+  const sendOtpMutation = useMutation<LoginResponse, { data?: LoginResponse; message?: string }, { email: string }>({
+    mutationFn: (payload: { email: string }) => authApi.sendOtpForgotPassword(payload.email),
+    onSuccess: (data) => {
+      if (data && data.success) {
+        toast.success('OTP sent successfully!')
+        navigate(PATH.RESET_PASSWORD, { state: { email: form.getValues('email') } })
+      } else {
+        const errorMessage = typeof data.message === 'string' ? data.message : data.message?.message || 'Failed to send OTP!'
+        toast.error(errorMessage)
+      }
+    },
+    onError: (error: { data?: LoginResponse; message?: string }) => {
+      let errorMessage = 'Failed to send OTP!'
+      if (error?.data?.message) {
+        errorMessage = typeof error.data.message === 'string' ? error.data.message : error.data.message.message
+      } else if (error?.message) {
+        errorMessage = error.message
+      }
+      toast.error(errorMessage)
+    }
+  })
+
+  const isLoading = sendOtpMutation.status === 'pending'
 
   const onSubmit: SubmitHandler<ForgotPasswordForm> = (data) => {
-    console.log(data)
+    sendOtpMutation.mutate({ email: data.email })
   }
 
   return (
@@ -62,7 +78,9 @@ const ForgotPassword = () => {
           </button>
           <div className='flex flex-col items-center mb-8'>
             <img className='w-28 h-28 object-contain drop-shadow-lg' src={logoFlowpilot} alt='flow-pilot-logo' />
-            <p className='text-gray-400 text-sm'>Forgot your password?</p>
+            <p className='text-gray-400 text-sm text-center'>
+              Please provide your email address, and we’ll send you an OTP to reset your password.
+            </p>
           </div>
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className='w-full flex flex-col items-center gap-4'>
@@ -79,7 +97,7 @@ const ForgotPassword = () => {
                   </FormItem>
                 )}
               />
-          
+
               <Button
                 type='submit'
                 className='w-full max-w-sm bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-full text-lg transition mb-4 border-0 shadow-md'
@@ -90,16 +108,10 @@ const ForgotPassword = () => {
             </form>
           </Form>
           <div className='flex flex-col gap-2 w-full text-sm text-gray-500 mt-2'>
-            {/* <span className='text-center'>
-              Forgot password?{' '}
-              <Link to={PATH.FORGOT_PASSWORD} className='text-blue-500 hover:underline font-medium'>
-                Reset
-              </Link>
-            </span> */}
             <span className='text-center'>
-              Return back to login?{' '}
+              Already have an account?{' '}
               <Link to={PATH.LOGIN} className='text-blue-500 hover:underline font-medium'>
-                Login
+                Click here
               </Link>
             </span>
           </div>

@@ -5,7 +5,7 @@ import LandingPage from '../modules/Guest/LandingPage/LandingPage'
 import PricingPage from '../modules/Guest/PricingPage/PricingPage'
 import AuthLayout from '../layouts/AuthLayout/AuthLayout'
 import Login from '../modules/Auth/Login/Login'
-import Register from '../modules/Auth/Register/Register'
+// import Register from '../modules/Auth/Register/Register'
 import SuperAdminLayout from '../layouts/SuperAdminLayout/SuperAdminLayout'
 import Dashboard from '../modules/SuperAdmin/Dashboard/Dashboard'
 import UserManagement from '../modules/SuperAdmin/UserManagement/UserManagement'
@@ -19,8 +19,6 @@ import WorkspaceDetail from '../modules/SuperAdmin/WorkspaceDetail/WorkspaceDeta
 import MyEmployeeDetail from '../modules/AdminWs/MyEmployeeDetail/MyEmployeeDetail'
 import MyProjectDetail from '../modules/AdminWs/MyProjectDetail/MyProjectDetail'
 import EmployeeLayout from '../layouts/EmployeeLayout/EmployeeLayout'
-import ProjectReports from '../modules/Employee/ProjectReports/ProjectReports'
-import BackLogs from '../modules/Employee/BackLogs/BackLogs'
 import MemberReports from '../modules/Employee/MemberReports/MemberReports'
 import AdminSettings from '../modules/AdminWs/AdminSettings/AdminSettings'
 import AccountSettings from '../modules/Employee/AccountSettings/AccountSettings'
@@ -33,21 +31,41 @@ import type { ReactNode } from 'react'
 import Forbidden from '../pages/Forbidden/Forbidden'
 import NotFound from '../pages/NotFound/NotFound'
 import ForgotPassword from '../modules/Auth/ForgotPassword/ForgotPassword'
+import AdminReports from '@/app/modules/AdminWs/AdminReports/AdminReports'
+import ManagerLayout from '@/app/layouts/ManagerLayout/ManagerLayout'
+import KanbanBoardManager from '@/app/modules/Manager/KanBoardManager/KanbanBoardManager'
+import MyTeamManager from '@/app/modules/Manager/MyTeamManager/MyTeamManager'
+import MyPerformanceManager from '@/app/modules/Manager/MyPerformanceManager/MyPerformanceManager'
+import MyFileManager from '@/app/modules/Manager/MyFileManager/MyFileManager'
+import ProjectReport from '@/app/modules/Manager/ProjectReport/ProjectReport'
+import { useSelector } from 'react-redux'
+import type { IRoleState } from '../models'
+import FirstLogin from '../modules/Auth/FirstLogin/FirstLogin'
+import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
+import ContactPage from '../modules/Guest/ContactPage/ContactPage'
+import NotificationManagement from '@/app/modules/Manager/NotificationManagement/NotificationManagement'
+import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
+import Order from '@/app/modules/SuperAdmin/Order/Order'
+import Payment from '@/app/modules/SuperAdmin/Payment/Payment'
+import MyTeamManagerDetail from '@/app/modules/Manager/MyTeamManagerDetail/MyTeamManagerDetail'
+import ConsultationReqManagement from '@/app/modules/SuperAdmin/ConsultationReqManagement/ConsultationReqManagement'
+import PackageManagement from '@/app/modules/SuperAdmin/PackageManagement/PackageManagement'
+import FeatureManagement from '@/app/modules/SuperAdmin/FeatureManagement/FeatureManagement'
+import EmloyeeNotifications from '@/app/modules/Employee/Notifications/EmployeeNotifications'
+import AdminNotifications from '@/app/modules/AdminWs/Notification/AdminNotifications'
+
+const redirectMap: Record<string, string> = {
+  superadmin: PATH.SUPER_ADMIN,
+  admin: PATH.ADMIN,
+  projectmanager: PATH.EMPLOYEE_MANAGE_PROJECTS,
+  employee: PATH.EMPLOYEE_MY_TASKS
+}
 
 const RejectedRouter = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (storedRole) {
-    const redirectMap: Record<string, string> = {
-      'super-admin': PATH.SUPER_ADMIN,
-      'admin-ws': PATH.ADMIN,
-      leader: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
-      staff: PATH.EMPLOYEE_MY_TASKS
-    }
-
-    const redirectPath = redirectMap[storedRole]
-    
+    const redirectPath = redirectMap[storedRole.toLowerCase()]
     return <Navigate to={redirectPath} replace />
   }
 
@@ -55,33 +73,25 @@ const RejectedRouter = () => {
 }
 
 const RejectedAuthRouter = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Outlet />
   }
 
-  const redirectMap: Record<string, string> = {
-    'super-admin': PATH.SUPER_ADMIN,
-    'admin-ws': PATH.ADMIN,
-    leader: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
-    staff: PATH.EMPLOYEE_MY_TASKS
-  }
-
-  const redirectPath = redirectMap[storedRole]
+  const redirectPath = redirectMap[storedRole.toLowerCase()]
 
   return redirectPath ? <Navigate to={redirectPath} replace /> : <Navigate to={PATH.HOME} replace />
 }
 
 const ProtectedRouter = ({ roles }: { roles: string[] }) => {
-  const storedRole = localStorage.getItem('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole && roles.includes(storedRole)) {
+  if (storedRole && roles.includes(storedRole.toLowerCase())) {
     return <Outlet />
   }
 
@@ -89,13 +99,13 @@ const ProtectedRouter = ({ roles }: { roles: string[] }) => {
 }
 
 const RoleGuard = ({ roles, children }: { roles: string[]; children: ReactNode }) => {
-  const storedRole = localStorage.getItem('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole && roles.includes(storedRole)) {
+  if (storedRole && roles.includes(storedRole.toLowerCase())) {
     return <>{children}</>
   }
 
@@ -103,19 +113,28 @@ const RoleGuard = ({ roles, children }: { roles: string[]; children: ReactNode }
 }
 
 const EmployeeIndexPage = () => {
-  // const { currentRole } = useSelector((state) => state.role);
-  const storedRole = localStorage.getItem('role')
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
 
   if (!storedRole) {
     return <Navigate to={PATH.LOGIN} replace />
   }
 
-  if (storedRole === 'leader') {
-    return <Navigate to={PATH.EMPLOYEE_LEAD_PROJECT_REPORTS} replace />
+  if (storedRole.toLowerCase() === 'employee') {
+    return <Navigate to={PATH.EMPLOYEE_MY_TASKS} replace />
   }
 
-  if (storedRole === 'staff') {
-    return <Navigate to={PATH.EMPLOYEE_MY_TASKS} replace />
+  return <Navigate to={PATH.FORBIDDEN} replace />
+}
+
+const EmployeeManagerIndexPage = () => {
+  const storedRole: string = useSelector((state: { role: IRoleState }) => state.role.currentRole)
+
+  if (!storedRole) {
+    return <Navigate to={PATH.LOGIN} replace />
+  }
+
+  if (storedRole.toLowerCase() === 'projectmanager') {
+    return <Navigate to={PATH.EMPLOYEE_MANAGE_PROJECTS} replace />
   }
 
   return <Navigate to={PATH.FORBIDDEN} replace />
@@ -147,10 +166,26 @@ const useRouteElement = () => {
               <PricingPage />
             </GuestLayout>
           )
+        },
+        {
+          path: PATH.CONTACT_PAGE,
+          element: (
+            <GuestLayout>
+              <ContactPage />
+            </GuestLayout>
+          )
         }
       ]
     },
     // Auth Module
+    {
+      path: PATH.FIRST_LOGIN,
+      element: (
+        <AuthLayout>
+          <FirstLogin />
+        </AuthLayout>
+      )
+    },
     {
       path: PATH.AUTH,
       element: <RejectedAuthRouter />,
@@ -167,19 +202,27 @@ const useRouteElement = () => {
             </AuthLayout>
           )
         },
-        {
-          path: PATH.REGISTER,
-          element: (
-            <AuthLayout>
-              <Register />
-            </AuthLayout>
-          )
-        },
+        // {
+        //   path: PATH.REGISTER,
+        //   element: (
+        //     <AuthLayout>
+        //       <Register />
+        //     </AuthLayout>
+        //   )
+        // },
         {
           path: PATH.FORGOT_PASSWORD,
           element: (
             <AuthLayout>
               <ForgotPassword />
+            </AuthLayout>
+          )
+        },
+        {
+          path: PATH.RESET_PASSWORD,
+          element: (
+            <AuthLayout>
+              <ResetPassword />
             </AuthLayout>
           )
         }
@@ -188,7 +231,7 @@ const useRouteElement = () => {
     // Super Admin Module
     {
       path: PATH.SUPER_ADMIN,
-      element: <ProtectedRouter roles={['super-admin']} />,
+      element: <ProtectedRouter roles={['superadmin']} />,
       children: [
         {
           index: true,
@@ -203,10 +246,50 @@ const useRouteElement = () => {
           )
         },
         {
+          path: PATH.SUPER_ADMIN_CONSULTATION_REQ,
+          element: (
+            <SuperAdminLayout>
+              <ConsultationReqManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PACKAGES,
+          element: (
+            <SuperAdminLayout>
+              <PackageManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_FEATURES,
+          element: (
+            <SuperAdminLayout>
+              <FeatureManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
           path: PATH.SUPER_ADMIN_USERS,
           element: (
             <SuperAdminLayout>
               <UserManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_ORDERS,
+          element: (
+            <SuperAdminLayout>
+              <Order />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PAYMENTS,
+          element: (
+            <SuperAdminLayout>
+              <Payment />
             </SuperAdminLayout>
           )
         },
@@ -231,7 +314,7 @@ const useRouteElement = () => {
     // Admin Ws Module
     {
       path: PATH.ADMIN,
-      element: <ProtectedRouter roles={['admin-ws']} />,
+      element: <ProtectedRouter roles={['admin']} />,
       children: [
         {
           index: true,
@@ -246,10 +329,26 @@ const useRouteElement = () => {
           )
         },
         {
+          path: PATH.ADMIN_MY_REPORT,
+          element: (
+            <AdminWsLayout>
+              <AdminReports />
+            </AdminWsLayout>
+          )
+        },
+        {
           path: PATH.ADMIN_MY_WORKSPACE,
           element: (
             <AdminWsLayout>
               <MyWorkspace />
+            </AdminWsLayout>
+          )
+        },
+        {
+          path: PATH.ADMIN_DEPARTMENTS,
+          element: (
+            <AdminWsLayout>
+              <MyDepartment />
             </AdminWsLayout>
           )
         },
@@ -292,13 +391,21 @@ const useRouteElement = () => {
               <AdminSettings />
             </AdminWsLayout>
           )
+        },
+        {
+          path: PATH.ADMIN_NOTIFICATIONS,
+          element: (
+            <AdminWsLayout>
+              <AdminNotifications />
+            </AdminWsLayout>
+          )
         }
       ]
     },
     // Employee Module
     {
       path: PATH.EMPLOYEE,
-      element: <ProtectedRouter roles={['staff', 'leader']} />,
+      element: <ProtectedRouter roles={['employee', 'projectmanager']} />,
       children: [
         {
           index: true,
@@ -340,7 +447,7 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MY_TASKS,
           element: (
-            <RoleGuard roles={['staff']}>
+            <RoleGuard roles={['employee']}>
               <EmployeeLayout>
                 <MyTasks />
               </EmployeeLayout>
@@ -350,41 +457,107 @@ const useRouteElement = () => {
         {
           path: PATH.EMPLOYEE_MY_PERFORMANCE,
           element: (
-            <RoleGuard roles={['staff']}>
+            <RoleGuard roles={['employee']}>
               <EmployeeLayout>
                 <MyPerformance />
               </EmployeeLayout>
             </RoleGuard>
           )
         },
-        // Team leader only
         {
-          path: PATH.EMPLOYEE_LEAD_PROJECT_REPORTS,
+          path: PATH.EMPLOYEE_NOTIFICATIONS,
           element: (
-            <RoleGuard roles={['leader']}>
+            <RoleGuard roles={['employee']}>
               <EmployeeLayout>
-                <ProjectReports />
+                <EmloyeeNotifications />
               </EmployeeLayout>
+            </RoleGuard>
+          )
+        }
+      ]
+    },
+
+    {
+      path: PATH.EMPLOYEE_MANAGER,
+      element: <ProtectedRouter roles={['projectmanager']} />,
+      children: [
+        {
+          index: true,
+          element: <EmployeeManagerIndexPage />
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_TASKS,
+          element: (
+            <ManagerLayout>
+              <MemberReports />
+            </ManagerLayout>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_TEAM_DETAIL,
+          element: (
+            <ManagerLayout>
+              <MyTeamManagerDetail />
+            </ManagerLayout>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_KANBAN,
+          element: (
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <KanbanBoardManager />
+              </ManagerLayout>
             </RoleGuard>
           )
         },
         {
-          path: PATH.EMPLOYEE_LEAD_BACKLOG,
+          path: PATH.EMPLOYEE_MANAGE_MY_TEAM,
           element: (
-            <RoleGuard roles={['leader']}>
-              <EmployeeLayout>
-                <BackLogs />
-              </EmployeeLayout>
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <MyTeamManager />
+              </ManagerLayout>
             </RoleGuard>
           )
         },
         {
-          path: PATH.EMPLOYEE_LEAD_MEMBER_REPORTS,
+          path: PATH.EMPLOYEE_MANAGE_BACKLOG,
           element: (
-            <RoleGuard roles={['leader']}>
-              <EmployeeLayout>
-                <MemberReports />
-              </EmployeeLayout>
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <MyPerformanceManager />
+              </ManagerLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_NOTIFICATIONS,
+          element: (
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <NotificationManagement />
+              </ManagerLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_FILES,
+          element: (
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <MyFileManager />
+              </ManagerLayout>
+            </RoleGuard>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_PROJECTS,
+          element: (
+            <RoleGuard roles={['projectmanager']}>
+              <ManagerLayout>
+                <ProjectReport />
+              </ManagerLayout>
             </RoleGuard>
           )
         }

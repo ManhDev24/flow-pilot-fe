@@ -1,12 +1,12 @@
+import { KanbanBoardForm } from '@/app/modules/Employee/KanbanBoard/partials/KanbanBoardForm'
+
 function KanbanBoard() {
-  return (
-    <div>KanbanBoard</div>
-  )
+  return <KanbanBoardForm />
 }
 
 export default KanbanBoard
 
 /**
- * NOTE 
+ * NOTE
  * Phân quyền sử dụng các function cho role teamleader và staff
  */
