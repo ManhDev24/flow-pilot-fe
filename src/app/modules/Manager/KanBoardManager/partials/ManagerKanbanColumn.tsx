@@ -1,5 +1,5 @@
-import type { Column } from './KanbanBoardForm'
-import { ManagerKanbanCard } from './ManagerKanbanCard'
+import type { Column } from '@/app/modules/Manager/KanBoardManager/partials/KanbanBoardForm'
+import { ManagerKanbanCard } from '@/app/modules/Manager/KanBoardManager/partials/ManagerKanbanCard'
 import { useDroppable } from '@dnd-kit/core'
 
 interface ManagerKanbanColumnProps {
@@ -7,9 +7,10 @@ interface ManagerKanbanColumnProps {
   onViewDetail?: (taskId: string) => void
   onReview?: (taskId: string, taskOwnerId: string) => void
   onReject?: (taskId: string) => void
+  onEdit?: (taskId: string) => void
 }
 
-export function ManagerKanbanColumn({ column, onViewDetail, onReview, onReject }: ManagerKanbanColumnProps) {
+export function ManagerKanbanColumn({ column, onViewDetail, onReview, onReject, onEdit }: ManagerKanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id
   })
@@ -31,6 +32,7 @@ export function ManagerKanbanColumn({ column, onViewDetail, onReview, onReject }
             onViewDetail={onViewDetail ? () => onViewDetail(card.id) : undefined}
             onReview={onReview}
             onReject={onReject}
+            onEdit={onEdit}
           />
         ))}
       </div>

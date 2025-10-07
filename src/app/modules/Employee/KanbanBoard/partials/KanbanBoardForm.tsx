@@ -92,9 +92,7 @@ const convertTaskToCard = (task: MyTask): Card => {
     tags,
     subtasks: task.checklists.length,
     comments: task.contents.length,
-    avatars: task.assignees.map(
-      (assignee) => assignee.user.avatar_url || `https://i.pravatar.cc/150?u=${assignee.user.id}`
-    ),
+    avatars: task.assignees.map((assignee) => assignee.user.avatar_url || '/placeholder.svg'),
     originalTask: task
   }
 }
@@ -264,7 +262,14 @@ export function KanbanBoardForm() {
     if (sourceColumn.id === targetColumn.id) return
 
     // Map column ID to task status for API
-    const newTaskStatus = overColumnId // This will be 'todo', 'doing', 'completed', or 'rejected'
+    let newTaskStatus: TaskStatus
+    if (overColumnId === 'completed') {
+      // When dragging to completed column, set status to 'reviewing'
+      newTaskStatus = 'reviewing'
+    } else {
+      // For other columns, use the column ID as status
+      newTaskStatus = overColumnId
+    }
 
     // Update columns state optimistically
     setColumns((prevColumns) => {
@@ -319,9 +324,6 @@ export function KanbanBoardForm() {
           return column
         })
       })
-
-      // Show error message to user
-      alert('Failed to update task status. Please try again.')
     }
   }
 

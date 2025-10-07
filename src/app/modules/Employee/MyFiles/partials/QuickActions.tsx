@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Button } from '@/app/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Upload } from 'lucide-react'
+import { useState } from 'react'
 import { UploadModal } from './UploadModal'
-import { FolderPlus, Upload, Share2, Trash2 } from 'lucide-react'
 
 interface QuickActionsProps {
   onFilesUploaded?: () => void
@@ -20,24 +20,9 @@ export function QuickActions({ onFilesUploaded }: QuickActionsProps) {
 
   const actions = [
     {
-      icon: <FolderPlus className='h-5 w-5' />,
-      label: 'New Folder',
-      onClick: () => console.log('Create new folder')
-    },
-    {
       icon: <Upload className='h-5 w-5' />,
       label: 'Upload Files',
       onClick: () => setUploadModalOpen(true)
-    },
-    {
-      icon: <Share2 className='h-5 w-5' />,
-      label: 'Share Link',
-      onClick: () => console.log('Share link')
-    },
-    {
-      icon: <Trash2 className='h-5 w-5' />,
-      label: 'Deleted Items',
-      onClick: () => console.log('View deleted items')
     }
   ]
 

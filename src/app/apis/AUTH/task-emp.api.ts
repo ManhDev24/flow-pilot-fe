@@ -230,5 +230,19 @@ export const MyTaskApi = {
       const axiosError = error as AxiosError
       throw axiosError
     }
+  },
+
+  // Assign task to users
+  assignTask: async (assignData: { task_id: string; user_ids: string[] }) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: any }> = await fetcher.post(
+        '/task/assign-task',
+        assignData
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
   }
 }

@@ -62,6 +62,7 @@ export interface Content {
   updated_at: string
   type: ContentType
   status: 'active' | 'inactive'
+  user: User
 }
 
 export interface Checklist {
