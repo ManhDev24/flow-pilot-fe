@@ -8,6 +8,7 @@ import './index.css'
 import { Provider } from 'react-redux'
 import store from './app/redux/store.ts'
 import { SocketProvider } from './app/components/Notification/hooks/SocketProvider.tsx'
+import { TimerProvider } from './app/providers'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,8 +24,10 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <SocketProvider>
-          <App />
-          <ToastContainer />
+          <TimerProvider>
+            <App />
+            <ToastContainer />
+          </TimerProvider>
         </SocketProvider>
       </QueryClientProvider>
     </BrowserRouter>

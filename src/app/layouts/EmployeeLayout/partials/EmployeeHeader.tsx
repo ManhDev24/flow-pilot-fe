@@ -12,7 +12,6 @@ export function EmployeeHeader() {
         <button className='p-2 text-gray-400 hover:text-gray-600 transition-colors'>
           <Bell className='w-5 h-5' />
         </button>
-        <img src='https://i.pravatar.cc/40?img=5' alt='User Avatar' className='w-9 h-9 rounded-full' />
       </div>
     </header>
   )
