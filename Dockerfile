@@ -1,5 +1,5 @@
 # Step 1: Build the Vite frontend
-FROM node:18-alpine AS build
+FROM node:22.12-alpine AS build
 
 # Set working directory
 WORKDIR /app
