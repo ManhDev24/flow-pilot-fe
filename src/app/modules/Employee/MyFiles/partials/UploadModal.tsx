@@ -1,20 +1,10 @@
-import { useState, useCallback } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
-import { Button } from '@/app/components/ui/button'
-import { Progress } from '@/app/components/ui/progress'
 import { MyTaskApi } from '@/app/apis/AUTH/file.api'
+import { Button } from '@/app/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { Progress } from '@/app/components/ui/progress'
+import { CheckCircle, File, FileArchive, FileImage, FileSpreadsheet, FileText, Upload, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import { toast } from 'react-toastify'
-import {
-  Upload,
-  X,
-  FileText,
-  FileImage,
-  FileArchive,
-  FileSpreadsheet,
-  File,
-  CheckCircle,
-  AlertCircle
-} from 'lucide-react'
 
 interface UploadFile {
   id: string
@@ -39,10 +29,16 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B'
-    const k = 1024
-    const sizes = ['B', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+
+    if (bytes < 1024) {
+      return bytes + ' B'
+    } else if (bytes < 1024 * 1024) {
+      return (bytes / 1024).toFixed(2) + ' KB'
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
+    } else {
+      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB'
+    }
   }
 
   const getFileIcon = (type: string) => {
@@ -186,34 +182,35 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
         <div className='space-y-6'>
           {/* Upload Area */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
               isDragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'
             }`}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
+            onClick={() => document.getElementById('fileInput')?.click()}
           >
+            <input
+              id='fileInput'
+              type='file'
+              multiple
+              onChange={handleFileInput}
+              className='hidden'
+              accept='.pdf,.doc,.docx,.ppt,.pptx,.txt,.zip,.rar,.xlsx,.xls'
+            />
+
             <div className='flex flex-col items-center space-y-4'>
               <div className='p-4 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl'>
                 <Upload className='h-8 w-8 text-orange-600' />
               </div>
 
               <div className='space-y-2'>
-                <label className='cursor-pointer'>
-                  <input
-                    type='file'
-                    multiple
-                    onChange={handleFileInput}
-                    className='hidden'
-                    accept='.pdf,.doc,.docx,.ppt,.pptx,.txt,.zip,.rar,.xlsx,.xls,.jpg,.jpeg,.png'
-                  />
-                  <div className='flex items-center justify-center space-x-2 text-primary hover:text-primary/80 transition-colors'>
-                    <FileText className='h-5 w-5' />
-                    <span className='font-medium'>Click to browse or Drag files here</span>
-                  </div>
-                </label>
-                <p className='text-xs text-muted-foreground'>Max file size: 500MB</p>
+                <div className='flex items-center justify-center space-x-2 text-primary hover:text-primary/80 transition-colors'>
+                  <FileText className='h-5 w-5' />
+                  <span className='font-medium'>Click or Drag files here to upload</span>
+                </div>
+                <p className='text-xs text-muted-foreground'>Max file size: 50MB</p>
               </div>
             </div>
           </div>
@@ -241,7 +238,14 @@ export function UploadModal({ open, onOpenChange, onFilesUploaded }: UploadModal
 
                     <div className='flex items-center space-x-2'>
                       {file.status === 'completed' && <CheckCircle className='h-4 w-4 text-green-500' />}
-                      {file.status === 'error' && <AlertCircle className='h-4 w-4 text-red-500' />}
+                      {file.status === 'error' && (
+                        <button
+                          onClick={() => removeFile(file.id)}
+                          className='p-1 hover:bg-muted rounded-full transition-colors'
+                        >
+                          <X className='h-4 w-4 text-muted-foreground' />
+                        </button>
+                      )}
                       {file.status === 'uploading' && (
                         <div className='w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin' />
                       )}

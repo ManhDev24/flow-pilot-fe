@@ -5,6 +5,12 @@ import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/app/components/ui/dropdown-menu'
 import { Input } from '@/app/components/ui/input'
 import { Separator } from '@/app/components/ui/separator'
 import {
@@ -131,6 +137,10 @@ export default function MyTasksPage() {
   const [filesLoading, setFilesLoading] = useState(false)
   const [uploadingFile, setUploadingFile] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [sortBy, setSortBy] = useState<string>('status')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -180,6 +190,86 @@ export default function MyTasksPage() {
     } catch (err) {
       console.error('Error refreshing tasks:', err)
     }
+  }
+
+  // Filter and sort tasks
+  const filteredAndSortedTasks = () => {
+    let filteredTasks = tasks
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filteredTasks = tasks.filter((task) => task.status === statusFilter)
+    }
+
+    // Filter by search term (search by name)
+    if (searchTerm.trim()) {
+      filteredTasks = filteredTasks.filter((task) => task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    }
+
+    // Sort tasks
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      switch (sortBy) {
+        case 'due_date':
+          aValue = new Date(a.due_at).getTime()
+          bValue = new Date(b.due_at).getTime()
+          break
+        case 'priority': {
+          const priorityOrder = { high: 3, medium: 2, low: 1 }
+          aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0
+          bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0
+          break
+        }
+        case 'name':
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+          break
+        case 'status': {
+          // Custom status order: todo -> doing -> overdued -> completed -> reviewing -> rejected -> feedbacked
+          const statusOrder = {
+            todo: 1,
+            doing: 2,
+            overdued: 3,
+            completed: 4,
+            reviewing: 5,
+            rejected: 6,
+            feedbacked: 7
+          }
+          aValue = statusOrder[a.status as keyof typeof statusOrder] || 999
+          bValue = statusOrder[b.status as keyof typeof statusOrder] || 999
+          break
+        }
+        case 'created_at':
+          aValue = new Date(a.created_at).getTime()
+          bValue = new Date(b.created_at).getTime()
+          break
+        default: {
+          // Default sorting by custom status order
+          const defaultStatusOrder = {
+            todo: 1,
+            doing: 2,
+            overdued: 3,
+            completed: 4,
+            reviewing: 5,
+            rejected: 6,
+            feedbacked: 7
+          }
+          aValue = defaultStatusOrder[a.status as keyof typeof defaultStatusOrder] || 999
+          bValue = defaultStatusOrder[b.status as keyof typeof defaultStatusOrder] || 999
+          break
+        }
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
+      } else {
+        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0
+      }
+    })
+
+    return sortedTasks
   }
 
   const fetchTaskFiles = async (taskId: string) => {
@@ -270,19 +360,52 @@ export default function MyTasksPage() {
             <div className='flex space-x-2'>
               <div className='flex-1 relative'>
                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
-                <Input placeholder='Search tasks...' className='pl-10' />
+                <Input
+                  placeholder='Search tasks by name...'
+                  className='pl-10'
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <Button variant='outline' size='sm'>
-                <ListFilter className='w-4 h-4' />
-              </Button>
-              <Button variant='outline' size='sm'>
-                <ArrowDownWideNarrow className='w-4 h-4' />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm'>
+                    <ListFilter className='w-4 h-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuItem onClick={() => setStatusFilter('all')}>All Status</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('todo')}>To Do</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('doing')}>In Progress</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('reviewing')}>Reviewing</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('completed')}>Completed</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('rejected')}>Rejected</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('feedbacked')}>Feedback</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('overdued')}>Overdue</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm'>
+                    <ArrowDownWideNarrow className='w-4 h-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuItem onClick={() => setSortBy('due_date')}>Sort by Due Date</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('priority')}>Sort by Priority</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('name')}>Sort by Name</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('status')}>Sort by Status</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('created_at')}>Sort by Created Date</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
+                    {sortOrder === 'asc' ? 'Sort Descending' : 'Sort Ascending'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
           <div className='flex-1 p-2 '>
-            {tasks.map((task) => {
+            {filteredAndSortedTasks().map((task) => {
               const statusStyles = getStatusStyles(task.status)
               return (
                 <div
