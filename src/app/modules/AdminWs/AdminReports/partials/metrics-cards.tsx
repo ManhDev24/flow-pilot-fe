@@ -8,7 +8,7 @@ interface MetricsCardsProps {
   loading?: boolean
 }
 
-export function MetricsCardsForReports({ dashboardData, evaluation, loading }: MetricsCardsProps) {
+export function MetricsCardsForReports({ dashboardData, loading }: MetricsCardsProps) {
   const metrics = [
     {
       title: 'Total Employees',
@@ -20,8 +20,8 @@ export function MetricsCardsForReports({ dashboardData, evaluation, loading }: M
     },
     {
       title: 'Performance Score',
-      value: loading ? '-' : `${dashboardData?.activeAccountScore || evaluation?.overallPerformanceScore || 0}/10`,
-      change: loading ? '-' : '+0.3 since last review',
+      value: loading ? '-' : `${dashboardData?.activeAccountScore || 0}/10`,
+      change: loading ? '-' : 'No change data',
       subtext: 'Average score across all evaluations',
       icon: UserCheck,
       color: 'text-green-600'
@@ -29,7 +29,7 @@ export function MetricsCardsForReports({ dashboardData, evaluation, loading }: M
     {
       title: 'Role Assignment',
       value: loading ? '-' : `${dashboardData?.roleAssignPercentage || 0}%`,
-      change: loading ? '-' : '+1.5% compared to Q1',
+      change: loading ? '-' : 'Current assignment rate',
       subtext: 'Percentage of employees with assigned roles',
       icon: ShieldCheck,
       color: 'text-purple-600'
@@ -37,7 +37,7 @@ export function MetricsCardsForReports({ dashboardData, evaluation, loading }: M
     {
       title: 'New Hires Success',
       value: loading ? '-' : `${dashboardData?.newHiresPercentage || 0}%`,
-      change: loading ? '-' : '+16% from last month',
+      change: loading ? '-' : 'Integration success rate',
       subtext: 'New hire integration success rate',
       icon: Tally3,
       color: 'text-orange-600'

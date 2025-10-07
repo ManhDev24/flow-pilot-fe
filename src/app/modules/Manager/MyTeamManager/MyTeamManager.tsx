@@ -35,8 +35,9 @@ function MyTeamManager() {
 
   const members = projectData?.data?.members || []
 
-  const handleViewDetail = (memberId: number) => {
-    navigate(PATH.EMPLOYEE_MANAGE_MY_TEAM_DETAIL.replace(':id', memberId.toString()))
+  const handleViewDetail = (memberId: string) => {
+    console.log('Navigating to detail page with userId:', memberId)
+    navigate(PATH.EMPLOYEE_MANAGE_MY_TEAM_DETAIL.replace(':id', memberId))
   }
 
   const getRoleBadgeColor = (role: string) => {
@@ -140,7 +141,7 @@ function MyTeamManager() {
                     </TableCell>
                     <TableCell>{member.user.department.name}</TableCell>
                     <TableCell className='text-right'>
-                      <Button variant='ghost' size='sm' onClick={() => handleViewDetail(member.id)}>
+                      <Button variant='ghost' size='sm' onClick={() => handleViewDetail(member.user.id)}>
                         <Eye className='w-4 h-4 mr-2' />
                         View
                       </Button>

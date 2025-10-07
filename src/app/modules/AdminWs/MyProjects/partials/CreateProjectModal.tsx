@@ -1,0 +1,215 @@
+import type React from 'react'
+import type { CreateProjectPayload } from '../models/ProjectInterface'
+
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { Button } from '@/app/components/ui/button'
+import { Input } from '@/app/components/ui/input'
+import { Label } from '@/app/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
+import { Textarea } from '@/app/components/ui/textarea'
+import { getAllUserByAdmin } from '@/app/apis/AUTH/user.api'
+import { X } from 'lucide-react'
+import type { AxiosError } from 'axios'
+
+interface CreateProjectData {
+  name: string
+  description: string
+  start_date: string
+  end_date: string
+  team_size: number
+  manager_id: string
+  status: string
+}
+
+interface CreateProjectModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onCreate: (project: Omit<CreateProjectPayload, 'workspace_id'>) => void
+}
+
+export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectModalProps) {
+  const [formData, setFormData] = useState<CreateProjectData>({
+    name: '',
+    description: '',
+    start_date: '',
+    end_date: '',
+    team_size: 1,
+    manager_id: '',
+    status: 'not_started'
+  })
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Fetch managers (users with role Project Manager or Admin)
+  const { data: usersData } = useQuery<any, AxiosError>({
+    queryKey: ['admin-ws-users'],
+    queryFn: () => getAllUserByAdmin(1, 10)
+  })
+
+  // Filter users to get only managers (role_id 2 = Admin, 3 = Project Manager)
+  const managers = (usersData?.data?.items || []).filter((user: any) => user.role_id === 2 || user.role_id === 3)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const payload: Omit<CreateProjectPayload, 'workspace_id'> = {
+        name: formData.name,
+        description: formData.description,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        team_size: formData.team_size,
+        manager_id: formData.manager_id,
+        status: formData.status
+      }
+
+      onCreate(payload)
+      setIsLoading(false)
+      onClose()
+
+      // Reset form
+      setFormData({
+        name: '',
+        description: '',
+        start_date: '',
+        end_date: '',
+        team_size: 1,
+        manager_id: '',
+        status: 'not_started'
+      })
+    } catch (error) {
+      setIsLoading(false)
+    }
+  }
+
+  const handleInputChange = (field: keyof CreateProjectData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className='sm:max-w-[600px] p-0 max-h-[90vh] overflow-y-auto'>
+        <DialogHeader className='px-6 py-4 border-b'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <DialogTitle className='text-lg font-semibold'>Create New Project</DialogTitle>
+              <p className='text-sm text-muted-foreground mt-1'>Add a new project to your workspace.</p>
+            </div>
+            <Button variant='ghost' size='icon' onClick={onClose}>
+              <X className='h-4 w-4' />
+            </Button>
+          </div>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className='px-6 py-4 space-y-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='project-name'>Project Name *</Label>
+            <Input
+              id='project-name'
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder='Enter project name'
+              required
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='project-description'>Description</Label>
+            <Textarea
+              id='project-description'
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder='Enter project description'
+              rows={3}
+            />
+          </div>
+
+          <div className='grid grid-cols-2 gap-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='start-date'>Start Date *</Label>
+              <Input
+                id='start-date'
+                type='date'
+                value={formData.start_date}
+                onChange={(e) => handleInputChange('start_date', e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='end-date'>End Date *</Label>
+              <Input
+                id='end-date'
+                type='date'
+                value={formData.end_date}
+                onChange={(e) => handleInputChange('end_date', e.target.value)}
+                min={formData.start_date || new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
+          </div>
+
+          <div className='grid grid-cols-2 gap-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='team-size'>Team Size *</Label>
+              <Input
+                id='team-size'
+                type='number'
+                min='1'
+                value={formData.team_size}
+                onChange={(e) => handleInputChange('team_size', parseInt(e.target.value) || 1)}
+                required
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label>Project Manager *</Label>
+              <Select
+                value={formData.manager_id}
+                onValueChange={(value) => handleInputChange('manager_id', value)}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='Select project manager' />
+                </SelectTrigger>
+                <SelectContent>
+                  {managers.map((manager: any) => (
+                    <SelectItem key={manager.id} value={manager.id}>
+                      {manager.name} ({manager.role?.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className='space-y-2'>
+            <Label>Status *</Label>
+            <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)} required>
+              <SelectTrigger>
+                <SelectValue placeholder='Select status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='not_started'>Not Started</SelectItem>
+                <SelectItem value='active'>Active</SelectItem>
+                <SelectItem value='completed'>Completed</SelectItem>
+                <SelectItem value='inactive'>Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            type='submit'
+            className='w-full bg-blue-600 hover:bg-blue-700 text-white mt-6'
+            disabled={isLoading || !formData.name || !formData.start_date || !formData.end_date || !formData.manager_id}
+          >
+            {isLoading ? 'CREATING...' : 'CREATE PROJECT'}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}

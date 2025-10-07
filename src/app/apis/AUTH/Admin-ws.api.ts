@@ -22,6 +22,16 @@ export const AdminWsApi = {
     }
   },
 
+  getAllUserByAdmin: async (page: number, pageSize: number) => {
+    try {
+      const response: AxiosResponse<AdminWsResponse> = await fetcher.get(`/user/admin?page=${page}&pageSize=${pageSize}`)
+      return response.data as AdminWsResponse
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
   // Delete user by id
   deleteUser: async (id: string) => {
     try {

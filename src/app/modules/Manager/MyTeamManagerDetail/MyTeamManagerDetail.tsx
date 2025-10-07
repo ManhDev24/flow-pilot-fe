@@ -1,10 +1,12 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Send, Settings } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Badge } from '@/app/components/ui/badge'
 import { Input } from '@/app/components/ui/input'
 import { PATH } from '@/app/routes/path'
+import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
+import { useEffect, useState } from 'react'
 import {
   BarChart,
   Bar,
@@ -21,81 +23,229 @@ import {
   Line
 } from 'recharts'
 
-// Mock data for employee detail
-const mockEmployeeData = {
-  id: 1,
-  name: 'Vu Nguyen',
-  role: 'Software Engineer',
-  department: 'Product Department',
-  email: 'vu.nguyen@company.com',
-  joinedDate: 'Jan 2023',
-  currentStatus: 'Active'
+// API Response Interface
+interface PerformanceData {
+  userInfo: {
+    name: string
+    role: string
+    department: string
+    joinDate: string
+    status: string
+  }
+  stressRate: {
+    categories: string[]
+    series: Array<{
+      name: string
+      data: number[]
+      colors: string[]
+    }>
+  }
+  workPerformance: {
+    series: Array<{
+      name: string
+      value: number
+      color: string
+    }>
+  }
+  stressAnalyzing: {
+    categories: string[]
+    series: Array<{
+      name: string
+      data: number[]
+      color: string
+    }>
+    warning: boolean
+  }
 }
 
-// Dữ liệu Stress Rate (Bar Chart)
-const stressData = [
-  { name: 'Week 1', difficult: 60, easy: 80, medium: 70 },
-  { name: 'Week 2', difficult: 90, easy: 85, medium: 95 },
-  { name: 'Week 3', difficult: 70, easy: 85, medium: 90 }
-]
+// Mock API response data - replace with actual API call
+const mockApiResponse: PerformanceData = {
+  userInfo: {
+    name: 'Unknown',
+    role: 'Software Engineer',
+    department: 'Product Department',
+    joinDate: '2025-10-07T13:28:48.528Z',
+    status: 'Active'
+  },
+  stressRate: {
+    categories: ['Difficult Task', 'Easy Task', 'Medium Task'],
+    series: [
+      {
+        name: 'Stress Level',
+        data: [60, 80, 70],
+        colors: ['#FF6B6B', '#4ECDC4', '#FFE66D']
+      }
+    ]
+  },
+  workPerformance: {
+    series: [
+      {
+        name: 'Completed',
+        value: 45,
+        color: '#8B5CF6'
+      },
+      {
+        name: 'In Progress',
+        value: 25,
+        color: '#EC4899'
+      },
+      {
+        name: 'In Review',
+        value: 20,
+        color: '#10B981'
+      },
+      {
+        name: 'Other',
+        value: 10,
+        color: '#F59E0B'
+      }
+    ]
+  },
+  stressAnalyzing: {
+    categories: ['2025-05', '2025-06', '2025-07', '2025-08', '2025-09', '2025-10'],
+    series: [
+      {
+        name: 'Burnout Index (%)',
+        data: [80, 70, 60, 50, 40, 30],
+        color: '#8B5CF6'
+      },
+      {
+        name: 'Quality Score (%)',
+        data: [60, 65, 70, 75, 80, 85],
+        color: '#EC4899'
+      }
+    ],
+    warning: true
+  }
+}
 
-// Dữ liệu Work Performance (Pie Chart)
-const performanceData = [
-  { name: 'Label 1', value: 60 },
-  { name: 'Label 2', value: 25 },
-  { name: 'Label 3', value: 10 },
-  { name: 'Label 4', value: 5 }
-]
-const COLORS = ['#3b82f6', '#ec4899', '#22c55e', '#8b5cf6']
+// Transform API data for charts
+const transformStressRateData = (apiData: PerformanceData) => {
+  return apiData.stressRate.categories.map((category, index) => ({
+    name: category,
+    value: apiData.stressRate.series[0]?.data[index] || 0,
+    fill: apiData.stressRate.series[0]?.colors[index] || '#8884d8'
+  }))
+}
 
-// Dữ liệu Stress Analyzing (Line Chart)
-const stressAnalysisData = [
-  { week: 'W1', label1: 120, label2: 100 },
-  { week: 'W2', label1: 100, label2: 85 },
-  { week: 'W3', label1: 80, label2: 95 },
-  { week: 'W4', label1: 90, label2: 75 },
-  { week: 'W5', label1: 70, label2: 65 },
-  { week: 'W6', label1: 60, label2: 70 },
-  { week: 'W7', label1: 65, label2: 80 },
-  { week: 'W8', label1: 55, label2: 75 },
-  { week: 'W9', label1: 70, label2: 85 },
-  { week: 'W10', label1: 65, label2: 90 }
-]
+const transformStressAnalysisData = (apiData: PerformanceData) => {
+  return apiData.stressAnalyzing.categories.map((category, index) => ({
+    period: category,
+    burnoutIndex: apiData.stressAnalyzing.series[0]?.data[index] || 0,
+    qualityScore: apiData.stressAnalyzing.series[1]?.data[index] || 0
+  }))
+}
 
 export default function MyTeamManagerDetail() {
   const navigate = useNavigate()
+  const { id: userId } = useParams<{ id: string }>()
+  console.log('userId from params:', userId)
+
+  // State for API data
+  const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch performance data
+  useEffect(() => {
+    const fetchPerformanceData = async () => {
+      console.log('Fetching performance data for userId:', userId)
+      if (!userId) {
+        setError('User ID is required')
+        setLoading(false)
+        return
+      }
+
+      try {
+        setLoading(true)
+        const response = await MyTaskApi.getIndividualDashboard(userId, 'monthly', '2025-01-01', '2025-03-31')
+
+        if (response.success && response.data) {
+          setPerformanceData(response.data)
+          setError(null)
+        } else {
+          setError('Failed to fetch performance data')
+        }
+      } catch (err) {
+        setError('Error fetching performance data')
+        console.error('API Error:', err)
+        // Fallback to mock data in case of error
+        setPerformanceData(mockApiResponse)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPerformanceData()
+  }, [userId])
+
+  // Use mock data as fallback
+  const currentData = performanceData || mockApiResponse
+
+  // Transform data for charts
+  const stressRateChartData = transformStressRateData(currentData)
+  const stressAnalysisChartData = transformStressAnalysisData(currentData)
+
+  // Format join date for display
+  const formatJoinDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  }
 
   const handleBack = () => {
     navigate(PATH.EMPLOYEE_MANAGE_MY_TEAM)
   }
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500'></div>
+          <p className='mt-4 text-gray-600'>Loading performance data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error && !performanceData) {
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='text-center'>
+          <p className='text-red-600 mb-4'>{error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen '>
       {/* Header Project Title */}
-      <div className='bg-white px-6 py-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>Clother Project</h1>
+      <div className='bg-white px-6 '>
+        <Button onClick={handleBack} variant='outline' size='sm'>
+          <ArrowLeft className='w-4 h-4 mr-2' />
+          Back to My Team
+        </Button>
       </div>
 
       {/* Employee Info */}
       <div className='bg-white border-b border-gray-200 px-6 py-4'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-4'>
-            <Button onClick={handleBack} variant='outline' size='sm'>
-              <ArrowLeft className='w-4 h-4 mr-2' />
-              Back to My Team
-            </Button>
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>
-                {mockEmployeeData.name} | {mockEmployeeData.role} | {mockEmployeeData.department}
+                {currentData.userInfo.name} | {currentData.userInfo.role} | {currentData.userInfo.department}
               </h1>
               <div className='flex items-center space-x-4 mt-1'>
                 <span className='text-sm text-gray-600'>
-                  Joined: <span className='text-gray-800'>{mockEmployeeData.joinedDate}</span>
+                  Joined: <span className='text-gray-800'>{formatJoinDate(currentData.userInfo.joinDate)}</span>
                 </span>
                 <span className='text-sm text-gray-600'>
                   Current Status:
                   <Badge variant='outline' className='ml-2 bg-green-50 text-green-700 border-green-200'>
-                    {mockEmployeeData.currentStatus}
+                    {currentData.userInfo.status}
                   </Badge>
                 </span>
               </div>
@@ -121,7 +271,7 @@ export default function MyTeamManagerDetail() {
             </CardHeader>
             <CardContent>
               <div className='space-y-4'>
-                <div className='bg-gray-50 p-3 rounded-lg text-sm text-gray-700'>
+                <div className=' p-3 rounded-lg text-sm text-gray-700'>
                   Hello! I am your Employee Performance AI. How can I assist you with employee evaluations today?
                 </div>
 
@@ -155,15 +305,15 @@ export default function MyTeamManagerDetail() {
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart>
                     <Pie
-                      data={performanceData}
+                      data={currentData.workPerformance.series}
                       cx='50%'
                       cy='50%'
                       outerRadius={100}
                       dataKey='value'
                       label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
                     >
-                      {performanceData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      {currentData.workPerformance.series.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -184,15 +334,13 @@ export default function MyTeamManagerDetail() {
             <CardContent>
               <div className='h-64'>
                 <ResponsiveContainer width='100%' height='100%'>
-                  <BarChart data={stressData}>
+                  <BarChart data={stressRateChartData}>
                     <CartesianGrid strokeDasharray='3 3' />
                     <XAxis dataKey='name' />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey='difficult' fill='#3b82f6' name='Difficult Task' />
-                    <Bar dataKey='easy' fill='#22c55e' name='Easy Task' />
-                    <Bar dataKey='medium' fill='#facc15' name='Medium Task' />
+                    <Bar dataKey='value' fill='#8884d8' name='Stress Level' />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -200,24 +348,38 @@ export default function MyTeamManagerDetail() {
           </Card>
 
           {/* Stress Analyzing (LineChart) */}
-          <Card className='border-2 border-purple-200'>
+          <Card className={`border-2 ${currentData.stressAnalyzing.warning ? 'border-red-200' : 'border-purple-200'}`}>
             <CardHeader>
               <div className='flex items-center justify-between'>
                 <CardTitle className='text-lg'>Stress analyzing</CardTitle>
-                <Badge className='bg-yellow-100 text-yellow-800 border-yellow-300'>Warning</Badge>
+                {currentData.stressAnalyzing.warning && (
+                  <Badge className='bg-red-100 text-red-800 border-red-300'>Warning</Badge>
+                )}
               </div>
             </CardHeader>
             <CardContent>
               <div className='h-64'>
                 <ResponsiveContainer width='100%' height='100%'>
-                  <LineChart data={stressAnalysisData}>
+                  <LineChart data={stressAnalysisChartData}>
                     <CartesianGrid strokeDasharray='3 3' />
-                    <XAxis dataKey='week' />
+                    <XAxis dataKey='period' />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type='monotone' dataKey='label1' stroke='#8b5cf6' strokeWidth={2} name='Label 1' />
-                    <Line type='monotone' dataKey='label2' stroke='#ec4899' strokeWidth={2} name='Label 2' />
+                    <Line
+                      type='monotone'
+                      dataKey='burnoutIndex'
+                      stroke={currentData.stressAnalyzing.series[0]?.color || '#8b5cf6'}
+                      strokeWidth={2}
+                      name={currentData.stressAnalyzing.series[0]?.name || 'Burnout Index (%)'}
+                    />
+                    <Line
+                      type='monotone'
+                      dataKey='qualityScore'
+                      stroke={currentData.stressAnalyzing.series[1]?.color || '#ec4899'}
+                      strokeWidth={2}
+                      name={currentData.stressAnalyzing.series[1]?.name || 'Quality Score (%)'}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

@@ -71,7 +71,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate, managers }: Crea
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-[600px] p-0 max-h-[90vh] overflow-y-auto'>
+      <DialogContent className='sm:max-w-[600px] p-0 max-h-[95vh] overflow-y-auto'>
         <DialogHeader className='px-6 py-4 border-b'>
           <div className='flex items-center justify-between'>
             <div>

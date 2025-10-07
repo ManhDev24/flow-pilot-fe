@@ -229,7 +229,6 @@ export interface OrganizationPerformanceSummaryResponse {
   }
 }
 
-
 /**
  * 1. ORGANIZATION PERFORMANCE SUMMARY API
  * GET /performance/organization-performance-summary
@@ -237,20 +236,18 @@ export interface OrganizationPerformanceSummaryResponse {
  */
 export interface OrganizationDashboardSummary {
   // Metrics tổng quan (4 ô trên cùng)
-  totalEmployees: number // 2,350
-  activeAccountScore: number // 3.7/10
-  roleAssignPercentage: number // 92%
-  newHiresPercentage: number // 78%
+  totalEmployees: number // 8
+  activeAccountScore: number // 3.9/10
+  roleAssignPercentage: number // 63%
+  newHiresPercentage: number // 63%
 
   // Thông tin thời gian
-  period: string // "monthly", "quarterly"
+  period: string // "2025-09-07 to 2025-10-07"
   lastUpdated: string // ISO date string
 
-  // Employee Role Distribution (Biểu đồ tròn)
+  // Employee Role Distribution (Biểu đồ tròn) - Updated structure
   employeeRoleDistribution: {
-    softwareEngineer: number // 65% (1527.5 người)
-    productManager: number // 25% (587.5 người)
-    designer: number // 10% (235 người)
+    [roleName: string]: number // Dynamic role names like "Unassigned": 1, "Human Resourcing": 2, "Engineering": 5
   }
 
   // Account Status Over Time (Biểu đồ đường)
@@ -263,7 +260,7 @@ export interface OrganizationDashboardSummary {
 
   // Employee Growth Trends (Biểu đồ cột)
   employeeGrowthTrends: Array<{
-    quarter: string // "Q1 2023", "Q2 2023"...
+    quarter: string // "Q1 2024", "Q2 2024"...
     newHires: number // Cột xanh - số người tuyển mới
     departures: number // Cột hồng - số người nghỉ việc
     netGrowth: number // new hires - departures
@@ -271,14 +268,14 @@ export interface OrganizationDashboardSummary {
 
   // Top 5 Active Roles (Biểu đồ thanh ngang)
   topActiveRoles: Array<{
-    roleName: string // "Software Engineer", "Product Manager"...
-    count: number // 65, 45, 35, 25, 15
-    percentage: number // % so với tổng
+    roleName: string // "Engineering", "Human Resourcing", "Unknown"...
+    count: number // 5, 2, 1...
+    percentage: number // 63, 25, 13...
   }>
 
   // Metadata
   hrManager: {
-    name: string // "John Doe"
+    name: string // "Employee Three"
     title: string // "HR Manager"
   }
 }

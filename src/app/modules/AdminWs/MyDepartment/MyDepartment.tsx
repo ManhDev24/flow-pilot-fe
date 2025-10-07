@@ -6,7 +6,7 @@ import { Input } from '@/app/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Building2, ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react'
+import { Building2, ChevronLeft, ChevronRight, Edit, Plus, Search, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import type { Department } from './models/MyDepartmentInterface'
@@ -294,9 +294,9 @@ function MyDepartment() {
                       </TableCell>
                       <TableCell>
                         <div className='flex items-center gap-2'>
-                          <Button variant='ghost' size='sm' className='h-8 w-8 p-0'>
+                          {/* <Button variant='ghost' size='sm' className='h-8 w-8 p-0'>
                             <Eye className='w-4 h-4 text-gray-400' />
-                          </Button>
+                          </Button> */}
                           <Button
                             variant='ghost'
                             size='sm'

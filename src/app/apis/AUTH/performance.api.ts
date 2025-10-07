@@ -300,5 +300,61 @@ export const MyTaskApi = {
       const axiosError = error as AxiosError
       throw axiosError
     }
+  },
+
+  // Get individual performance dashboard
+  getIndividualDashboard: async (userId: string, period?: string, fromDate?: string, toDate?: string) => {
+    try {
+      let url = `/performance/individual-dashboard/${userId}`
+      const params = new URLSearchParams()
+
+      if (period) params.append('period', period)
+      if (fromDate) params.append('fromDate', fromDate)
+      if (toDate) params.append('toDate', toDate)
+
+      if (params.toString()) url += `?${params.toString()}`
+
+      const response: AxiosResponse<{
+        success: boolean
+        message: string
+        data: {
+          userInfo: {
+            name: string
+            role: string
+            department: string
+            joinDate: string
+            status: string
+          }
+          stressRate: {
+            categories: string[]
+            series: Array<{
+              name: string
+              data: number[]
+              colors: string[]
+            }>
+          }
+          workPerformance: {
+            series: Array<{
+              name: string
+              value: number
+              color: string
+            }>
+          }
+          stressAnalyzing: {
+            categories: string[]
+            series: Array<{
+              name: string
+              data: number[]
+              color: string
+            }>
+            warning: boolean
+          }
+        }
+      }> = await fetcher.get(url)
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
   }
 }
