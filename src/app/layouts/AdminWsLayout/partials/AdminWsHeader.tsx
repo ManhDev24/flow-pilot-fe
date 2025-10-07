@@ -3,7 +3,7 @@ import { SidebarTrigger } from '@/app/components/ui/sidebar'
 import { PATH } from '@/app/routes/path'
 import { useNavigate } from 'react-router-dom'
 
-export function EmployeeHeader() {
+function AdminWsHeader() {
   const navigate = useNavigate()
   return (
     <header className='flex h-16 shrink-0 items-center gap-2 bg-white border-b border-gray-200'>
@@ -12,10 +12,10 @@ export function EmployeeHeader() {
         <div className='h-6 w-px bg-gray-200' />
       </div>
       <div className='ml-auto flex items-center gap-3 px-6'>
-        <div className='ml-auto flex items-center gap-3 px-6'>
-          <NotificationDropdown onViewAll={() => navigate(PATH.EMPLOYEE_NOTIFICATIONS)} />
-        </div>
+        <NotificationDropdown onViewAll={() => navigate(PATH.ADMIN_NOTIFICATIONS)} />
       </div>
     </header>
   )
 }
+
+export default AdminWsHeader

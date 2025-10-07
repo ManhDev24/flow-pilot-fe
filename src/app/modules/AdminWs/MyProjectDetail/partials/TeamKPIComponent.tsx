@@ -14,9 +14,7 @@ export function TeamKPIComponent({ kpi }: TeamKPIComponentProps) {
             <p className='text-sm font-medium text-gray-600 mb-2'>TEAM KPI</p>
             <p className='text-5xl font-bold text-indigo-600 mb-2'>{kpi.percentage}%</p>
             <p className='text-sm text-gray-700'>
-              <span className='font-semibold'>{kpi.value}</span>
-              <span className='text-gray-500'>/</span>
-              <span className='text-gray-500'>{kpi.amount}</span>
+              <span className='font-semibold'>KPI Value: {kpi.value}</span>
             </p>
           </div>
           <div className='relative w-32 h-32'>

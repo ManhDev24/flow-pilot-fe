@@ -16,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/app/components/ui/sidebar'
-import { Briefcase, ChevronDown, FileText, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react'
+import { Briefcase, ChartPie, ChevronDown, FileText, LayoutDashboard, LogOut, Users } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { authApi } from '@/app/apis/AUTH/Auth.api'
@@ -37,9 +37,9 @@ export function EmployeeSidebar() {
 
   const navigationItems = [
     { icon: LayoutDashboard, label: 'My Tasks', to: `${PATH.EMPLOYEE_MY_TASKS}` },
-    { icon: Users, label: 'Kanban', to: `${PATH.EMPLOYEE_KANBAN}` },
-    { icon: Briefcase, label: 'My Team', to: `${PATH.EMPLOYEE_MY_TEAM}` },
-    { icon: Settings, label: 'My performance', to: `${PATH.EMPLOYEE_MY_PERFORMANCE}` },
+    { icon: Briefcase, label: 'Kanban', to: `${PATH.EMPLOYEE_KANBAN}` },
+    { icon: Users, label: 'My Team', to: `${PATH.EMPLOYEE_MY_TEAM}` },
+    { icon: ChartPie, label: 'My performance', to: `${PATH.EMPLOYEE_MY_PERFORMANCE}` },
     { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MY_FILES}` }
   ]
 
@@ -116,8 +116,8 @@ export function EmployeeSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-semibold text-gray-900'>Super Admin</span>
-                    <span className='truncate text-xs text-gray-600'>superadmin@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>Employee</span>
+                    <span className='truncate text-xs text-gray-600'>employee@flowpilot.io.vn</span>
                   </div>
                 </div>
                 <DropdownMenuSeparator className='bg-gray-200' />

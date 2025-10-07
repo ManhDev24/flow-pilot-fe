@@ -36,7 +36,7 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     reset
   } = useForm<ReviewFormData>({
     resolver: yupResolver(reviewSchema),

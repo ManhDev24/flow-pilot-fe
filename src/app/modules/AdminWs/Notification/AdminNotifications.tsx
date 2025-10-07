@@ -1,7 +1,7 @@
 import { NotificationPage } from '@/app/components/Notification/partials/NotificationPage'
 
-function NotificationManagement() {
+function AdminNotifications() {
   return <NotificationPage />
 }
 
-export default NotificationManagement
+export default AdminNotifications

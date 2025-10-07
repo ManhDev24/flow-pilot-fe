@@ -34,12 +34,14 @@ export const PATH = {
   ADMIN_MY_PROJECTS: '/admin-ws/my-projects',
   ADMIN_MY_PROJECT_DETAIL: '/admin-ws/my-project-detail/:id',
   ADMIN_SETTINGS: '/admin-ws/account-settings',
+  ADMIN_NOTIFICATIONS: '/admin-ws/notifications',
   // EMPLOYEE (emp)
   EMPLOYEE: '/emp',
   EMPLOYEE_SETTINGS: '/emp/account-settings',
   EMPLOYEE_KANBAN: '/emp/kanban-board',
   EMPLOYEE_MY_TEAM: '/emp/my-team',
   EMPLOYEE_MY_FILES: '/emp/my-files',
+  EMPLOYEE_NOTIFICATIONS: '/emp/notifications',
   // STAFF
   EMPLOYEE_MY_TASKS: '/emp/my-tasks',
   EMPLOYEE_MY_PERFORMANCE: '/emp/my-performance',

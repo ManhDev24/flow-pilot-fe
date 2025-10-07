@@ -2,7 +2,7 @@ import { Button } from '@/app/components/ui/button'
 import { Card, CardContent } from '@/app/components/ui/card'
 import { decrementTime, setIsRunning, setTimerVisible } from '@/app/redux/slices/timer.slice'
 import type { RootState } from '@/app/redux/store'
-import { AppWindow, ExternalLink, LucideAirVent, LucideAppWindowMac, Minimize2, X } from 'lucide-react'
+import { ExternalLink, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +13,7 @@ export function GlobalTimerWidget() {
   const [position, setPosition] = useState({ x: 30, y: 400 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
-  const [isMinimized, setIsMinimized] = useState(false)
+  const [isMinimized] = useState(false)
 
   // Timer countdown effect
   useEffect(() => {
@@ -69,11 +69,6 @@ export function GlobalTimerWidget() {
     }
   }, [isDragging, dragOffset])
 
-  // Handle play/pause
-  const handlePlayPause = () => {
-    dispatch(setIsRunning(!timer.isRunning))
-  }
-
   // Handle close
   const handleClose = () => {
     dispatch(setTimerVisible(false))
@@ -82,11 +77,6 @@ export function GlobalTimerWidget() {
   const nav = useNavigate()
   const handleRedirect = () => {
     nav('/emp/my-performance')
-  }
-
-  // Handle minimize/maximize
-  const handleMinimize = () => {
-    setIsMinimized(!isMinimized)
   }
 
   // Don't render if not visible

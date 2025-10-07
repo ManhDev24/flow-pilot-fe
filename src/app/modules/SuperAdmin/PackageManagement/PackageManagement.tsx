@@ -4,7 +4,7 @@ import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
-import { Edit, Eye, Package, Trash2 } from 'lucide-react'
+import { Edit, Eye, Package } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 import type { PackageData } from './models/package.type'
@@ -51,10 +51,6 @@ function PackageManagement() {
   useEffect(() => {
     loadPackages()
   }, [loadPackages])
-
-  const openDeleteDialog = (pkg: PackageData) => {
-    setPackageToDelete(pkg)
-  }
 
   const closeDeleteDialog = () => {
     setPackageToDelete(null)
@@ -129,7 +125,6 @@ function PackageManagement() {
 
   const totalPages = Math.max(1, Math.ceil(total / limit))
 
-  const handleAddPackage = () => setCreateOpen(true)
   const handleEditPackage = (pkg: PackageData) => {
     setSelectedPackage(pkg)
     setEditOpen(true)

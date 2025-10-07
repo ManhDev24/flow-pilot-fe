@@ -1,3 +1,5 @@
+import type { FeatureData } from '@/app/modules/SuperAdmin/FeatureManagement/models/feature.type'
+
 export interface PackageResponse {
   success: boolean
   message: string
@@ -20,7 +22,7 @@ export interface PackageData {
   created_at: string
   updated_at: string
   status: string
-  features: Feature[]
+  features: FeatureData[]
 }
 
 export interface PackageDetailsResponse {
