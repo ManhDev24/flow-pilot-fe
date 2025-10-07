@@ -17,6 +17,7 @@ RUN npm run build
 
 # Step 2: Serve the built app using NGINX
 
+ENV VITE_API_BASE_URL=https://develop.flowpilot.io.vn
 
 # Optional: Add custom nginx config if needed
 # COPY nginx.conf /etc/nginx/nginx.conf
