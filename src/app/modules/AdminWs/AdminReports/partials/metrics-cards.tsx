@@ -8,7 +8,7 @@ interface MetricsCardsProps {
   loading?: boolean
 }
 
-export function MetricsCardsForReports({ dashboardData, evaluation, loading }: MetricsCardsProps) {
+export function MetricsCardsForReports({ dashboardData, loading }: MetricsCardsProps) {
   const metrics = [
     {
       title: 'Total Employees',
@@ -20,7 +20,7 @@ export function MetricsCardsForReports({ dashboardData, evaluation, loading }: M
     },
     {
       title: 'Performance Score',
-      value: loading ? '-' : `${dashboardData?.activeAccountScore || evaluation?.overallPerformanceScore || 0}/10`,
+      value: loading ? '-' : `${dashboardData?.activeAccountScore || 0}/10`,
       change: loading ? '-' : 'No change data',
       subtext: 'Average score across all evaluations',
       icon: UserCheck,

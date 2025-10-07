@@ -25,11 +25,18 @@ interface ChartsGridProps {
 
 export function ChartsGridForReports({ dashboardData, loading }: ChartsGridProps) {
   // Transform API data for charts
-  const roleDistributionData = dashboardData?.employeeRoleDistribution ? [
-    { name: 'Software Engineer', value: dashboardData.employeeRoleDistribution.softwareEngineer, color: '#6366f1' },
-    { name: 'Product Manager', value: dashboardData.employeeRoleDistribution.productManager, color: '#ec4899' },
-    { name: 'Designer', value: dashboardData.employeeRoleDistribution.designer, color: '#8b5cf6' }
-  ] : []
+  const roleDistributionData = dashboardData?.employeeRoleDistribution ? 
+    Object.entries(dashboardData.employeeRoleDistribution).map(([roleName, count], index) => {
+      const colors = ['#6366f1', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']
+      // Calculate percentage based on total employees
+      const percentage = dashboardData.totalEmployees > 0 ? Math.round((count / dashboardData.totalEmployees) * 100) : 0
+      return {
+        name: roleName,
+        value: percentage,
+        count: count,
+        color: colors[index % colors.length]
+      }
+    }) : []
 
   const accountStatusData = dashboardData?.accountStatusOverTime || []
 
@@ -90,7 +97,7 @@ export function ChartsGridForReports({ dashboardData, loading }: ChartsGridProps
                 <div key={item.name} className='flex items-center space-x-2'>
                   <div className='w-3 h-3 rounded-full' style={{ backgroundColor: item.color }} />
                   <span className='text-xs text-muted-foreground'>
-                    {item.name} {item.value}%
+                    {item.name} ({item.count}) {item.value}%
                   </span>
                 </div>
               ))
@@ -225,20 +232,24 @@ export function ChartsGridForReports({ dashboardData, loading }: ChartsGridProps
           ) : (
             <div className='space-y-4'>
               {topRolesData.map((role: any, index: number) => {
-                const roleName = role.roleName || role.role || 'Unknown'
+                const roleName = role.roleName || 'Unknown'
                 const roleCount = role.count || 0
-                const maxRoleCount = Math.max(...topRolesData.map((r: any) => r.count || 0))
+                const rolePercentage = role.percentage || 0
+                const colors = ['bg-blue-500', 'bg-pink-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500']
                 
                 return (
                   <div key={roleName} className='flex items-center space-x-3'>
-                    <span className='text-sm font-medium w-32 text-left'>{roleName}</span>
+                    <span className='text-sm font-medium w-32 text-left truncate'>{roleName}</span>
                     <div className='flex-1 bg-secondary rounded-full h-6 relative'>
                       <div
-                        className={`h-6 rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-pink-500'}`}
-                        style={{ width: `${maxRoleCount > 0 ? (roleCount / maxRoleCount) * 100 : 0}%` }}
+                        className={`h-6 rounded-full ${colors[index % colors.length]}`}
+                        style={{ width: `${rolePercentage}%` }}
                       />
                     </div>
-                    <span className='text-sm font-medium w-8 text-right'>{roleCount}</span>
+                    <div className='flex items-center space-x-2'>
+                      <span className='text-sm font-medium w-8 text-right'>{roleCount}</span>
+                      <span className='text-xs text-gray-500 w-10 text-right'>({rolePercentage}%)</span>
+                    </div>
                   </div>
                 )
               })}
