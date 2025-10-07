@@ -49,11 +49,11 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
 # Expose port
-EXPOSE 80
+EXPOSE 6868
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost/health || exit 1
 
 # Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npx", "next", "start", "-H", "0.0.0.0", "-p", "6868"]
