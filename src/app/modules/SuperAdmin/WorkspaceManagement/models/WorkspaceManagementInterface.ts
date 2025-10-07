@@ -170,7 +170,7 @@ export interface WorkspaceFormData {
   package_id: string
   start_date: string
   expire_date: string
-  status: 'active' | 'inactive' | 'suspended'
+  status: 'active' | 'inactive'
 }
 
 // Filter interfaces
@@ -192,7 +192,6 @@ export const WORKSPACE_STATUS_OPTIONS = [
   { value: 'all', label: 'All Statuses' },
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' },
-  { value: 'suspended', label: 'Suspended' }
 ] as const
 
 export const WORKSPACE_TABLE_COLUMNS: WorkspaceTableColumn[] = [
