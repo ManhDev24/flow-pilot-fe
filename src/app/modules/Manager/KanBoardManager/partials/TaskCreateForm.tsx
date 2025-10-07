@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Input } from '@/app/components/ui/input'
-import { Textarea } from '@/app/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
-import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
-import { toast } from 'react-toastify'
+import { Textarea } from '@/app/components/ui/textarea'
 import type { IUserStatePayload } from '@/app/models'
 import { getLocalStorage } from '@/app/utils'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import * as yup from 'yup'
 
 // Validation schema
 const taskSchema = yup.object({
@@ -62,9 +62,7 @@ export function TaskCreateForm({ onSuccess, onCancel }: TaskCreateFormProps) {
     control,
     handleSubmit,
     formState: { errors },
-    reset,
-    setValue,
-    watch
+    reset
   } = useForm<TaskFormData>({
     resolver: yupResolver(taskSchema) as any,
     defaultValues: {

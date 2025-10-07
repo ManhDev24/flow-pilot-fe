@@ -34,6 +34,7 @@ export const PATH = {
   ADMIN_MY_PROJECTS: '/admin-ws/my-projects',
   ADMIN_MY_PROJECT_DETAIL: '/admin-ws/my-project-detail/:id',
   ADMIN_SETTINGS: '/admin-ws/account-settings',
+  ADMIN_NOTIFICATIONS: '/admin-ws/notifications',
   // EMPLOYEE (emp)
   EMPLOYEE: '/emp',
   EMPLOYEE_SETTINGS: '/emp/account-settings',

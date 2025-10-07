@@ -1,7 +1,7 @@
 import { NotificationPage } from '@/app/components/Notification/partials/NotificationPage'
 
-function EmloyeeNotifications() {
+function AdminNotifications() {
   return <NotificationPage />
 }
 
-export default EmloyeeNotifications
+export default AdminNotifications

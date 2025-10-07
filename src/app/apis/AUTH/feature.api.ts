@@ -28,7 +28,7 @@ export const FeatureApi = {
   },
   getAllFeaturesForSelect: async () => {
     try {
-      const response = await fetcher.get('/feature')
+      const response = await fetcher.get('/feature?page=1&limit=1000')
       return response.data.data
     } catch (error) {
       const axiosError = error as AxiosError

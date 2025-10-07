@@ -52,6 +52,7 @@ import ConsultationReqManagement from '@/app/modules/SuperAdmin/ConsultationReqM
 import PackageManagement from '@/app/modules/SuperAdmin/PackageManagement/PackageManagement'
 import FeatureManagement from '@/app/modules/SuperAdmin/FeatureManagement/FeatureManagement'
 import EmloyeeNotifications from '@/app/modules/Employee/Notifications/EmployeeNotifications'
+import AdminNotifications from '@/app/modules/AdminWs/Notification/AdminNotifications'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
@@ -388,6 +389,14 @@ const useRouteElement = () => {
           element: (
             <AdminWsLayout>
               <AdminSettings />
+            </AdminWsLayout>
+          )
+        },
+        {
+          path: PATH.ADMIN_NOTIFICATIONS,
+          element: (
+            <AdminWsLayout>
+              <AdminNotifications />
             </AdminWsLayout>
           )
         }

@@ -162,7 +162,7 @@ export default function MyTeamManagerDetail() {
                       dataKey='value'
                       label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
                     >
-                      {performanceData.map((entry, index) => (
+                      {performanceData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>

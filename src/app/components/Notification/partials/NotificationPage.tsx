@@ -6,11 +6,11 @@ import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '../hooks/useN
 import { formatDistanceToNow } from 'date-fns'
 import type { INotification } from '../models'
 
-interface NotificationPageProps {
-  onBack: () => void
-}
+// interface NotificationPageProps {
+//   onBack: () => void
+// }
 
-export function NotificationPage({ onBack }: NotificationPageProps) {
+export function NotificationPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const { data: notificationsData, isLoading } = useNotifications()

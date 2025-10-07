@@ -1,6 +1,5 @@
 import { fetcher } from '@/app/apis/fetcher'
-import type { MyFileResponse } from '@/app/modules/Employee/MyFiles/models/myFile.type'
-import type { FileByTaskRes, MyTaskResponse, MyTask } from '@/app/modules/Employee/MyTasks/models/myTask.type'
+import type { FileByTaskRes, MyTask, MyTaskResponse } from '@/app/modules/Employee/MyTasks/models/myTask.type'
 
 import type { AxiosError, AxiosResponse } from 'axios'
 

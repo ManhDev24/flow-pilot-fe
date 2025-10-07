@@ -18,10 +18,10 @@ import {
   SidebarMenuItem
 } from '@/app/components/ui/sidebar'
 import { PATH } from '@/app/routes/path'
-import { ChevronDown, FileText, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react'
+import { ChevronDown, ClipboardPlus, Folder, Hotel, LayoutDashboard, LogOut, Users } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
-function ManagerSidebar() {
+function AdminWsSidebar() {
   const location = useLocation()
 
   const handleLogout = async () => {
@@ -35,10 +35,11 @@ function ManagerSidebar() {
   }
 
   const navigationItems = [
-    { icon: LayoutDashboard, label: 'Project reports', to: `${PATH.EMPLOYEE_MANAGE_PROJECTS}` },
-    { icon: Users, label: 'Kanban', to: `${PATH.EMPLOYEE_MANAGE_KANBAN}` },
-    { icon: Settings, label: 'My team', to: `${PATH.EMPLOYEE_MANAGE_MY_TEAM}` },
-    { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MANAGE_MY_FILES}` }
+    { icon: LayoutDashboard, label: 'Dashboard', to: `${PATH.ADMIN_DASHBOARD}` },
+    { icon: ClipboardPlus, label: 'Report', to: `${PATH.ADMIN_MY_REPORT}` },
+    { icon: Hotel, label: 'Department', to: `${PATH.ADMIN_DEPARTMENTS}` },
+    { icon: Users, label: 'Employees', to: `${PATH.ADMIN_MY_EMPLOYEES}` },
+    { icon: Folder, label: 'Project', to: `${PATH.ADMIN_MY_PROJECTS}` }
   ]
 
   return (
@@ -95,8 +96,8 @@ function ManagerSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
-                    <span className='truncate font-semibold text-gray-900'>Manager</span>
-                    <span className='truncate text-xs text-gray-600'>manager@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>Admin</span>
+                    <span className='truncate text-xs text-gray-600'>admin@flowpilot.io.vn</span>
                   </div>
                   <ChevronDown className='ml-auto size-4 text-gray-500 group-data-[collapsible=icon]:hidden' />
                 </SidebarMenuButton>
@@ -114,8 +115,8 @@ function ManagerSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-semibold text-gray-900'>Manager</span>
-                    <span className='truncate text-xs text-gray-600'>manager@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>Admin</span>
+                    <span className='truncate text-xs text-gray-600'>admin@flowpilot.io.vn</span>
                   </div>
                 </div>
                 <DropdownMenuSeparator className='bg-gray-200' />
@@ -135,4 +136,4 @@ function ManagerSidebar() {
   )
 }
 
-export default ManagerSidebar
+export default AdminWsSidebar
