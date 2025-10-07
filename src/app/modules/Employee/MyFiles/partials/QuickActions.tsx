@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
 import { Button } from '@/app/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Upload } from 'lucide-react'
+import { useState } from 'react'
 import { UploadModal } from './UploadModal'
-import { FolderPlus, Upload, Share2, Trash2 } from 'lucide-react'
 
 interface QuickActionsProps {
   onFilesUploaded?: () => void
