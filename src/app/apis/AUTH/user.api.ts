@@ -63,8 +63,8 @@ export class UserSuperAdminAPI {
     return response.data
   }
 
-  static async getAllUserByAdmin(): Promise<UserListResponse> {
-    const response = await fetcher.get('/user/admin')
+  static async getAllUserByAdmin(page: number,pageSize:number): Promise<UserListResponse> {
+    const response = await fetcher.get('/user/admin?page='+page+'&pageSize='+pageSize)
     return response.data
   }
 }

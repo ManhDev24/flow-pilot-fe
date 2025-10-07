@@ -19,7 +19,6 @@ const AdminReports = () => {
   // Fetch organization dashboard data
   const {
     dashboardData,
-    aiAnalysis,
     evaluation,
     loading: orgLoading,
     error: orgError,
@@ -84,8 +83,7 @@ const AdminReports = () => {
       <MetricsCardsForReports dashboardData={dashboardData} evaluation={evaluation} loading={isLoading} />
 
       <ChartsGridForReports dashboardData={dashboardData} loading={isLoading} />
-
-      {/* AI Analysis Summary */}
+{/* 
       {aiAnalysis && (
         <Card className='p-6'>
           <h3 className='text-lg font-semibold mb-4'>AI Performance Analysis</h3>
@@ -134,7 +132,7 @@ const AdminReports = () => {
             )}
           </div>
         </Card>
-      )}
+      )} */}
     </div>
   )
 }

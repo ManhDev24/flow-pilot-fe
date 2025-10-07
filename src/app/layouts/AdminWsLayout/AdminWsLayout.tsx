@@ -57,7 +57,9 @@ function AdminWsLayout({ children }: { children: ReactNode }) {
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <div className='max-w-7xl mx-auto'>{children}</div>
+      </SidebarInset>
     </SidebarProvider>
   )
 }
