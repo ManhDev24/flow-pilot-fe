@@ -9,6 +9,7 @@ import { Calendar, Check, ClipboardList, Paperclip, Star, ThumbsDown, ThumbsUp, 
 import { useState } from 'react'
 import { RejectForm } from './RejectForm'
 import { ReviewForm } from './ReviewForm'
+import { TaskUpdateForm } from './TaskUpdateForm'
 
 interface TaskDetailModalProps {
   open: boolean
@@ -93,6 +94,8 @@ const formatDate = (dateString: string) => {
 }
 
 export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: TaskDetailModalProps) {
+  const [showUpdateForm, setShowUpdateForm] = useState(false)
+
   if (!task) return null
 
   const statusStyles = getStatusStyles(task.status)
@@ -105,19 +108,29 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
   const comments = task.contents.filter((c) => c.type === 'comment' && c.status === 'active')
   const notes = task.contents.filter((c) => c.type === 'note' && c.status === 'active')
 
-  console.log('task', task.status)
+  if (showUpdateForm) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className='min-w-4xl max-h-[90vh] p-0 overflow-hidden'>
+          <div className='p-6'>
+            <TaskUpdateForm
+              task={task}
+              onSuccess={() => {
+                setShowUpdateForm(false)
+                onTaskUpdated?.()
+              }}
+              onCancel={() => setShowUpdateForm(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className=' min-w-2xl max-h-[90vh] p-0 overflow-hidden'>
-        <div className='p-6 pb-2 border-b border-gray-200'>
-          <DialogHeader>
-            <DialogTitle className='text-2xl font-semibold'>{task.name}</DialogTitle>
-          </DialogHeader>
-        </div>
-
         <div className='overflow-y-auto max-h-[80vh] p-6 space-y-4'>
-          {/* Task Description */}
           <div>
             <p className='text-gray-700 leading-relaxed'>{task.description || 'No description available'}</p>
           </div>
@@ -180,7 +193,6 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
 
           <Separator />
 
-          {/* Checklist */}
           <div>
             <div className='flex items-center justify-between mb-4'>
               <h3 className='text-lg font-semibold text-gray-900'>
@@ -218,7 +230,6 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
 
           <Separator />
 
-          {/* Comments */}
           <div>
             <h3 className='text-lg font-semibold text-gray-900 mb-4'>Comments ({comments.length})</h3>
             <div className='space-y-4'>
@@ -244,7 +255,6 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
 
           <Separator />
 
-          {/* Notes */}
           <div>
             <h3 className='text-lg font-semibold text-gray-900 mb-4'>Notes ({notes.length})</h3>
             <div className='space-y-4'>
@@ -270,7 +280,6 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
 
           <Separator />
 
-          {/* Attachments */}
           <div>
             <div className='flex items-center justify-between mb-4'>
               <h3 className='text-lg font-semibold text-gray-900'>Attachments ({task._count?.files || 0})</h3>
@@ -286,7 +295,6 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
             )}
           </div>
 
-          {/* All Assignees */}
           {task.assignees.length > 1 && (
             <>
               <Separator />
@@ -306,73 +314,8 @@ export function TaskDetailModal({ open, onOpenChange, task, onTaskUpdated }: Tas
               </div>
             </>
           )}
-
-          {task.status === 'reviewing' && (
-            <>
-              <Separator />
-              <ReviewRejectActions
-                task={task}
-                onActionComplete={() => {
-                  onOpenChange(false)
-                  onTaskUpdated?.()
-                }}
-              />
-            </>
-          )}
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
-
-// Review/Reject Component
-function ReviewRejectActions({ task, onActionComplete }: { task: MyTask; onActionComplete: () => void }) {
-  const [showReview, setShowReview] = useState(false)
-  const [showReject, setShowReject] = useState(false)
-
-  // Get task owner ID
-  const taskOwnerId = task.assignees[0]?.user?.id || ''
-
-  if (showReview) {
-    return (
-      <ReviewForm
-        taskId={task.id}
-        taskOwnerId={taskOwnerId}
-        onSuccess={() => {
-          setShowReview(false)
-          onActionComplete()
-        }}
-        onCancel={() => setShowReview(false)}
-      />
-    )
-  }
-
-  if (showReject) {
-    return (
-      <RejectForm
-        taskId={task.id}
-        onSuccess={() => {
-          setShowReject(false)
-          onActionComplete()
-        }}
-        onCancel={() => setShowReject(false)}
-      />
-    )
-  }
-
-  return (
-    <div>
-      <h3 className='text-lg font-semibold text-gray-900 mb-4'>Manager Actions</h3>
-      <div className='flex space-x-3'>
-        <Button onClick={() => setShowReview(true)} className='bg-green-600 hover:bg-green-700'>
-          <ThumbsUp className='w-4 h-4 mr-2' />
-          Approve & Review
-        </Button>
-        <Button variant='destructive' onClick={() => setShowReject(true)}>
-          <ThumbsDown className='w-4 h-4 mr-2' />
-          Reject Task
-        </Button>
-      </div>
-    </div>
   )
 }

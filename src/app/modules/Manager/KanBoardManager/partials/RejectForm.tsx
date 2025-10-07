@@ -29,7 +29,6 @@ interface RejectFormProps {
 export function RejectForm({ taskId, onSuccess, onCancel }: RejectFormProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  // React Hook Form setup
   const {
     control,
     handleSubmit,

@@ -3,6 +3,7 @@ import { KanbanCard } from '@/app/modules/Employee/KanbanBoard/partials/KanbanCa
 import { SortDialog } from '@/app/modules/Employee/KanbanBoard/partials/SortDialog'
 import { TaskDetailModal } from './TaskDetailModal'
 import { TaskCreateForm } from './TaskCreateForm'
+import { TaskUpdateForm } from './TaskUpdateForm'
 import { ManagerKanbanColumn } from './ManagerKanbanColumn'
 import { ReviewForm } from './ReviewForm'
 import { RejectForm } from './RejectForm'
@@ -117,8 +118,10 @@ export function KanbanBoardForm() {
   const [createTaskOpen, setCreateTaskOpen] = useState(false)
   const [reviewModalOpen, setReviewModalOpen] = useState(false)
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
+  const [updateTaskOpen, setUpdateTaskOpen] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string>('')
   const [selectedTaskOwnerId, setSelectedTaskOwnerId] = useState<string>('')
+  const [selectedTaskForUpdate, setSelectedTaskForUpdate] = useState<MyTask | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -143,6 +146,8 @@ export function KanbanBoardForm() {
           completed: [],
           rejected: []
         }
+
+        console.log('response.data', response.data)
 
         response.data.forEach((task) => {
           const card = convertTaskToCard(task)
@@ -237,7 +242,6 @@ export function KanbanBoardForm() {
   }
 
   const handleReview = async (taskId: string, taskOwnerId: string) => {
-    // First call /task/:id to get task details
     try {
       const response = await MyTaskApi.getTaskById(taskId)
       if (response.success && response.data) {
@@ -245,6 +249,7 @@ export function KanbanBoardForm() {
         setSelectedTaskOwnerId(taskOwnerId)
         setReviewModalOpen(true)
       }
+      console.log('checkk')
     } catch (error) {
       console.error('Error fetching task details:', error)
     }
@@ -260,6 +265,15 @@ export function KanbanBoardForm() {
       }
     } catch (error) {
       console.error('Error fetching task details:', error)
+    }
+  }
+
+  const handleEdit = async (taskId: string) => {
+    // Find task in current columns
+    const task = columns.flatMap((col) => col.cards).find((card) => card.id === taskId)?.originalTask
+    if (task) {
+      setSelectedTaskForUpdate(task)
+      setUpdateTaskOpen(true)
     }
   }
 
@@ -301,7 +315,13 @@ export function KanbanBoardForm() {
     if (sourceColumn.id === targetColumn.id) return
 
     // Map column ID to task status for API
-    const newTaskStatus = overColumnId // This will be 'todo', 'doing', 'completed', or 'rejected'
+    // When dropped to "completed" column, set status as "reviewing" instead
+    let newTaskStatus: TaskStatus
+    if (overColumnId === 'completed') {
+      newTaskStatus = 'reviewing'
+    } else {
+      newTaskStatus = overColumnId
+    }
 
     // Update columns state optimistically
     setColumns((prevColumns) => {
@@ -482,6 +502,7 @@ export function KanbanBoardForm() {
                     onViewDetail={handleViewDetail}
                     onReview={handleReview}
                     onReject={handleReject}
+                    onEdit={handleEdit}
                   />
                 </div>
               ))}
@@ -539,7 +560,6 @@ export function KanbanBoardForm() {
         </div>
       )}
 
-      {/* Review Modal */}
       {reviewModalOpen && (
         <div className='fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4'>
           <div className='bg-background rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto'>
@@ -567,6 +587,22 @@ export function KanbanBoardForm() {
                 fetchTasks()
               }}
               onCancel={() => setRejectModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Update Task Modal */}
+      {updateTaskOpen && selectedTaskForUpdate && (
+        <div className='fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4'>
+          <div className='bg-background rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
+            <TaskUpdateForm
+              task={selectedTaskForUpdate}
+              onSuccess={() => {
+                setUpdateTaskOpen(false)
+                fetchTasks()
+              }}
+              onCancel={() => setUpdateTaskOpen(false)}
             />
           </div>
         </div>
