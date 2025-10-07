@@ -1,169 +1,143 @@
-import { useState, useEffect } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
+import { projectApi } from '@/app/apis/AUTH/project.api'
+import { Badge } from '@/app/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
+import type { IUserStatePayload } from '@/app/models'
+import type { ITeamMember } from '@/app/modules/Manager/MyTeamManager/models/TeamInterface'
+import { getLocalStorage } from '@/app/utils'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-interface TeamMember {
-  id: string
-  name: string
-  email: string
-  role: string
-  avatar?: string
-}
-
-// Mock data - replace with actual API call
-const mockTeamData: TeamMember[] = [
-  {
-    id: '001',
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    role: 'Back-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=john'
-  },
-  {
-    id: '002',
-    name: 'Jane Smith',
-    email: 'jane.smith@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=jane'
-  },
-  {
-    id: '003',
-    name: 'Michael Johnson',
-    email: 'michael.johnson@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=michael'
-  },
-  {
-    id: '004',
-    name: 'Emily Brown',
-    email: 'emily.brown@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=emily'
-  },
-  {
-    id: '005',
-    name: 'David Wilson',
-    email: 'david.wilson@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=david'
-  },
-  {
-    id: '006',
-    name: 'Sarah Miller',
-    email: 'sarah.miller@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=sarah'
-  },
-  {
-    id: '007',
-    name: 'Kevin Lee',
-    email: 'kevin.lee@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=kevin1'
-  },
-  {
-    id: '008',
-    name: 'Kevin Lee',
-    email: 'kevin.lee@email.com',
-    role: 'Front-end Dev',
-    avatar: 'https://i.pravatar.cc/150?u=kevin2'
-  }
-]
-
-export default function MyTeam() {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
-  const [loading, setLoading] = useState(true)
+function MyTeam() {
+  const [projectId, setProjectId] = useState<string>('')
 
   useEffect(() => {
-    // Simulate API call
-    const fetchTeamData = async () => {
-      try {
-        setLoading(true)
-        // Replace with actual API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setTeamMembers(mockTeamData)
-      } catch (error) {
-        console.error('Error fetching team data:', error)
-      } finally {
-        setLoading(false)
-      }
+    const userLocalStorage: IUserStatePayload = getLocalStorage('user')
+    if (userLocalStorage?.projectId) {
+      setProjectId(userLocalStorage.projectId)
     }
-
-    fetchTeamData()
   }, [])
 
-  if (loading) {
+  const {
+    data: projectData,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['project', projectId],
+    queryFn: () => projectApi.getProjectById(projectId),
+    enabled: !!projectId
+  })
+
+  const members = projectData?.data?.members || []
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'product manager':
+      case 'project manager':
+        return 'bg-purple-100 text-purple-800 border-purple-200'
+      case 'developer':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'designer':
+        return 'bg-green-100 text-green-800 border-green-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  const getSystemRoleBadgeColor = (role: string) => {
+    switch (role.toUpperCase()) {
+      case 'PROJECTMANAGER':
+        return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'EMPLOYEE':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'ADMIN':
+        return 'bg-red-100 text-red-800 border-red-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  if (isLoading) {
     return (
-      <div className='flex h-full items-center justify-center'>
-        <div className='text-lg'>Loading team members...</div>
+      <div className='flex items-center justify-center h-64'>
+        <div className='text-gray-500'>Loading team members...</div>
+      </div>
+    )
+  }
+
+  if (error || !projectData?.success) {
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <div className='text-red-500'>Error loading team members</div>
       </div>
     )
   }
 
   return (
-    <div className='flex flex-col h-full bg-background'>
-      <div className='flex-1 p-6'>
-        {/* Header */}
-        <div className='mb-8'>
-          <h1 className='text-3xl font-bold text-gray-900'>Clother Project</h1>
-        </div>
-
-        {/* Team Table */}
-        <div className='bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden'>
-          {/* Table Header */}
-          <div className='grid grid-cols-4 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200'>
-            <div className='text-sm font-medium text-gray-600'>ID</div>
-            <div className='text-sm font-medium text-gray-600'>Avatar</div>
-            <div className='text-sm font-medium text-gray-600'>Name</div>
-            <div className='text-sm font-medium text-gray-600'>Email</div>
-            <div className='text-sm font-medium text-gray-600'>Role</div>
-          </div>
-
-          {/* Table Body */}
-          <div className='divide-y divide-gray-200'>
-            {teamMembers.map((member, index) => (
-              <div
-                key={member.id}
-                className={`grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors ${
-                  index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                }`}
-              >
-                {/* ID */}
-                <div className='flex items-center'>
-                  <span className='text-sm text-gray-900 font-medium'>{member.id}</span>
-                </div>
-
-                {/* Avatar */}
-                <div className='flex items-center'>
-                  <Avatar className='h-10 w-10'>
-                    <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback className='bg-blue-500 text-white font-semibold'>
-                      {member.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-
-                {/* Name */}
-                <div className='flex items-center'>
-                  <span className='text-sm text-gray-900 font-medium'>{member.name}</span>
-                </div>
-
-                {/* Email */}
-                <div className='flex items-center'>
-                  <span className='text-sm text-gray-600'>{member.email}</span>
-                </div>
-
-                {/* Role */}
-                <div className='flex items-center'>
-                  <span className='text-sm text-gray-900'>{member.role}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div className='p-6 space-y-6'>
+      <div className='flex items-center justify-between'>
+        <div>
+          <h1 className='text-2xl font-bold text-gray-900'>My Team</h1>
+          <p className='text-gray-600 mt-1'>Manage and view your team members for project: {projectData.data?.name}</p>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Team Members ({members.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {members.length === 0 ? (
+            <div className='text-center py-8 text-gray-500'>No team members found</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Project Role</TableHead>
+                  <TableHead>System Role</TableHead>
+                  <TableHead>Department</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {members.map((member: ITeamMember) => (
+                  <TableRow key={member.id}>
+                    <TableCell className='font-medium'>
+                      <div className='flex items-center space-x-3'>
+                        <div className='w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center'>
+                          {member.user.avatar_url ? (
+                            <img
+                              src={member.user.avatar_url}
+                              alt={member.user.name}
+                              className='w-8 h-8 rounded-full object-cover'
+                            />
+                          ) : (
+                            <span className='text-sm font-medium text-gray-600'>
+                              {member.user.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <span>{member.user.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{member.user.email}</TableCell>
+                    <TableCell>
+                      <Badge className={getRoleBadgeColor(member.role)}>{member.role}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getSystemRoleBadgeColor(member.user.role.role)}>{member.user.role.role}</Badge>
+                    </TableCell>
+                    <TableCell>{member.user.department.name}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
+
+export default MyTeam

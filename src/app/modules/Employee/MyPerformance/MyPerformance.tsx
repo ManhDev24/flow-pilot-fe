@@ -1,8 +1,21 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { MyTaskApi } from '@/app/apis/AUTH/performance.api'
+import type { RootState } from '@/app/redux/store'
+import {
+  setCurrentTime,
+  setInitialTime,
+  setIsRunning,
+  setSelectedMode,
+  setFocusDuration,
+  setBreakDuration,
+  setFocusStartTime,
+  setTimerVisible,
+  resetTimer,
+  changeModeAndReset
+} from '@/app/redux/slices/timer.slice'
 import type { FocusLog } from './models/perfomance.type'
-import { AlertPopup } from './partials/AlertPopup'
 import { MetricsCards } from './partials/MetricsCards'
 import { PersonalNotifications } from './partials/PersonalNotifications'
 import { PriorityTasks } from './partials/PriorityTasks'
@@ -11,16 +24,9 @@ import { TimerSettings } from './partials/TimerSettings'
 import { WeeklyFocusHistory } from './partials/WeeklyFocusHistory'
 
 export default function FlowpilotDashboard() {
-  const [focusDuration, setFocusDuration] = useState([25])
-  const [breakDuration, setBreakDuration] = useState([5])
-  const [currentTime, setCurrentTime] = useState(25 * 60)
-  const [initialTime, setInitialTime] = useState(25 * 60)
-  const [isRunning, setIsRunning] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
-  const [selectedMode, setSelectedMode] = useState('pomodoro')
-  const [isBreakMode, setIsBreakMode] = useState(false)
-  const [showAlert, setShowAlert] = useState(false)
-  const [focusStartTime, setFocusStartTime] = useState<number | null>(null)
+  const dispatch = useDispatch()
+  const timer = useSelector((state: RootState) => state.timer)
+
   const [focusLogData, setFocusLogData] = useState<FocusLog[]>([])
   const [loadingFocusLog, setLoadingFocusLog] = useState(true)
 
@@ -42,101 +48,31 @@ export default function FlowpilotDashboard() {
     fetchFocusLog()
   }, [])
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (isRunning && currentTime > 0) {
-      interval = setInterval(() => {
-        setCurrentTime((time) => {
-          if (time <= 1) {
-            setShowAlert(true)
-            setIsRunning(false)
-
-            // Nếu là focus mode (không phải break mode), ghi lại focus time
-            if (!isBreakMode && focusStartTime) {
-              const focusedMinutes = Math.round((initialTime - 1) / 60) // Tính số phút đã focus
-              postFocusTime(focusedMinutes)
-            }
-
-            return 0
-          }
-          return time - 1
-        })
-      }, 1000)
-    }
-    return () => clearInterval(interval)
-  }, [isRunning, currentTime, isBreakMode, focusStartTime, initialTime])
-
-  useEffect(() => {
-    if (!isRunning && !isCompleted) {
-      const newTime = focusDuration[0] * 60
-      setCurrentTime(newTime)
-      setInitialTime(newTime)
-    }
-  }, [focusDuration, isRunning, isCompleted])
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Hàm gửi focus time lên server
-  const postFocusTime = async (focusedMinutes: number) => {
-    try {
-      await MyTaskApi.postFocusTime(focusedMinutes)
-      console.log(`Focus time logged: ${focusedMinutes} minutes`)
-      // Refresh focus log data after logging
-      const response = await MyTaskApi.getFocusMe()
-      if (response.success) {
-        setFocusLogData(response.data)
-      }
-    } catch (error) {
-      console.error('Failed to log focus time:', error)
-    }
-  }
-
   const handleStart = () => {
-    if (isCompleted) {
-      handleReset()
+    if (timer.isCompleted) {
+      dispatch(resetTimer())
     }
 
-    // Nếu bắt đầu focus session (không phải break mode)
-    if (!isRunning && !isBreakMode) {
-      setFocusStartTime(Date.now())
+    // Start focus session (not break mode)
+    if (!timer.isRunning && !timer.isBreakMode) {
+      dispatch(setFocusStartTime(Date.now()))
+      dispatch(setTimerVisible(true))
     }
 
-    setIsRunning(!isRunning)
+    dispatch(setIsRunning(!timer.isRunning))
   }
 
   const handleReset = () => {
-    setIsRunning(false)
-    setIsCompleted(false)
-    setIsBreakMode(false)
-    setShowAlert(false)
-    setFocusStartTime(null)
-    const newTime = getTimeForMode(selectedMode)
-    setCurrentTime(newTime)
-    setInitialTime(newTime)
-  }
-
-  const getTimeForMode = (mode: string) => {
-    switch (mode) {
-      case 'pomodoro':
-        return focusDuration[0] * 60
-      case 'deep':
-        return 45 * 60
-      case 'marathon':
-        return 60 * 60
-      default:
-        return focusDuration[0] * 60
-    }
+    dispatch(resetTimer())
   }
 
   const handleModeChange = (mode: string) => {
-    setSelectedMode(mode)
-    setIsRunning(false)
-    setIsCompleted(false)
-
     let newFocusDuration, newBreakDuration
     switch (mode) {
       case 'pomodoro':
@@ -156,62 +92,55 @@ export default function FlowpilotDashboard() {
         newBreakDuration = [5]
     }
 
-    setFocusDuration(newFocusDuration)
-    setBreakDuration(newBreakDuration)
-
-    const newTime = newFocusDuration[0] * 60
-    setCurrentTime(newTime)
-    setInitialTime(newTime)
+    dispatch(
+      changeModeAndReset({
+        mode,
+        focusDuration: newFocusDuration,
+        breakDuration: newBreakDuration
+      })
+    )
   }
 
   const getCircleProgress = () => {
-    if (isCompleted) {
+    if (timer.isCompleted) {
       return 2 * Math.PI * 45
     }
-    const progress = (initialTime - currentTime) / initialTime
+    const progress = (timer.initialTime - timer.currentTime) / timer.initialTime
     return 2 * Math.PI * 45 * progress
   }
 
-  const handleContinueBreak = () => {
-    setShowAlert(false)
-    if (!isBreakMode) {
-      // Chuyển sang break mode
-      setIsBreakMode(true)
-      setFocusStartTime(null) // Clear focus tracking khi chuyển sang break
-      const breakTime = breakDuration[0] * 60
-      setCurrentTime(breakTime)
-      setInitialTime(breakTime)
-      setIsRunning(true)
-    } else {
-      // Kết thúc break, reset để bắt đầu session mới
-      setIsBreakMode(false)
-      setIsCompleted(true)
-      handleReset()
+  const handleFocusDurationChange = (value: number[]) => {
+    dispatch(setFocusDuration(value))
+    if (timer.selectedMode !== 'custom') {
+      dispatch(setSelectedMode('custom'))
+    }
+    if (!timer.isRunning) {
+      const newTime = value[0] * 60
+      dispatch(setCurrentTime(newTime))
+      dispatch(setInitialTime(newTime))
+    }
+  }
+
+  const handleBreakDurationChange = (value: number[]) => {
+    dispatch(setBreakDuration(value))
+    if (timer.selectedMode !== 'custom') {
+      dispatch(setSelectedMode('custom'))
     }
   }
 
   return (
     <div className=''>
-      <AlertPopup
-        showAlert={showAlert}
-        isBreakMode={isBreakMode}
-        breakDuration={breakDuration}
-        onContinueBreak={handleContinueBreak}
-        onReset={handleReset}
-        onClose={() => setShowAlert(false)}
-      />
-
       <div className='p-6'>
         <MetricsCards />
 
         <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
           <div className='col-span-3'>
             <TimerSection
-              selectedMode={selectedMode}
-              currentTime={currentTime}
-              isRunning={isRunning}
-              isCompleted={isCompleted}
-              isBreakMode={isBreakMode}
+              selectedMode={timer.selectedMode}
+              currentTime={timer.currentTime}
+              isRunning={timer.isRunning}
+              isCompleted={timer.isCompleted}
+              isBreakMode={timer.isBreakMode}
               onModeChange={handleModeChange}
               onStart={handleStart}
               onReset={handleReset}
@@ -225,12 +154,12 @@ export default function FlowpilotDashboard() {
             <WeeklyFocusHistory focusLogData={focusLogData} loading={loadingFocusLog} />
 
             <TimerSettings
-              focusDuration={focusDuration}
-              breakDuration={breakDuration}
-              selectedMode={selectedMode}
-              onFocusDurationChange={setFocusDuration}
-              onBreakDurationChange={setBreakDuration}
-              onModeChange={setSelectedMode}
+              focusDuration={timer.focusDuration}
+              breakDuration={timer.breakDuration}
+              selectedMode={timer.selectedMode}
+              onFocusDurationChange={handleFocusDurationChange}
+              onBreakDurationChange={handleBreakDurationChange}
+              onModeChange={(mode: string) => dispatch(setSelectedMode(mode))}
             />
 
             <PriorityTasks />

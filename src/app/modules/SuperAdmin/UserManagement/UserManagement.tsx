@@ -22,6 +22,7 @@ import { toast } from 'react-toastify'
 import type { User, UserListResponse } from './models/UserManagementInterface'
 
 const PAGE_SIZE = 10
+const VISIBLE_ROWS = 10
 
 function UserManagement() {
   const [users, setUsers] = useState<User[]>([])
@@ -240,90 +241,111 @@ function UserManagement() {
               </tr>
             </TableHeader>
             <TableBody>
+              {
+                // Render up to VISIBLE_ROWS data rows, then filler rows to keep table height constant
+              }
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className='p-8 text-center'>
-                    Loading users...
-                  </TableCell>
-                </TableRow>
-              ) : sorted.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className='p-8 text-center'>
-                    No users found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                sorted.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className='flex items-center gap-3'>
-                      <Avatar>
-                        {u.avatar_url ? (
-                          <AvatarImage src={u.avatar_url} alt={u.name} />
-                        ) : (
-                          <AvatarFallback>{u.name?.charAt(0) ?? '?'}</AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div>
-                        <div className='font-medium'>{u.name}</div>
-                        <div className='text-muted-foreground text-sm'>{u.email}</div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>{u.role?.role ?? '-'}</TableCell>
-
-                    <TableCell>
-                        <Badge
-                          variant={u.status === 'Active' || u.status === 'active' ? 'default' : 'destructive'}
-                          className={u.status === 'Active' || u.status === 'active' ? 'bg-green-100 text-green-800 border-transparent' : 'bg-red-100 text-red-800 border-transparent'}
-                        >
-                          {u.status.toUpperCase()}
-                        </Badge>
-                    </TableCell>
-
-                    <TableCell className='text-sm text-muted-foreground'>
-                      {u.created_at ? new Date(u.created_at).toLocaleDateString('en-GB') : '-'}
-                    </TableCell>
-
-                    <TableCell className='text-sm'>{u.workspace?.name ?? '-'}</TableCell>
-
-                    <TableCell>
-                      <div className='flex items-center justify-start gap-2'>
-                        {/* Icon-only action buttons */}
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          aria-label={`Edit ${u.name}`}
-                          onClick={() => handleEditUser(u)}
-                        >
-                          <Edit className='size-4' />
-                        </Button>
-
-                        {u.status === 'Active' || u.status === 'active' ? (
-                          <Button
-                            variant='destructive'
-                            size='icon'
-                            aria-label={`Delete ${u.name}`}
-                            onClick={() => openDeleteDialog(u)}
-                          >
-                            <Trash2 className='size-4' />
-                          </Button>
-                        ) : (
-                          <Button
-                            variant='default'
-                            size='icon'
-                            aria-label={`Activate ${u.name}`}
-                            onClick={() => {
-                              handleActivate(u)
-                            }}
-                            className='bg-green-800 hover:bg-green-900 text-white'
-                          >
-                            <Check className='size-4' />
-                          </Button>
-                        )}
-                      </div>
+                // When loading, show a loading row plus filler rows to reach VISIBLE_ROWS
+                <>
+                  <TableRow className='h-14'>
+                    <TableCell colSpan={6} className='p-8 text-center'>
+                      Loading users...
                     </TableCell>
                   </TableRow>
-                ))
+                  {Array.from({ length: Math.max(0, VISIBLE_ROWS - 1) }).map((_, i) => (
+                    <TableRow key={`filler-loading-${i}`} className='h-14'>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {sorted.slice(0, VISIBLE_ROWS).map((u) => (
+                    <TableRow key={u.id} className='h-14'>
+                      <TableCell className='flex items-center gap-3'>
+                        <Avatar>
+                          {u.avatar_url ? (
+                            <AvatarImage src={u.avatar_url} alt={u.name} />
+                          ) : (
+                            <AvatarFallback>{u.name?.charAt(0) ?? '?'}</AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div>
+                          <div className='font-medium'>{u.name}</div>
+                          <div className='text-muted-foreground text-sm'>{u.email}</div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>{u.role?.role ?? '-'}</TableCell>
+
+                      <TableCell>
+                          <Badge
+                            variant={u.status === 'Active' || u.status === 'active' ? 'default' : 'destructive'}
+                            className={u.status === 'Active' || u.status === 'active' ? 'bg-green-100 text-green-800 border-transparent' : 'bg-red-100 text-red-800 border-transparent'}
+                          >
+                            {u.status.toUpperCase()}
+                          </Badge>
+                      </TableCell>
+
+                      <TableCell className='text-sm text-muted-foreground'>
+                        {u.created_at ? new Date(u.created_at).toLocaleDateString('en-GB') : '-'}
+                      </TableCell>
+
+                      <TableCell className='text-sm'>{u.workspace?.name ?? '-'}</TableCell>
+
+                      <TableCell>
+                        <div className='flex items-center justify-start gap-2'>
+                          {/* Icon-only action buttons */}
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            aria-label={`Edit ${u.name}`}
+                            onClick={() => handleEditUser(u)}
+                          >
+                            <Edit className='size-4' />
+                          </Button>
+
+                          {u.status === 'Active' || u.status === 'active' ? (
+                            <Button
+                              variant='destructive'
+                              size='icon'
+                              aria-label={`Delete ${u.name}`}
+                              onClick={() => openDeleteDialog(u)}
+                            >
+                              <Trash2 className='size-4' />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant='default'
+                              size='icon'
+                              aria-label={`Activate ${u.name}`}
+                              onClick={() => {
+                                handleActivate(u)
+                              }}
+                              className='bg-green-800 hover:bg-green-900 text-white'
+                            >
+                              <Check className='size-4' />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
+                  {/* filler rows to always show VISIBLE_ROWS */}
+                  {Array.from({ length: Math.max(0, VISIBLE_ROWS - sorted.slice(0, VISIBLE_ROWS).length) }).map((_, i) => (
+                    <TableRow key={`filler-${i}`} className='h-14'>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  ))}
+
+                  {/* when there are absolutely zero items, show the 'No users found' message centered in the first row */}
+                  {sorted.length === 0 && (
+                    <TableRow className='sr-only'>
+                      <TableCell colSpan={6} className='p-8 text-center'>No users found.</TableCell>
+                    </TableRow>
+                  )}
+                </>
               )}
             </TableBody>
             <TableFooter>

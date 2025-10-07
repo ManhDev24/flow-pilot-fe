@@ -1,6 +1,6 @@
 import { AdminWsApi } from '@/app/apis/AUTH/Admin-ws.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { PATH } from '@/app/routes/path'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
@@ -19,35 +19,37 @@ import { CreateEmployeeModal } from '@/app/modules/AdminWs/MyEmployees/partials/
 import { UpdateEmployeeModal } from '@/app/modules/AdminWs/MyEmployees/partials/Update-employee-modal'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
-import { ChevronLeft, ChevronRight, Edit, Plus, Search, Trash2, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 
 // Component to display projects with tooltip for multiple projects
 const ProjectsDisplay = ({ projectUsers }: { projectUsers: ApiEmployee['projectUsers'] }) => {
   const projectNames = (projectUsers || []).map((pu) => pu.project?.name).filter(Boolean) as string[]
-  
+
   if (projectNames.length === 0) {
-    return <span className="text-gray-500">Not assigned</span>
+    return <span className='text-gray-500'>Not assigned</span>
   }
-  
+
   if (projectNames.length === 1) {
     return <span>{projectNames[0]}</span>
   }
-  
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="cursor-help">
-          {projectNames[0]}... <span className="text-xs text-gray-500">+{projectNames.length - 1} more</span>
+        <span className='cursor-help'>
+          {projectNames[0]}... <span className='text-xs text-gray-500'>+{projectNames.length - 1} more</span>
         </span>
       </TooltipTrigger>
       <TooltipContent>
-        <div className="max-w-xs">
-          <div className="font-medium mb-1">All Projects:</div>
-          <div className="space-y-1">
+        <div className='max-w-xs'>
+          <div className='font-medium mb-1'>All Projects:</div>
+          <div className='space-y-1'>
             {projectNames.map((name, index) => (
-              <div key={index} className="text-xs">• {name}</div>
+              <div key={index} className='text-xs'>
+                • {name}
+              </div>
             ))}
           </div>
         </div>
@@ -160,6 +162,12 @@ function MyEmployees() {
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
     setCurrentPage(1) // Reset to first page when changing page size
+  }
+
+  const navigate = useNavigate()
+
+  const handleViewDetail = (memberId: string) => {
+    navigate(PATH.ADMIN_MY_EMPLOYEE_DETAIL.replace(':id', memberId))
   }
 
   const hasActiveFilters =
@@ -407,9 +415,14 @@ function MyEmployees() {
                     </TableCell>
                     <TableCell>
                       <div className='flex items-center gap-2'>
-                        {/* <Button variant='ghost' size='sm' className='h-8 w-8 p-0'>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0'
+                          onClick={() => handleViewDetail(employee.id)}
+                        >
                           <Eye className='w-4 h-4 text-gray-400' />
-                        </Button> */}
+                        </Button>
                         <Button
                           variant='ghost'
                           size='sm'
@@ -467,60 +480,46 @@ function MyEmployees() {
               </div>
             </div>
             <div className='flex items-center gap-2'>
-              <Button 
-                variant='ghost' 
-                size='sm' 
-                disabled={currentPage <= 1}
-                onClick={handlePrevPage}
-              >
+              <Button variant='ghost' size='sm' disabled={currentPage <= 1} onClick={handlePrevPage}>
                 <ChevronLeft className='w-4 h-4' />
               </Button>
-              
+
               {/* Page numbers */}
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
+                let pageNum
                 if (totalPages <= 5) {
-                  pageNum = i + 1;
+                  pageNum = i + 1
                 } else if (currentPage <= 3) {
-                  pageNum = i + 1;
+                  pageNum = i + 1
                 } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
+                  pageNum = totalPages - 4 + i
                 } else {
-                  pageNum = currentPage - 2 + i;
+                  pageNum = currentPage - 2 + i
                 }
-                
+
                 return (
-                  <Button 
+                  <Button
                     key={pageNum}
-                    variant={currentPage === pageNum ? 'default' : 'ghost'} 
-                    size='sm' 
+                    variant={currentPage === pageNum ? 'default' : 'ghost'}
+                    size='sm'
                     className={currentPage === pageNum ? 'bg-blue-600 hover:bg-blue-700' : ''}
                     onClick={() => handlePageChange(pageNum)}
                   >
                     {pageNum}
                   </Button>
-                );
+                )
               })}
-              
+
               {totalPages > 5 && currentPage < totalPages - 2 && (
                 <>
                   <span className='text-gray-400'>...</span>
-                  <Button 
-                    variant='ghost' 
-                    size='sm'
-                    onClick={() => handlePageChange(totalPages)}
-                  >
+                  <Button variant='ghost' size='sm' onClick={() => handlePageChange(totalPages)}>
                     {totalPages}
                   </Button>
                 </>
               )}
-              
-              <Button 
-                variant='ghost' 
-                size='sm' 
-                disabled={currentPage >= totalPages}
-                onClick={handleNextPage}
-              >
+
+              <Button variant='ghost' size='sm' disabled={currentPage >= totalPages} onClick={handleNextPage}>
                 <ChevronRight className='w-4 h-4' />
               </Button>
             </div>

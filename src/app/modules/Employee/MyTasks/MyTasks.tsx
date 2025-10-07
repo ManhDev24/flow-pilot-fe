@@ -1,5 +1,6 @@
 'use client'
 
+import { authApi } from '@/app/apis/AUTH/Auth.api'
 import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Badge } from '@/app/components/ui/badge'
@@ -125,13 +126,26 @@ export default function MyTasksPage() {
   const [selectedTask, setSelectedTask] = useState<string>('')
   const [tasks, setTasks] = useState<MyTask[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setError] = useState<string | null>(null)
   const [taskFiles, setTaskFiles] = useState<FileByTask[]>([])
   const [filesLoading, setFilesLoading] = useState(false)
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const currentUserId = '327e1b0b-2698-4a0f-9273-ca9729a9f0cd'
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await authApi.getCurrentUser()
+        if (response.success) {
+          setCurrentUserId(response.data.id)
+        }
+      } catch (err) {
+        console.error('Error fetching current user:', err)
+      }
+    }
+    fetchCurrentUser()
+  }, [])
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -236,6 +250,17 @@ export default function MyTasksPage() {
     { type: 'comment', user: 'Bob Miller', action: 'Added a comment', time: '2024-07-25 10:30 AM' }
   ]
 
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <div className='flex items-center space-x-2'>
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+          <span className='text-sm text-gray-600'>Loading Tasks ...</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className=' h-screen'>
       <div className='flex-1 flex'>
@@ -259,7 +284,6 @@ export default function MyTasksPage() {
           <div className='flex-1 p-2 '>
             {tasks.map((task) => {
               const statusStyles = getStatusStyles(task.status)
-              const priorityStyles = getPriorityStyles(task.priority)
               return (
                 <div
                   key={task.id}

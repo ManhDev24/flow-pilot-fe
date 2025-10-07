@@ -47,13 +47,11 @@ export function UpdateProjectModal({ isOpen, onClose, project, onUpdate }: Updat
   // Fetch managers (users with role Project Manager or Admin)
   const { data: usersData } = useQuery<any, AxiosError>({
     queryKey: ['admin-ws-users'],
-    queryFn: getAllUserByAdmin
+    queryFn: () => getAllUserByAdmin(1, 10)
   })
 
   // Filter users to get only managers (role_id 2 = Admin, 3 = Project Manager)
-  const managers = (usersData?.data?.items || []).filter((user: any) => 
-    user.role_id === 2 || user.role_id === 3
-  )
+  const managers = (usersData?.data?.items || []).filter((user: any) => user.role_id === 2 || user.role_id === 3)
 
   useEffect(() => {
     if (project) {
@@ -180,10 +178,7 @@ export function UpdateProjectModal({ isOpen, onClose, project, onUpdate }: Updat
 
             <div className='space-y-2'>
               <Label>Project Manager *</Label>
-              <Select 
-                value={formData.manager_id} 
-                onValueChange={(value) => handleInputChange('manager_id', value)}
-              >
+              <Select value={formData.manager_id} onValueChange={(value) => handleInputChange('manager_id', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select project manager' />
                 </SelectTrigger>
@@ -200,10 +195,7 @@ export function UpdateProjectModal({ isOpen, onClose, project, onUpdate }: Updat
 
           <div className='space-y-2'>
             <Label>Status *</Label>
-            <Select 
-              value={formData.status} 
-              onValueChange={(value) => handleInputChange('status', value)}
-            >
+            <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
               <SelectTrigger>
                 <SelectValue placeholder='Select status' />
               </SelectTrigger>
@@ -216,11 +208,7 @@ export function UpdateProjectModal({ isOpen, onClose, project, onUpdate }: Updat
             </Select>
           </div>
 
-          <Button 
-            type='submit' 
-            className='w-full bg-blue-600 hover:bg-blue-700 text-white mt-6' 
-            disabled={isLoading}
-          >
+          <Button type='submit' className='w-full bg-blue-600 hover:bg-blue-700 text-white mt-6' disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Save Changes'}
           </Button>
         </form>

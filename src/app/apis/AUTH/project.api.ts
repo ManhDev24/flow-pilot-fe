@@ -1,11 +1,58 @@
-import { fetcher } from '@/app/apis/fetcher'
+import type { AxiosError, AxiosResponse } from 'axios'
+import { fetcher } from '../fetcher'
 import type {
   CreateProjectPayload,
-  ProjectResponse,
   SingleProjectResponse,
   UpdateProjectPayload
 } from '@/app/modules/AdminWs/MyProjects/models/ProjectInterface'
-import type { AxiosError, AxiosResponse } from 'axios'
+
+export interface IUser {
+  id: string
+  name: string
+  email: string
+  avatar_url: string | null
+  role: {
+    role: string
+  }
+  department: {
+    id: number
+    name: string
+  }
+}
+
+export interface IProjectMember {
+  id: number
+  role: string
+  user: IUser
+}
+
+export interface IProject {
+  id: string
+  workspace_id: string
+  name: string
+  description: string | null
+  start_date: string
+  end_date: string
+  process: number
+  team_size: number | null
+  created_at: string
+  updated_at: string
+  manager_id: string
+  status: string
+  members: IProjectMember[]
+}
+
+export interface ProjectResponse {
+  success: boolean
+  message: string
+  data: IProject
+}
+
+export interface MemberDetailResponse {
+  success: boolean
+  message: string
+  data: IProjectMember
+}
 
 // Helper function to get workspace_id from localStorage
 const getWorkspaceId = (): string => {
@@ -18,6 +65,26 @@ const getWorkspaceId = (): string => {
 }
 
 export const projectApi = {
+  // Get project by ID
+
+  // Get member detail by member ID (from project members)
+  getMemberDetail: async (projectId: string, memberId: number): Promise<MemberDetailResponse> => {
+    // Since we don't have a direct API, we'll get the project and find the member
+    const projectResponse = await fetcher.get(`/project/${projectId}`)
+    const project = projectResponse.data.data
+    const member = project.members.find((m: IProjectMember) => m.id === memberId)
+
+    if (!member) {
+      throw new Error('Member not found')
+    }
+
+    return {
+      success: true,
+      message: 'Get member detail successfully',
+      data: member
+    }
+  },
+
   getAllProjects: async (page: number, limit: number) => {
     try {
       const response: AxiosResponse<ProjectResponse> = await fetcher.get(`/project?page=${page}&limit=${limit}`)

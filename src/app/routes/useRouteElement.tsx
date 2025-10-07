@@ -45,16 +45,19 @@ import ResetPassword from '../modules/Auth/ResetPassword/ResetPassword'
 import ContactPage from '../modules/Guest/ContactPage/ContactPage'
 import NotificationManagement from '@/app/modules/Manager/NotificationManagement/NotificationManagement'
 import MyDepartment from '@/app/modules/AdminWs/MyDepartment/MyDepartment'
-import ConsultationReqManagement from '../modules/SuperAdmin/ConsultationReqManagement/ConsultationReqManagement'
-import OrderManagement from '../modules/SuperAdmin/OrderManagement/OrderManagement'
-import PaymentManagement from '../modules/SuperAdmin/PaymentManagement/PaymentManagement'
-import PackageManagement from '../modules/SuperAdmin/PackageManagement/PackageManagement'
-import FeatureManagement from '../modules/SuperAdmin/FeatureManagement/FeatureManagement'
+import Order from '@/app/modules/SuperAdmin/Order/Order'
+import Payment from '@/app/modules/SuperAdmin/Payment/Payment'
+import MyTeamManagerDetail from '@/app/modules/Manager/MyTeamManagerDetail/MyTeamManagerDetail'
+import ConsultationReqManagement from '@/app/modules/SuperAdmin/ConsultationReqManagement/ConsultationReqManagement'
+import PackageManagement from '@/app/modules/SuperAdmin/PackageManagement/PackageManagement'
+import FeatureManagement from '@/app/modules/SuperAdmin/FeatureManagement/FeatureManagement'
+import EmloyeeNotifications from '@/app/modules/Employee/Notifications/EmployeeNotifications'
+import AdminNotifications from '@/app/modules/AdminWs/Notification/AdminNotifications'
 
 const redirectMap: Record<string, string> = {
   superadmin: PATH.SUPER_ADMIN,
   admin: PATH.ADMIN,
-  projectmanager: PATH.EMPLOYEE_MANAGE_MY_TASKS,
+  projectmanager: PATH.EMPLOYEE_MANAGE_PROJECTS,
   employee: PATH.EMPLOYEE_MY_TASKS
 }
 
@@ -251,22 +254,6 @@ const useRouteElement = () => {
           )
         },
         {
-          path: PATH.SUPER_ADMIN_ORDERS,
-          element: (
-            <SuperAdminLayout>
-              <OrderManagement />
-            </SuperAdminLayout>
-          )
-        },
-        {
-          path: PATH.SUPER_ADMIN_PAYMENTS,
-          element: (
-            <SuperAdminLayout>
-              <PaymentManagement />
-            </SuperAdminLayout>
-          )
-        },
-        {
           path: PATH.SUPER_ADMIN_PACKAGES,
           element: (
             <SuperAdminLayout>
@@ -287,6 +274,22 @@ const useRouteElement = () => {
           element: (
             <SuperAdminLayout>
               <UserManagement />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_ORDERS,
+          element: (
+            <SuperAdminLayout>
+              <Order />
+            </SuperAdminLayout>
+          )
+        },
+        {
+          path: PATH.SUPER_ADMIN_PAYMENTS,
+          element: (
+            <SuperAdminLayout>
+              <Payment />
             </SuperAdminLayout>
           )
         },
@@ -388,6 +391,14 @@ const useRouteElement = () => {
               <AdminSettings />
             </AdminWsLayout>
           )
+        },
+        {
+          path: PATH.ADMIN_NOTIFICATIONS,
+          element: (
+            <AdminWsLayout>
+              <AdminNotifications />
+            </AdminWsLayout>
+          )
         }
       ]
     },
@@ -452,6 +463,16 @@ const useRouteElement = () => {
               </EmployeeLayout>
             </RoleGuard>
           )
+        },
+        {
+          path: PATH.EMPLOYEE_NOTIFICATIONS,
+          element: (
+            <RoleGuard roles={['employee']}>
+              <EmployeeLayout>
+                <EmloyeeNotifications />
+              </EmployeeLayout>
+            </RoleGuard>
+          )
         }
       ]
     },
@@ -469,6 +490,14 @@ const useRouteElement = () => {
           element: (
             <ManagerLayout>
               <MemberReports />
+            </ManagerLayout>
+          )
+        },
+        {
+          path: PATH.EMPLOYEE_MANAGE_MY_TEAM_DETAIL,
+          element: (
+            <ManagerLayout>
+              <MyTeamManagerDetail />
             </ManagerLayout>
           )
         },

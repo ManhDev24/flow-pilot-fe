@@ -19,13 +19,8 @@ export function Notification({ showFullPage = false, onToggleView }: Notificatio
     onToggleView?.()
   }
 
-  const handleBack = () => {
-    setIsFullPageView(false)
-    onToggleView?.()
-  }
-
   if (isFullPageView) {
-    return <NotificationPage onBack={handleBack} />
+    return <NotificationPage />
   }
 
   return <NotificationDropdown onViewAll={handleViewAll} />
