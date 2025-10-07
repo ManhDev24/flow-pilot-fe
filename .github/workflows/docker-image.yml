@@ -47,7 +47,7 @@ jobs:
           sudo docker rmi -f $(docker images -aq) || true
 
           echo "Starting new container..."
-          sudo docker container run -dp 4000:8080 --name flow-pilot-fe-container --env-file container.env tienmanh/flow-pilot-fe:latest
+          sudo docker container run -dp 4000:4000 --name flow-pilot-fe-container --env-file container.env tienmanh/flow-pilot-fe:latest
           echo "Cleaning up env file..."
           rm container.env
 
