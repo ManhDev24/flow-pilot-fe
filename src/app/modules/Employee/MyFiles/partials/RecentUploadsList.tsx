@@ -6,6 +6,7 @@ import { MyTaskApi } from '@/app/apis/AUTH/file.api'
 import { toast } from 'react-toastify'
 import type { FileItem as ApiFileItem } from '@/app/modules/Employee/MyFiles/models/myFile.type'
 import { FileText, Download, FileImage, FileArchive, FileSpreadsheet, File, Trash2, Share } from 'lucide-react'
+import { ConfirmDeleteFileDialog } from './ConfirmDeleteFileDialog'
 
 interface FileItem {
   id: string
@@ -48,6 +49,9 @@ function formatDate(dateString: string) {
 export function RecentUploadsList({ onRefresh }: { onRefresh?: () => void }) {
   const [files, setFiles] = useState<FileItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Fetch files from API
   const fetchFiles = useCallback(async () => {
@@ -117,17 +121,27 @@ export function RecentUploadsList({ onRefresh }: { onRefresh?: () => void }) {
   }
 
   const handleDelete = async (file: FileItem) => {
-    if (confirm('Are you sure you want to delete this file?')) {
-      try {
-        if (file.api_id) {
-          await MyTaskApi.deleteFile(file.api_id)
-          setFiles((prevFiles) => prevFiles.filter((f) => f.id !== file.id))
-          toast.success('File deleted successfully')
-        }
-      } catch (error) {
-        console.error('Delete failed:', error)
-        toast.error('Failed to delete file')
+    setFileToDelete(file)
+    setShowDeleteDialog(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!fileToDelete) return
+
+    try {
+      setIsDeleting(true)
+      if (fileToDelete.api_id) {
+        await MyTaskApi.deleteFile(fileToDelete.api_id)
+        setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileToDelete.id))
+        toast.success('File deleted successfully')
       }
+    } catch (error) {
+      console.error('Delete failed:', error)
+      toast.error('Failed to delete file')
+    } finally {
+      setIsDeleting(false)
+      setShowDeleteDialog(false)
+      setFileToDelete(null)
     }
   }
 
@@ -260,6 +274,17 @@ export function RecentUploadsList({ onRefresh }: { onRefresh?: () => void }) {
           </div>
         )}
       </CardContent>
+
+      <ConfirmDeleteFileDialog
+        isOpen={showDeleteDialog}
+        onClose={() => {
+          setShowDeleteDialog(false)
+          setFileToDelete(null)
+        }}
+        onConfirm={confirmDelete}
+        fileName={fileToDelete?.name || ''}
+        isLoading={isDeleting}
+      />
     </Card>
   )
 }

@@ -6,6 +6,7 @@ import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Edit, Trash2, Check, X, Loader2 } from 'lucide-react'
 import { toast } from 'react-toastify'
 import type { Content } from '../models/myTask.type'
+import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
 
 interface TaskContentItemProps {
   content: Content
@@ -19,6 +20,7 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
   const [editContent, setEditContent] = useState(content.content)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleEdit = async () => {
     if (!editContent.trim()) {
@@ -49,15 +51,12 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
   }
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete this ${content.type}?`)) {
-      return
-    }
-
     try {
       setIsDeleting(true)
       await MyTaskApi.deleteTaskContent(content.id)
 
       toast.success(`${content.type === 'comment' ? 'Comment' : 'Note'} deleted successfully`)
+      setShowDeleteDialog(false)
       onSuccess?.()
     } catch (error) {
       console.error('Error deleting content:', error)
@@ -87,7 +86,7 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
                 <Button
                   variant='ghost'
                   size='sm'
-                  onClick={handleDelete}
+                  onClick={() => setShowDeleteDialog(true)}
                   disabled={isDeleting}
                   className='h-6 w-6 p-0 text-red-500 hover:text-red-700'
                 >
@@ -142,6 +141,15 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
           )}
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title={`Confirm Delete ${content.type === 'comment' ? 'Comment' : 'Note'}`}
+        description={`Are you sure you want to delete this ${content.type}`}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

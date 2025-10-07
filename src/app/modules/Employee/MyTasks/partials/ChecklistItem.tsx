@@ -6,6 +6,7 @@ import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Edit, Trash2, Check, X, Loader2 } from 'lucide-react'
 import { toast } from 'react-toastify'
 import type { Checklist } from '../models/myTask.type'
+import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
 
 interface ChecklistItemProps {
   checklist: Checklist
@@ -19,6 +20,7 @@ export function ChecklistItem({ checklist, taskId, onSuccess }: ChecklistItemPro
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isToggling, setIsToggling] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleToggleComplete = async () => {
     try {
@@ -69,10 +71,6 @@ export function ChecklistItem({ checklist, taskId, onSuccess }: ChecklistItemPro
   }
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this checklist item?')) {
-      return
-    }
-
     try {
       setIsDeleting(true)
       await MyTaskApi.updateChecklistItem(
@@ -84,6 +82,7 @@ export function ChecklistItem({ checklist, taskId, onSuccess }: ChecklistItemPro
       )
 
       toast.success('Checklist item deleted successfully')
+      setShowDeleteDialog(false)
       onSuccess?.()
     } catch (error) {
       console.error('Error deleting checklist:', error)
@@ -141,7 +140,7 @@ export function ChecklistItem({ checklist, taskId, onSuccess }: ChecklistItemPro
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={handleDelete}
+                onClick={() => setShowDeleteDialog(true)}
                 disabled={isDeleting}
                 className='h-6 w-6 p-0 text-red-500 hover:text-red-700'
               >
@@ -151,6 +150,16 @@ export function ChecklistItem({ checklist, taskId, onSuccess }: ChecklistItemPro
           </div>
         )}
       </div>
+
+      <ConfirmDeleteDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title='Confirm Delete Checklist Item'
+        description='Are you sure you want to delete this checklist item'
+        itemName={checklist.title}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

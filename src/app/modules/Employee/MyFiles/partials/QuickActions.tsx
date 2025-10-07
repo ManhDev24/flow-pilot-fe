@@ -20,24 +20,9 @@ export function QuickActions({ onFilesUploaded }: QuickActionsProps) {
 
   const actions = [
     {
-      icon: <FolderPlus className='h-5 w-5' />,
-      label: 'New Folder',
-      onClick: () => console.log('Create new folder')
-    },
-    {
       icon: <Upload className='h-5 w-5' />,
       label: 'Upload Files',
       onClick: () => setUploadModalOpen(true)
-    },
-    {
-      icon: <Share2 className='h-5 w-5' />,
-      label: 'Share Link',
-      onClick: () => console.log('Share link')
-    },
-    {
-      icon: <Trash2 className='h-5 w-5' />,
-      label: 'Deleted Items',
-      onClick: () => console.log('View deleted items')
     }
   ]
 

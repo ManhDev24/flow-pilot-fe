@@ -13,17 +13,28 @@ export function KanbanColumn({ column, onViewDetail }: KanbanColumnProps) {
   })
 
   return (
-    <div className='flex flex-col'>
-      <div className='mb-4 flex items-center justify-between'>
+    <div className='flex flex-col h-full'>
+      {/* Header */}
+      <div className='mb-4 flex items-center justify-between sticky top-0 bg-background z-10'>
         <h2 className='text-sm font-semibold'>{column.title}</h2>
       </div>
+
+      {/* Drop Zone */}
       <div
         ref={setNodeRef}
-        className={`min-h-[200px] space-y-3 rounded-lg transition-colors ${isOver ? 'bg-muted/50' : ''}`}
+        className={`flex-1 min-h-[400px] space-y-3 rounded-lg p-2 overflow-y-auto transition-colors ${
+          isOver ? 'bg-muted/50' : ''
+        }`}
       >
-        {column.cards.map((card) => (
-          <KanbanCard key={card.id} {...card} onViewDetail={onViewDetail ? () => onViewDetail(card.id) : undefined} />
-        ))}
+        {column.cards.length > 0 ? (
+          column.cards.map((card) => (
+            <KanbanCard key={card.id} {...card} onViewDetail={onViewDetail ? () => onViewDetail(card.id) : undefined} />
+          ))
+        ) : (
+          <div className='text-center text-sm text-muted-foreground py-4 border border-dashed rounded-lg'>
+            Drop here
+          </div>
+        )}
       </div>
     </div>
   )
