@@ -195,8 +195,7 @@ function WorkspaceManagement() {
       <section className='rounded-md border bg-background p-4 shadow-sm'>
         {error && <div className='text-destructive mb-2'>{error}</div>}
 
-        <div className='overflow-x-auto'>
-          <Table>
+        <Table>
           <TableHeader>
             <tr>
               <TableHead>Name</TableHead>
@@ -318,7 +317,6 @@ function WorkspaceManagement() {
             </tr>
           </TableFooter>
         </Table>
-        </div>
       </section>
 
       <CreateWorkspaceDialog

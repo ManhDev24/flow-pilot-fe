@@ -7,17 +7,11 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogClose
 } from '@/app/components/ui/dialog'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from '@/app/components/ui/select'
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/app/components/ui/select'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -47,15 +41,15 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: Props) {
         name: yup.string().required('Name is required').min(2, 'Name must be at least 2 characters'),
         email: yup.string().required('Email is required').email('Invalid email address'),
         role_id: yup.number().required('Role is required').min(1, 'Role is required'),
-        workspace_id: yup.string().required('Workspace is required'),
+        workspace_id: yup.string().required('Workspace is required')
       })
     ),
     defaultValues: {
       name: '',
       email: '',
       role_id: 0,
-      workspace_id: '',
-    },
+      workspace_id: ''
+    }
   })
 
   useEffect(() => {
@@ -63,18 +57,20 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: Props) {
       setLoadingData(true)
       Promise.all([
         RoleAPI.getAllRoles({ page: 1, pageSize: 1000 }),
-        WorkspaceAPI.getAllWorkspaces({ page: 1, limit: 1000 }),
+        WorkspaceAPI.getAllWorkspaces({ page: 1, limit: 1000 })
       ])
         .then(([rolesResp, wsResp]) => {
+          const workspaces = wsResp.data.data.filter((ws) => ws.status === 'active')
+
           setRoles(rolesResp.data.data)
-          setWorkspaces(wsResp.data.data)
+          setWorkspaces(workspaces)
           const firstRole = rolesResp.data.data[0]
-          const firstWs = wsResp.data.data[0]
+          const firstWs = workspaces[0]
           reset({
             name: '',
             email: '',
             role_id: firstRole?.id ?? 0,
-            workspace_id: firstWs?.id ?? '',
+            workspace_id: firstWs?.id ?? ''
           })
         })
         .catch((err) => {
@@ -105,56 +101,55 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) onClose()
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New User</DialogTitle>
           <DialogDescription>Fill in user details below.</DialogDescription>
         </DialogHeader>
         {/* form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <div>
-            <label className="block text-sm font-medium">Name</label>
+            <label className='block text-sm font-medium'>Name</label>
             <Controller
-              name="name"
+              name='name'
               control={control}
               render={({ field, fieldState }) => (
                 <>
-                  <Input placeholder="Name" {...field} />
-                  {fieldState.error && (
-                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
-                  )}
+                  <Input placeholder='Name' {...field} />
+                  {fieldState.error && <p className='text-sm text-red-500 mt-1'>{fieldState.error.message}</p>}
                 </>
               )}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Email</label>
+            <label className='block text-sm font-medium'>Email</label>
             <Controller
-              name="email"
+              name='email'
               control={control}
               render={({ field, fieldState }) => (
                 <>
-                  <Input type="email" placeholder="Email" {...field} />
-                  {fieldState.error && (
-                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
-                  )}
+                  <Input type='email' placeholder='Email' {...field} />
+                  {fieldState.error && <p className='text-sm text-red-500 mt-1'>{fieldState.error.message}</p>}
                 </>
               )}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Role</label>
+            <label className='block text-sm font-medium'>Role</label>
             <Controller
-              name="role_id"
+              name='role_id'
               control={control}
               render={({ field, fieldState }) => (
                 <>
                   <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-                    <SelectTrigger className="min-w-[200px]">
-                      <SelectValue>
-                        {roles.find((r) => r.id === field.value)?.role || 'Select Role'}
-                      </SelectValue>
+                    <SelectTrigger className='min-w-[200px]'>
+                      <SelectValue>{roles.find((r) => r.id === field.value)?.role || 'Select Role'}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {roles.map((r) => (
@@ -164,22 +159,20 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: Props) {
                       ))}
                     </SelectContent>
                   </Select>
-                  {fieldState.error && (
-                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
-                  )}
+                  {fieldState.error && <p className='text-sm text-red-500 mt-1'>{fieldState.error.message}</p>}
                 </>
               )}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Workspace</label>
+            <label className='block text-sm font-medium'>Workspace</label>
             <Controller
-              name="workspace_id"
+              name='workspace_id'
               control={control}
               render={({ field, fieldState }) => (
                 <>
                   <Select value={field.value} onValueChange={(v) => field.onChange(v)}>
-                    <SelectTrigger className="min-w-[200px]">
+                    <SelectTrigger className='min-w-[200px]'>
                       <SelectValue>
                         {workspaces.find((w) => w.id === field.value)?.name || 'Select Workspace'}
                       </SelectValue>
@@ -192,23 +185,21 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: Props) {
                       ))}
                     </SelectContent>
                   </Select>
-                  {fieldState.error && (
-                    <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
-                  )}
+                  {fieldState.error && <p className='text-sm text-red-500 mt-1'>{fieldState.error.message}</p>}
                 </>
               )}
             />
           </div>
-          <DialogFooter className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={creating}>
+          <DialogFooter className='flex justify-end gap-2'>
+            <Button type='button' variant='outline' onClick={onClose} disabled={creating}>
               Cancel
             </Button>
-            <Button type="submit" disabled={creating || loadingData}>
+            <Button type='submit' disabled={creating || loadingData}>
               {creating ? 'Creating...' : 'Create User'}
             </Button>
           </DialogFooter>
         </form>
-        <DialogClose className="sr-only">Close</DialogClose>
+        <DialogClose className='sr-only'>Close</DialogClose>
       </DialogContent>
     </Dialog>
   )
