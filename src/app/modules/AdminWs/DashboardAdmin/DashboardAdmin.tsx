@@ -10,9 +10,8 @@ import { FeedbackTrends } from '@/app/modules/AdminWs/DashboardAdmin/partials/fe
 import { MetricsCards } from '@/app/modules/AdminWs/DashboardAdmin/partials/metrics-cards'
 import { PerformanceTrend } from '@/app/modules/AdminWs/DashboardAdmin/partials/performance-trend'
 import { DateRangeSelector } from '@/app/modules/AdminWs/DashboardAdmin/partials/project-selector'
-import { RecentEvaluations } from '@/app/modules/AdminWs/DashboardAdmin/partials/recent-evaluations'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
-
+import { ProjectsStatisticsOverview } from '@/app/modules/AdminWs/DashboardAdmin/partials/projects-statistics-overview'
 // Component con để xử lý data fetching
 function DashboardContent() {
   const { fromDate, toDate } = usePerformanceContext()
@@ -76,7 +75,7 @@ function DashboardContent() {
         </div>
 
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6'>
-          <RecentEvaluations />
+          <ProjectsStatisticsOverview />
           <FeedbackTrends />
         </div>
       </main>
