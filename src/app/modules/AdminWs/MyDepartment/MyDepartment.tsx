@@ -294,9 +294,9 @@ function MyDepartment() {
                       </TableCell>
                       <TableCell>
                         <div className='flex items-center gap-2'>
-                          <Button variant='ghost' size='sm' className='h-8 w-8 p-0'>
+                          {/* <Button variant='ghost' size='sm' className='h-8 w-8 p-0'>
                             <Eye className='w-4 h-4 text-gray-400' />
-                          </Button>
+                          </Button> */}
                           <Button
                             variant='ghost'
                             size='sm'
