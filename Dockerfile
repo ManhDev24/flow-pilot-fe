@@ -1,36 +1,34 @@
-FROM node:20-bullseye-slim AS build
+# Step 1: Build the Vite frontend
+FROM node:18-alpine AS build
 
+# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Install dependencies
 COPY package.json package-lock.json ./
+RUN npm install -f
 
-# Install deps
-RUN npm ci
-
-# Fix cho Tailwind v4
-RUN npm install --save-dev @tailwindcss/oxide lightningcss
-
-# Copy toàn bộ source
+# Copy source code
 COPY . .
 
-# Build Next.js
+
+# Build for production
 RUN npm run build
 
+# Step 2: Serve the built app using NGINX
+FROM nginx:1.23-alpine
 
-# ==========================
-# STEP 2: Run Next.js app
-# ==========================
-FROM node:20-bullseye-slim AS runner
+# Remove default static files
+RUN rm -rf /usr/share/nginx/html/*
 
-WORKDIR /app
+# Copy built assets
+COPY --from=build /app/dist /usr/share/nginx/html
 
-ENV NODE_ENV=production
-
-# Copy output từ build stage
-COPY --from=build /app ./
+# Optional: Add custom nginx config if needed
+# COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port
-EXPOSE 6868
+EXPOSE 80
 
-CMD ["npx", "next", "start", "-H", "0.0.0.0", "-p", "6868"]
+# Run NGINX
+CMD ["nginx", "-g", "daemon off;"]
