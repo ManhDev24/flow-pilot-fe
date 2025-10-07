@@ -1,7 +1,9 @@
 name: CICD
+
 on:
   push:
-    branches: [aws]
+    branches:
+      - aws
 
 jobs:
   build:
@@ -16,30 +18,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Image
-        env:
-          TAG: ${{ github.sha }}
-        run: |
-          docker build -t tienmanh/flow-pilot-fe:latest -t tienmanh/flow-pilot-fe:${TAG::7} .
-          docker push tienmanh/flow-pilot-fe:latest
-          docker push tienmanh/flow-pilot-fe:${TAG::7}
+      - name: Build Docker Image
+        run: docker build -t tienmanh/flow-pilot-fe .
+
+      - name: Push Docker Image
+        run: docker push tienmanh/flow-pilot-fe:latest
 
   deploy:
     needs: build
-    runs-on: [self-hosted, Linux, X64]  # EC2 runner
+    runs-on: [self-hosted, linux, x64]
     steps:
-      - name: Pull image
-        run: sudo docker pull tienmanh/flow-pilot-fe:latest
+      - name: Pull image from Docker Hub
+        run: docker pull tienmanh/flow-pilot-fe:latest
 
-      - name: Stop & remove old
-        run: sudo docker rm -f flow-pilot-fe-container || true
+      - name: Delete Old Container
+        run: docker rm -f flow-pilot-fe-container || true
 
-      - name: Run container (host 6868 -> container 80)
-        run: |
-          sudo docker run -d --name flow-pilot-fe-container \
-            -p 6868:6868 \
-            --restart unless-stopped \
-            tienmanh/flow-pilot-fe:latest
-
-      - name: Clean dangling images (optional)
-        run: sudo docker image prune -f
+      - name: Run docker container
+        run: docker run -d -p 6868:6868 --name flow-pilot-fe-container tienmanh/flow-pilot-fe:latest
