@@ -1,19 +1,19 @@
-import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { projectApi } from '@/app/apis/AUTH/project.api'
+import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Button } from '@/app/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import { Checkbox } from '@/app/components/ui/checkbox'
 import { Input } from '@/app/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Textarea } from '@/app/components/ui/textarea'
-import { Checkbox } from '@/app/components/ui/checkbox'
 import type { IUserStatePayload } from '@/app/models'
 import { getLocalStorage } from '@/app/utils'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import * as yup from 'yup'
-import { useQuery } from '@tanstack/react-query'
 
 // Validation schema
 const taskSchema = yup.object({
