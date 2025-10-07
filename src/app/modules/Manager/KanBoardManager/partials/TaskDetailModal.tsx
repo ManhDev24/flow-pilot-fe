@@ -1,14 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Badge } from '@/app/components/ui/badge'
-import { Button } from '@/app/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { Dialog, DialogContent } from '@/app/components/ui/dialog'
 import { Progress } from '@/app/components/ui/progress'
 import { Separator } from '@/app/components/ui/separator'
 import type { MyTask } from '@/app/modules/Employee/MyTasks/models/myTask.type'
-import { Calendar, Check, ClipboardList, Paperclip, Star, ThumbsDown, ThumbsUp, User } from 'lucide-react'
+import { Calendar, Check, ClipboardList, Paperclip, Star, User } from 'lucide-react'
 import { useState } from 'react'
-import { RejectForm } from './RejectForm'
-import { ReviewForm } from './ReviewForm'
 import { TaskUpdateForm } from './TaskUpdateForm'
 
 interface TaskDetailModalProps {
