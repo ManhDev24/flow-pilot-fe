@@ -1,14 +1,14 @@
 import axios from 'axios'
-import { getLocalStorage, removeLocalStorage, setLocalStorage } from '../utils';
-import type { IUserStatePayload } from '../models';
-import type { LoginResponseData } from '../modules/Auth/Login/models/LoginFormInterface';
+import { getLocalStorage, removeLocalStorage, setLocalStorage } from '../utils'
+import type { IUserStatePayload } from '../models'
+import type { LoginResponseData } from '../modules/Auth/Login/models/LoginFormInterface'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export const fetcher = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 })
 
@@ -26,7 +26,7 @@ const onRefreshed = (token: string | null) => {
 }
 
 fetcher.interceptors.request.use((config) => {
-  const userLocalStorage: IUserStatePayload = getLocalStorage('user');
+  const userLocalStorage: IUserStatePayload = getLocalStorage('user')
 
   if (userLocalStorage) {
     config.headers.Authorization = `Bearer ${userLocalStorage.accessToken}`
@@ -79,11 +79,6 @@ fetcher.interceptors.response.use(
           setLocalStorage('role', role)
           const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid, projectId }
           setLocalStorage('user', userStatePayload)
-
-          // notify queued requests
-          onRefreshed(accessToken)
-
-          originalRequest.headers = originalRequest.headers || {}
           originalRequest.headers.Authorization = `Bearer ${accessToken}`
 
           isRefreshing = false
@@ -126,7 +121,7 @@ fetcher.interceptors.response.use(
       removeLocalStorage('user')
       removeLocalStorage('role')
     }
-    
+
     return Promise.reject(error)
   }
 )

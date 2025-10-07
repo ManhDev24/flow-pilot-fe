@@ -50,6 +50,7 @@ export const PATH = {
   EMPLOYEE_MANAGE_MY_TASKS: '/emp/mng/my-tasks',
   EMPLOYEE_MANAGE_KANBAN: '/emp/mng/kanban-board',
   EMPLOYEE_MANAGE_MY_TEAM: '/emp/mng/my-team',
+  EMPLOYEE_MANAGE_MY_TEAM_DETAIL: '/emp/mng/my-team/:id',
   EMPLOYEE_MANAGE_MY_PERFORMANCE: '/emp/mng/my-performance',
   EMPLOYEE_MANAGE_MY_FILES: '/emp/mng/my-files',
   EMPLOYEE_MANAGE_BACKLOG: '/emp/mng/backlog',
