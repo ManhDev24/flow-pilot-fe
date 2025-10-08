@@ -226,7 +226,7 @@ export default function MyEmployeeDetail() {
       <div className='bg-white px-6 '>
         <Button onClick={handleBack} variant='outline' size='sm'>
           <ArrowLeft className='w-4 h-4 mr-2' />
-          Back to My Team
+          Back to Employee
         </Button>
       </div>
 

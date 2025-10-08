@@ -1,4 +1,5 @@
 import { ProjectAdminApi } from '@/app/apis/AUTH/project-admin.api'
+import { projectApi } from '@/app/apis/AUTH/project.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
@@ -8,9 +9,14 @@ import { Progress } from '@/app/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
 import type { ProjectByAdmin, ProjectByAdminData } from '@/app/modules/AdminWs/MyProjects/models/project.type'
-import { CreateProjectModal, DeleteProjectModal, UpdateProjectModal } from '@/app/modules/AdminWs/MyProjects/partials'
+import {
+  CreateProjectModal,
+  DeleteProjectModal,
+  UpdateProjectModal,
+  AssignUserModal
+} from '@/app/modules/AdminWs/MyProjects/partials'
 import { PATH } from '@/app/routes/path'
-import { ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Edit, Eye, Plus, Search, Trash2, UserPlus, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -42,6 +48,7 @@ function MyProjects() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
   const [selectedProject, setSelectedProject] = useState<ProjectByAdminData | null>(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
 
   // Data states
   const [projectsData, setProjectsData] = useState<ProjectByAdmin | null>(null)
@@ -183,6 +190,21 @@ function MyProjects() {
     } catch (error) {
       toast.error('Failed to delete project.')
       console.error('Delete failed:', error)
+    }
+  }
+
+  // Handle assign users to project
+  const handleAssignUsers = async (users: Array<{ user_id: string; role: string }>) => {
+    if (!selectedProject) return
+
+    try {
+      await projectApi.assignUsersToProject(selectedProject.id, users)
+      const userCount = users.length
+      toast.success(`${userCount} user${userCount !== 1 ? 's' : ''} assigned to project successfully!`)
+      setIsAssignModalOpen(false)
+    } catch (error) {
+      toast.error('Failed to assign users to project.')
+      console.error('Assign failed:', error)
     }
   } // Format date for display
   const formatDateRange = (startDate: string, endDate: string) => {
@@ -356,6 +378,18 @@ function MyProjects() {
                             variant='ghost'
                             size='sm'
                             className='h-8 w-8 p-0'
+                            title='Assign user to project'
+                            onClick={() => {
+                              setSelectedProject(project)
+                              setIsAssignModalOpen(true)
+                            }}
+                          >
+                            <UserPlus className='w-4 h-4 text-green-500' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            className='h-8 w-8 p-0'
                             title='Edit project'
                             onClick={() => {
                               setSelectedProject(project)
@@ -449,6 +483,12 @@ function MyProjects() {
           onClose={() => setIsDeleteModalOpen(false)}
           projectName={selectedProject?.name || ''}
           onConfirm={handleDeleteProject}
+        />
+        <AssignUserModal
+          isOpen={isAssignModalOpen}
+          onClose={() => setIsAssignModalOpen(false)}
+          project={selectedProject}
+          onAssign={handleAssignUsers}
         />
       </div>
     </div>
