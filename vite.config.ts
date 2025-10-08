@@ -10,7 +10,7 @@ export default defineConfig({
     port: 6868, 
     host: '0.0.0.0',
     allowedHosts: [
-      'test.flowpilot.io.vn',
+      'flowpilot.io.vn',
       'localhost'
     ]
 
