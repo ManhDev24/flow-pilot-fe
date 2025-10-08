@@ -31,8 +31,7 @@ interface ReviewFormProps {
 
 export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewFormProps) {
   const [isLoading, setIsLoading] = useState(false)
-
-  // ✅ Bật chế độ validation realtime
+  console.log('props:', { taskId, taskOwnerId })
   const {
     control,
     handleSubmit,
@@ -40,7 +39,7 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
     reset
   } = useForm<ReviewFormData>({
     resolver: yupResolver(reviewSchema),
-    mode: 'onChange', // 👈 quan trọng
+    mode: 'onChange',
     defaultValues: {
       task_owner_id: taskOwnerId,
       quality_score: 5,
@@ -48,9 +47,8 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
     }
   })
 
-  // ✅ Chắc chắn rằng hàm này chạy
   const onSubmit = async (data: ReviewFormData) => {
-    console.log('✅ Form submitted with data:', data) // 👈 Nếu không thấy log này -> form không chạy
+    console.log('Submitting form with data:', data)
     try {
       setIsLoading(true)
       const reviewData = {
@@ -60,9 +58,7 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
         notes: data.notes
       }
 
-      console.log('📤 Sending review data to API:', reviewData)
       const response = await MyTaskApi.createReview(reviewData)
-      console.log('✅ API response:', response)
 
       if (response.success) {
         toast.success('Review submitted successfully!')
@@ -70,8 +66,9 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
         reset()
       }
     } catch (error: any) {
-      console.error('❌ Error submitting review:', error)
-      toast.error(error?.response?.data?.message || 'Failed to submit review')
+      console.error('Error submitting review:', error)
+      const message = error?.response?.data?.message || 'Failed to submit review'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -83,16 +80,13 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
         <CardTitle>Review Task</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* 👇 FORM phải bọc toàn bộ nội dung */}
         <form onSubmit={handleSubmit(onSubmit)} noValidate className='space-y-4'>
-          {/* Hidden owner */}
           <Controller
             name='task_owner_id'
             control={control}
             render={({ field }) => <input type='hidden' {...field} />}
           />
 
-          {/* Quality score */}
           <div>
             <label className='block text-sm font-medium mb-1'>Quality Score (1–10) *</label>
             <Controller
@@ -120,7 +114,6 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
             {errors.quality_score && <p className='text-sm text-red-500 mt-1'>{errors.quality_score.message}</p>}
           </div>
 
-          {/* Notes */}
           <div>
             <label className='block text-sm font-medium mb-1'>Review Notes *</label>
             <Controller
@@ -131,7 +124,6 @@ export function ReviewForm({ taskId, taskOwnerId, onSuccess, onCancel }: ReviewF
             {errors.notes && <p className='text-sm text-red-500 mt-1'>{errors.notes.message}</p>}
           </div>
 
-          {/* Actions */}
           <div className='flex justify-end space-x-2 pt-4'>
             <Button type='button' variant='outline' onClick={onCancel} disabled={isLoading}>
               Cancel

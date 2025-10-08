@@ -3,7 +3,7 @@ export interface Payment {
   order_id: string
   payment_date: string
   amount: number
-  status: 'pending' | 'completed' | 'failed'
+  status: 'pending' | 'success' | 'failed'
   created_at: string
   updated_at: string
 }

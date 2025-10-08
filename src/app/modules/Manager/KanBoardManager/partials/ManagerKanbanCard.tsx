@@ -2,7 +2,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { Card } from '@/app/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Button } from '@/app/components/ui/button'
-import { MessageSquare, ThumbsUp, ThumbsDown, Eye } from 'lucide-react'
+import { MessageSquare, ThumbsUp, ThumbsDown, Eye, Pencil } from 'lucide-react'
 import type { MyTask } from '@/app/modules/Employee/MyTasks/models/myTask.type'
 
 interface Tag {
@@ -22,6 +22,7 @@ interface ManagerKanbanCardProps {
   onViewDetail?: () => void
   onReview?: (taskId: string, taskOwnerId: string) => void
   onReject?: (taskId: string) => void
+  onEdit?: (taskId: string) => void
 }
 
 const tagColors: Record<string, string> = {
@@ -45,10 +46,15 @@ export function ManagerKanbanCard({
   originalTask,
   onViewDetail,
   onReview,
-  onReject
+  onReject,
+  onEdit
 }: ManagerKanbanCardProps) {
+  // Check if task can be dragged (not feedbacked or rejected)
+  const isDragDisabled = originalTask.status === 'feedbacked' || originalTask.status === 'rejected'
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: id
+    id: id,
+    disabled: isDragDisabled
   })
 
   const style = transform
@@ -64,11 +70,15 @@ export function ManagerKanbanCard({
     <Card
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className={`overflow-hidden border border-border bg-card p-0 shadow-sm transition-all hover:shadow-md ${
-        isDragging ? 'cursor-grabbing opacity-50' : 'cursor-grab'
-      } ${isReviewing ? 'ring-2 ring-purple-500 ring-opacity-50' : ''}`}
+      {...(isDragDisabled ? {} : listeners)}
+      {...(isDragDisabled ? {} : attributes)}
+      className={`overflow-hidden border border-border bg-card p-0 shadow-sm transition-all ${
+        isDragDisabled
+          ? 'opacity-75 cursor-not-allowed'
+          : isDragging
+            ? 'cursor-grabbing opacity-50'
+            : 'cursor-grab hover:shadow-md'
+      } ${isReviewing ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isDragDisabled ? 'bg-gray-50' : ''}`}
     >
       {image && (
         <div className='h-32 overflow-hidden'>
@@ -91,6 +101,16 @@ export function ManagerKanbanCard({
           {isReviewing && (
             <span className='rounded-full px-2 py-1 text-xs font-bold bg-purple-200 text-purple-800 border border-purple-500'>
               🔍 REVIEWING
+            </span>
+          )}
+          {originalTask.status === 'feedbacked' && (
+            <span className='rounded-full px-2 py-1 text-xs font-bold bg-orange-200 text-orange-800 border border-orange-500'>
+              💬 FEEDBACKED
+            </span>
+          )}
+          {originalTask.status === 'rejected' && (
+            <span className='rounded-full px-2 py-1 text-xs font-bold bg-red-200 text-red-800 border border-red-500'>
+              ❌ REJECTED
             </span>
           )}
         </div>
@@ -119,10 +139,11 @@ export function ManagerKanbanCard({
           </div>
         </div>
 
-        {/* Manager Actions for Reviewing Tasks */}
-        {isReviewing && (
-          <div className='pt-2 border-t border-gray-200'>
-            <div className='flex gap-2'>
+        {/* Action buttons area */}
+        <div className='pt-2 border-t border-gray-200'>
+          {isReviewing && (
+            /* Manager Actions for Reviewing Tasks */
+            <div className='flex gap-2 mb-2'>
               <Button
                 size='sm'
                 variant='default'
@@ -147,38 +168,37 @@ export function ManagerKanbanCard({
                 <ThumbsDown className='h-3 w-3 mr-1' />
                 Reject
               </Button>
-              <Button
-                size='sm'
-                variant='outline'
-                className='h-7 px-2'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onViewDetail?.()
-                }}
-              >
-                <Eye className='h-3 w-3' />
-              </Button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Regular View Detail Button for non-reviewing tasks */}
-        {!isReviewing && onViewDetail && (
-          <div className='pt-2 border-t border-gray-200'>
+          {/* Common action buttons for all tasks */}
+          <div className='flex gap-2'>
             <Button
               size='sm'
               variant='outline'
-              className='w-full h-7 text-xs'
+              className='flex-1 h-7 text-xs'
               onClick={(e) => {
                 e.stopPropagation()
-                onViewDetail()
+                onEdit?.(id)
+              }}
+            >
+              <Pencil className='h-3 w-3 mr-1' />
+              Edit
+            </Button>
+            <Button
+              size='sm'
+              variant='outline'
+              className='flex-1 h-7 text-xs'
+              onClick={(e) => {
+                e.stopPropagation()
+                onViewDetail?.()
               }}
             >
               <Eye className='h-3 w-3 mr-1' />
-              View Details
+              View
             </Button>
           </div>
-        )}
+        </div>
       </div>
     </Card>
   )

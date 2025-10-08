@@ -17,9 +17,9 @@ export function StorageUsage() {
         const response = await MyTaskApi.getMyFile()
 
         if (response?.data?.items) {
-          // Calculate total file size in GB
+          // Calculate total file size in GB with higher precision
           const totalBytes = response.data.items.reduce((sum, file) => sum + file.file_size, 0)
-          const totalGB = Number((totalBytes / (1024 * 1024 * 1024)).toFixed(1))
+          const totalGB = Number((totalBytes / (1024 * 1024 * 1024)).toFixed(6))
           setUsedStorage(totalGB)
         }
       } catch (error) {
@@ -60,7 +60,9 @@ export function StorageUsage() {
       <CardContent className='space-y-4'>
         {/* Storage Amount */}
         <div className='text-center'>
-          <div className='text-3xl font-bold text-primary mb-1'>{usedStorage} GB</div>
+          <div className='text-3xl font-bold text-primary mb-1'>
+            {usedStorage < 0.001 ? usedStorage.toFixed(6) : usedStorage.toFixed(3)} GB
+          </div>
           <div className='text-sm text-muted-foreground'>of {totalStorage}GB used</div>
         </div>
 

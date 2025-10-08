@@ -6,6 +6,7 @@ import { MyTaskApi } from '@/app/apis/AUTH/task-emp.api'
 import { Edit, Trash2, Check, X, Loader2 } from 'lucide-react'
 import { toast } from 'react-toastify'
 import type { Content } from '../models/myTask.type'
+import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
 
 interface TaskContentItemProps {
   content: Content
@@ -19,6 +20,7 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
   const [editContent, setEditContent] = useState(content.content)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleEdit = async () => {
     if (!editContent.trim()) {
@@ -49,15 +51,12 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
   }
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete this ${content.type}?`)) {
-      return
-    }
-
     try {
       setIsDeleting(true)
       await MyTaskApi.deleteTaskContent(content.id)
 
       toast.success(`${content.type === 'comment' ? 'Comment' : 'Note'} deleted successfully`)
+      setShowDeleteDialog(false)
       onSuccess?.()
     } catch (error) {
       console.error('Error deleting content:', error)
@@ -72,13 +71,13 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
   return (
     <div className='flex space-x-3'>
       <Avatar className='w-8 h-8'>
-        <AvatarImage src='/placeholder.svg' />
-        <AvatarFallback>{content.user_id.slice(0, 2).toUpperCase()}</AvatarFallback>
+        <AvatarImage src={content.user.avatar_url} />
+        <AvatarFallback>{content.user.name.slice(0, 1).toUpperCase()}</AvatarFallback>
       </Avatar>
       <div className='flex-1'>
         <div className='p-3'>
           <div className='flex items-center justify-between mb-1'>
-            <p className='text-sm font-semibold text-gray-900'>User {content.user_id}</p>
+            <p className='text-sm font-semibold text-gray-900'> {content.user.name}</p>
             {canEdit && !isEditing && (
               <div className='flex items-center gap-1'>
                 <Button variant='ghost' size='sm' onClick={() => setIsEditing(true)} className='h-6 w-6 p-0'>
@@ -87,7 +86,7 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
                 <Button
                   variant='ghost'
                   size='sm'
-                  onClick={handleDelete}
+                  onClick={() => setShowDeleteDialog(true)}
                   disabled={isDeleting}
                   className='h-6 w-6 p-0 text-red-500 hover:text-red-700'
                 >
@@ -142,6 +141,15 @@ export function TaskContentItem({ content, currentUserId, onSuccess, formatDate 
           )}
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title={`Confirm Delete ${content.type === 'comment' ? 'Comment' : 'Note'}`}
+        description={`Are you sure you want to delete this ${content.type}`}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

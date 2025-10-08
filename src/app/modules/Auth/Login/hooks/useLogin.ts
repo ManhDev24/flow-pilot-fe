@@ -10,11 +10,19 @@ import { useNavigate } from 'react-router-dom'
 import { PATH } from '@/app/routes/path'
 import { useState } from 'react'
 import { setRole } from '@/app/redux/slices/role.slice'
+import { UserSuperAdminAPI } from '@/app/apis/AUTH/user.api'
+import { setProfile } from '@/app/redux/slices/profile.slice'
 
 export const useLogin = () => {
   const [email, setEmail] = useState<string>('')
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const getMe = async () => {
+    const response = await UserSuperAdminAPI.getMe();
+    setLocalStorage('profile', response);
+    dispatch(setProfile(response));
+  }
 
   return useMutation({
     mutationFn: async (variables: { email: string; password: string }) => {
@@ -28,6 +36,7 @@ export const useLogin = () => {
         const userStatePayload: IUserStatePayload = { accessToken, refreshToken, role, wsid, projectId };
         setLocalStorage('user', userStatePayload);
         dispatch(setUser(userStatePayload));
+        getMe();
 
         if (!isFirstLogin) {
           setEmail('');

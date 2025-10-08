@@ -211,9 +211,9 @@ export default function EditConsultationReqDialog({ open, onClose, onSuccess, co
                       <SelectValue placeholder="Select Package" />
                     </SelectTrigger>
                     <SelectContent>
-                      {packages.map((pkg) => (
+                      {packages?.map((pkg) => (
                         <SelectItem key={pkg.id} value={pkg.id}>
-                          {pkg.name} - ${pkg.price}
+                          {pkg.name} - {pkg.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                         </SelectItem>
                       ))}
                     </SelectContent>
