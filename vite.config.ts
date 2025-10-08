@@ -7,12 +7,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    host: true,
     port: 6868, 
-    host: '0.0.0.0',
     allowedHosts: [
-      'flowpilot.io.vn',
-      'localhost'
-    ]
+      'flowpilot.io.vn'    ]
 
   },
   css: {
