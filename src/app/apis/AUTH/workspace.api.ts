@@ -116,6 +116,17 @@ export class WorkspaceAPI {
     return response.data
   }
 
+  static async getAllWorkspacesInSystem(): Promise<WorkspaceListResponse> {
+    const queryParams = new URLSearchParams({
+      page: String(1),
+      limit: String(10000)
+    })
+
+    const response = await fetcher.get(`/workspace?${queryParams.toString()}`)
+    return response.data
+  }
+
+
   /**
    * Get workspace by ID
    * GET /workspace/:id

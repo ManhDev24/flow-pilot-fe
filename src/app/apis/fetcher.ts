@@ -48,11 +48,12 @@ fetcher.interceptors.response.use(
     ) {
       originalRequest._retry = true
 
+      const userProfile = getLocalStorage('profile')
       const userLocalStorage: IUserStatePayload = getLocalStorage('user')
       const oldAccessToken = userLocalStorage?.accessToken
       const oldRefreshToken = userLocalStorage?.refreshToken
 
-      if (oldAccessToken && oldRefreshToken) {
+      if (oldAccessToken && oldRefreshToken && userProfile) {
         // If a refresh is already in progress, queue this request until it's done
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
@@ -81,6 +82,11 @@ fetcher.interceptors.response.use(
           setLocalStorage('user', userStatePayload)
           originalRequest.headers.Authorization = `Bearer ${accessToken}`
 
+          const response = await axios.get(`${BASE_URL}/user/me`, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          })
+          setLocalStorage('profile', response.data?.data || null)
+
           isRefreshing = false
           return fetcher(originalRequest)
         } catch (refreshError) {
@@ -108,6 +114,7 @@ fetcher.interceptors.response.use(
         if (!window.location.pathname.startsWith('/auth')) {
           removeLocalStorage('user')
           removeLocalStorage('role')
+          removeLocalStorage('profile')
           window.location.href = '/auth/login'
         }
       }

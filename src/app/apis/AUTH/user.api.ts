@@ -18,6 +18,16 @@ export class UserSuperAdminAPI {
     return response.data
   }
 
+  static async getAllUsersInSystem(): Promise<UserListResponse> {
+    const queryParams = new URLSearchParams({
+      page: String(1),
+      limit: String(10000)
+    })
+
+    const response = await fetcher.get(`/user/super-admin?${queryParams.toString()}`)
+    return response.data
+  }
+
   /**
    * Get user by ID (SuperAdmin)
    * GET /user/super-admin/:id
@@ -63,12 +73,26 @@ export class UserSuperAdminAPI {
     return response.data
   }
 
-  static async getAllUserByAdmin(page: number,pageSize:number): Promise<UserListResponse> {
-    const response = await fetcher.get('/user/admin?page='+page+'&pageSize='+pageSize)
+  static async getAllUserByAdmin(page: number, pageSize: number): Promise<UserListResponse> {
+    const response = await fetcher.get('/user/admin?page=' + page + '&pageSize=' + pageSize)
+    return response.data
+  }
+
+  static async getMe() {
+    const response = await fetcher.get('/user/me')
+    return response.data?.data
+  }
+
+  static async updateProfile(formData: FormData) {
+    const response = await fetcher.put('/user/update-profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     return response.data
   }
 }
 
 // Export individual functions for easier imports
-export const { getAllUsers, getUserById, createUser, updateUser, deleteUser, activateUser, getAllUserByAdmin } =
+export const { getAllUsers, getUserById, createUser, updateUser, deleteUser, activateUser, getAllUserByAdmin, getMe } =
   UserSuperAdminAPI

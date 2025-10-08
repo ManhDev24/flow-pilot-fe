@@ -31,6 +31,7 @@ export const authApi = {
       }
 
       removeLocalStorage('user')
+      removeLocalStorage('profile')
       removeLocalStorage('role')
 
       return

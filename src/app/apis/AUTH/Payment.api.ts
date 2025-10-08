@@ -10,6 +10,11 @@ export const paymentApi = {
     return response.data
   },
 
+  getAllPaymentsInSystem: async (): Promise<PaymentListResponse> => {
+    const response = await fetcher.get(`/payment?page=1&limit=10000`)
+    return response.data
+  },
+
   getPaymentById: async (id: number): Promise<PaymentDetailResponse> => {
     const response = await fetcher.get(`/payment/${id}`)
     return response.data

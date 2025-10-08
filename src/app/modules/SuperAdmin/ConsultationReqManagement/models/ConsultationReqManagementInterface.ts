@@ -129,7 +129,7 @@ export interface StatusConfig {
 }
 
 export const STATUS_CONFIG: Record<string, StatusConfig> = {
-  new: { variant: 'default', label: 'New' },
-  contacted: { variant: 'secondary', label: 'Contacted' },
+  new: { variant: 'destructive', label: 'New' },
+  contacted: { variant: 'default', label: 'Contacted' },
   closed: { variant: 'outline', label: 'Closed' }
 }

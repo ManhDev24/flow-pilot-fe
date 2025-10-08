@@ -4,9 +4,9 @@ import { Button } from '@/app/components/ui/button'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/app/components/ui/table'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/app/components/ui/select'
 import { Badge } from '@/app/components/ui/badge'
-import { Eye, Trash2, Search } from 'lucide-react'
+import { Eye, Trash2, Search, Edit } from 'lucide-react'
 import { toast } from 'react-toastify'
-// import EditConsultationReqDialog from './partials/EditConsultationReqDialog'
+import EditConsultationReqDialog from './partials/EditConsultationReqDialog'
 import DeleteConsultationReqDialog from './partials/DeleteConsultationReqDialog'
 import ViewConsultationReqDialog from './partials/ViewConsultationReqDialog'
 import { ConsultationRequestAPI } from '@/app/apis/AUTH/consultation-req.api'
@@ -15,6 +15,7 @@ import {
   type ConsultationRequest,
   type ConsultationRequestListResponse
 } from './models/ConsultationReqManagementInterface'
+import { orderApi } from '@/app/apis/AUTH/Order.api'
 
 const PAGE_SIZE = 10
 
@@ -30,12 +31,13 @@ function ConsultationReqManagement() {
   const [selectedPackage, setSelectedPackage] = useState<string>('all')
 
   // Dialog states
-  // const [editOpen, setEditOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [viewOpen, setViewOpen] = useState(false)
   const [requestToDelete, setRequestToDelete] = useState<ConsultationRequest | null>(null)
   const [selectedRequest, setSelectedRequest] = useState<ConsultationRequest | null>(null)
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+  const [orderLoading, setOrderLoading] = useState<boolean>(false)
 
   // Derived filter labels
   const packageLabels = useMemo(
@@ -100,10 +102,10 @@ function ConsultationReqManagement() {
     setViewOpen(true)
   }
 
-  // const handleEdit = (request: ConsultationRequest) => {
-  //   setSelectedRequest(request)
-  //   setEditOpen(true)
-  // }
+  const handleEdit = (request: ConsultationRequest) => {
+    setSelectedRequest(request)
+    setEditOpen(true)
+  }
 
   const openDeleteDialog = (request: ConsultationRequest) => {
     setRequestToDelete(request)
@@ -136,9 +138,24 @@ function ConsultationReqManagement() {
     }
   }
 
-  const handlePlaceOrder = (request: ConsultationRequest) => {
-    // TODO: Implement place order functionality
-    toast.info(`Place order functionality for ${request.name} will be implemented`)
+  const handlePlaceOrder = async (request: ConsultationRequest) => {
+    setOrderLoading(true)
+    try {
+      const resp = await orderApi.placeOrder(request.email, request.package_id)
+      if (resp?.success) {
+        await loadConsultationRequests()
+        setViewOpen(false)
+        toast.success('Order placed successfully')
+      } else {
+        setError(resp?.message || 'Failed to place order')
+        toast.error(resp?.message || 'Failed to place order')
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Failed to place order')
+      toast.error(err?.message || 'Failed to place order')
+    } finally {
+      setOrderLoading(false)
+    }
   }
 
   // Status badge rendering
@@ -273,9 +290,9 @@ function ConsultationReqManagement() {
                       <Button variant='ghost' size='sm' onClick={() => handleView(request)} className='h-8 w-8 p-0'>
                         <Eye className='h-4 w-4' />
                       </Button>
-                      {/* <Button variant='ghost' size='sm' onClick={() => handleEdit(request)} className='h-8 w-8 p-0'>
+                      <Button variant='ghost' size='sm' onClick={() => handleEdit(request)} className='h-8 w-8 p-0'>
                         <Edit className='h-4 w-4' />
-                      </Button> */}
+                      </Button>
                       <Button
                         variant='ghost'
                         size='sm'
@@ -337,12 +354,12 @@ function ConsultationReqManagement() {
       </div>
 
       {/* Dialogs */}
-      {/* <EditConsultationReqDialog
+      <EditConsultationReqDialog
         open={editOpen}
         onClose={() => setEditOpen(false)}
         onSuccess={loadConsultationRequests}
         consultationRequest={selectedRequest}
-      /> */}
+      />
 
       <DeleteConsultationReqDialog
         open={deleteOpen}
@@ -353,6 +370,7 @@ function ConsultationReqManagement() {
       />
 
       <ViewConsultationReqDialog
+        loading={orderLoading}
         open={viewOpen}
         onClose={() => setViewOpen(false)}
         consultationRequest={selectedRequest}

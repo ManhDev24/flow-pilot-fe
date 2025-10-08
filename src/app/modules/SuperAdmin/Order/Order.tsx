@@ -59,11 +59,11 @@ function Order() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'paid':
         return 'bg-green-100 text-green-800'
       case 'pending':
         return 'bg-yellow-100 text-yellow-800'
-      case 'cancelled':
+      case 'canceled':
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-gray-100 text-gray-800'
@@ -96,10 +96,10 @@ function Order() {
   }
 
   return (
-    <div className='space-y-4 p-6'>
+    <div className='flex flex-col min-h-screen gap-6'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-bold tracking-tight'>Orders</h1>
+          <h1 className='text-4xl font-semibold'>Order Management</h1>
           <p className='text-muted-foreground'>Manage and view all orders in the system</p>
         </div>
       </div>
