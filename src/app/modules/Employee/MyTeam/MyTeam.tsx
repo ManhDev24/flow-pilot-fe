@@ -128,7 +128,7 @@ function MyTeam() {
                     <TableCell>
                       <Badge className={getSystemRoleBadgeColor(member.user.role.role)}>{member.user.role.role}</Badge>
                     </TableCell>
-                    <TableCell>{member.user.department.name}</TableCell>
+                    <TableCell>{member.user.department?.name}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
