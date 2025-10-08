@@ -134,5 +134,14 @@ export const projectApi = {
       const axiosError = error as AxiosError
       throw axiosError
     }
+  },
+  assignUsersToProject: async (projectId: string, users: Array<{ user_id: string; role: string }>) => {
+    try {
+      const response = await fetcher.post(`/project/${projectId}/assign-users`, { users })
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
   }
 }
