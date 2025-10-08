@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/componen
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
-import { Slider } from '@/app/components/ui/slider'
 import { Textarea } from '@/app/components/ui/textarea'
 import { useState } from 'react'
 
@@ -32,7 +31,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate, managers }: Crea
     description: '',
     start_date: '',
     end_date: '',
-    process: 0,
+    process: 0, // Will be set to 0 by default, no user input needed
     team_size: 1,
     status: 'active'
   })
@@ -55,7 +54,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate, managers }: Crea
       description: '',
       start_date: '',
       end_date: '',
-      process: 0,
+      process: 0, // Always reset to 0 for new projects
       team_size: 1,
       status: 'active'
     })
@@ -65,9 +64,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate, managers }: Crea
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleProgressChange = (value: number[]) => {
-    setFormData((prev) => ({ ...prev, process: value[0] }))
-  }
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -153,16 +150,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate, managers }: Crea
             </div>
           </div>
 
-          <div className='space-y-2'>
-            <Label>Progress: {formData.process}%</Label>
-            <Slider
-              value={[formData.process]}
-              onValueChange={handleProgressChange}
-              max={100}
-              step={1}
-              className='w-full'
-            />
-          </div>
+
 
           <div className='space-y-2'>
             <Label htmlFor='team-size'>Team Size</Label>
