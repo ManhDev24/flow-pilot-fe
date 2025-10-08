@@ -8,6 +8,11 @@ export const orderApi = {
     return response.data
   },
 
+  getAllOrdersInSystem: async (): Promise<OrderListResponse> => {
+    const response = await fetcher.get(`/Order?page=1&limit=10000`)
+    return response.data
+  },
+
   // Get order by ID
   getOrderById: async (id: string): Promise<OrderDetailResponse> => {
     const response = await fetcher.get(`/Order/${id}`)

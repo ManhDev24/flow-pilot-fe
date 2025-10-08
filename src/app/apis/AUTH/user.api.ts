@@ -18,6 +18,16 @@ export class UserSuperAdminAPI {
     return response.data
   }
 
+  static async getAllUsersInSystem(): Promise<UserListResponse> {
+    const queryParams = new URLSearchParams({
+      page: String(1),
+      limit: String(10000)
+    })
+
+    const response = await fetcher.get(`/user/super-admin?${queryParams.toString()}`)
+    return response.data
+  }
+
   /**
    * Get user by ID (SuperAdmin)
    * GET /user/super-admin/:id
