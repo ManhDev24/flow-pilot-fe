@@ -1,17 +1,17 @@
 import type React from 'react'
 import type { CreateProjectPayload } from '../models/ProjectInterface'
 
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
+import { getAllUserByAdmin } from '@/app/apis/AUTH/user.api'
 import { Button } from '@/app/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Textarea } from '@/app/components/ui/textarea'
-import { getAllUserByAdmin } from '@/app/apis/AUTH/user.api'
-import { X } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
+import { X } from 'lucide-react'
+import { useState } from 'react'
 
 interface CreateProjectData {
   name: string
@@ -44,7 +44,7 @@ export function CreateProjectModal({ isOpen, onClose, onCreate }: CreateProjectM
   // Fetch managers (users with role Project Manager or Admin)
   const { data: usersData } = useQuery<any, AxiosError>({
     queryKey: ['admin-ws-users'],
-    queryFn: () => getAllUserByAdmin(1, 10)
+    queryFn: () => getAllUserByAdmin(1, 100)
   })
 
   // Filter users to get only managers (role_id 2 = Admin, 3 = Project Manager)

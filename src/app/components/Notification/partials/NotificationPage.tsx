@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { Search, Check, Trash2, Bell } from 'lucide-react'
 import { Button } from '@/app/components/ui/button'
 import { Input } from '@/app/components/ui/input'
-import { useNotifications, useMarkAsRead, useMarkAllAsRead } from '../hooks/useNotification'
 import { formatDistanceToNow } from 'date-fns'
+import { Bell, Check, Search, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { useMarkAllAsRead, useMarkAsRead, useNotifications } from '../hooks/useNotification'
 import type { INotification } from '../models'
 
 // interface NotificationPageProps {

@@ -139,7 +139,7 @@ function MyTeamManager() {
                     <TableCell>
                       <Badge className={getSystemRoleBadgeColor(member.user.role.role)}>{member.user.role.role}</Badge>
                     </TableCell>
-                    <TableCell>{member.user.department.name}</TableCell>
+                    <TableCell>{member.user.department?.name}</TableCell>
                     <TableCell className='text-right'>
                       <Button variant='ghost' size='sm' onClick={() => handleViewDetail(member.user.id)}>
                         <Eye className='w-4 h-4 mr-2' />
