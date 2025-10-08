@@ -10,7 +10,7 @@ function EmployeeLayout({ children }: { children: ReactNode }) {
       <EmployeeSidebar />
       <SidebarInset>
         <EmployeeHeader />
-        {children}
+        <div className='container mx-auto max-w-7xl min-h-screen p-6'>{children}</div>
         {window.location.pathname !== '/emp/my-performance' && <GlobalTimerWidget />}
       </SidebarInset>
     </SidebarProvider>

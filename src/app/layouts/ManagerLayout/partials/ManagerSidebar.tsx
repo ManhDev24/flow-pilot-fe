@@ -19,7 +19,7 @@ import {
 } from '@/app/components/ui/sidebar'
 import type { IProfileState } from '@/app/models'
 import { PATH } from '@/app/routes/path'
-import { ChevronDown, FileText, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react'
+import { ChevronDown, FileText, KanbanSquare, LayoutDashboard, LogOut, UserCogIcon, Users } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -38,10 +38,11 @@ function ManagerSidebar() {
   }
 
   const navigationItems = [
-    { icon: LayoutDashboard, label: 'Project reports', to: `${PATH.EMPLOYEE_MANAGE_PROJECTS}` },
-    { icon: Users, label: 'Kanban', to: `${PATH.EMPLOYEE_MANAGE_KANBAN}` },
-    { icon: Settings, label: 'My team', to: `${PATH.EMPLOYEE_MANAGE_MY_TEAM}` },
-    { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MANAGE_MY_FILES}` }
+    { icon: LayoutDashboard, label: 'Project Reports', to: `${PATH.EMPLOYEE_MANAGE_PROJECTS}` },
+    { icon: KanbanSquare, label: 'Kanban', to: `${PATH.EMPLOYEE_MANAGE_KANBAN}` },
+    { icon: Users, label: 'My Team', to: `${PATH.EMPLOYEE_MANAGE_MY_TEAM}` },
+    { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MANAGE_MY_FILES}` },
+    { icon: UserCogIcon, label: 'My Account', to: `${PATH.EMPLOYEE_MANAGE_SETTINGS}` },
   ]
 
   return (

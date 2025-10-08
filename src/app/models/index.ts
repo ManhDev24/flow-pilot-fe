@@ -24,6 +24,10 @@ export interface IRole {
   id: number
   role: string
 }
+export interface IWorkspace {
+  id: string
+  name: string
+}
 
 export interface IProfile {
   id: string
@@ -36,7 +40,7 @@ export interface IProfile {
   nickname: string | null
   role: IRole | null
   status: string
-  workspace: string | null
+  workspace: IWorkspace | null
   created_at: string
   updated_at: string
 }

@@ -17,12 +17,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/app/components/ui/sidebar'
+import type { IProfileState } from '@/app/models'
 import { PATH } from '@/app/routes/path'
-import { ChevronDown, ClipboardPlus, Folder, Hotel, LayoutDashboard, LogOut, Users } from 'lucide-react'
+import { ChevronDown, ClipboardPlus, Folder, Hotel, LayoutDashboard, LogOut, UserCogIcon, Users } from 'lucide-react'
+import { useSelector } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 
 function AdminWsSidebar() {
   const location = useLocation()
+  const userProfile = useSelector((state: { profile: IProfileState }) => state.profile.currentProfile)
 
   const handleLogout = async () => {
     try {
@@ -37,9 +40,10 @@ function AdminWsSidebar() {
   const navigationItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: `${PATH.ADMIN_DASHBOARD}` },
     { icon: ClipboardPlus, label: 'Report', to: `${PATH.ADMIN_MY_REPORT}` },
-    { icon: Hotel, label: 'Department', to: `${PATH.ADMIN_DEPARTMENTS}` },
+    { icon: Hotel, label: 'Departments', to: `${PATH.ADMIN_DEPARTMENTS}` },
     { icon: Users, label: 'Employees', to: `${PATH.ADMIN_MY_EMPLOYEES}` },
-    { icon: Folder, label: 'Project', to: `${PATH.ADMIN_MY_PROJECTS}` }
+    { icon: Folder, label: 'Projects', to: `${PATH.ADMIN_MY_PROJECTS}` },
+    { icon: UserCogIcon, label: 'My Account', to: `${PATH.ADMIN_SETTINGS}` }
   ]
 
   return (
@@ -91,13 +95,23 @@ function AdminWsSidebar() {
                   className='group h-14 rounded-xl bg-white shadow-sm border border-gray-200 hover:bg-gradient-to-r hover:bg-gray-50 hover:shadow-md transition-all duration-200 data-[state=open]:bg-gradient-to-r data-[state=open]:bg-gray-100 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center'
                 >
                   <Avatar className='h-9 w-9 rounded-xl border-2 border-gray-300 transition-all duration-300'>
-                    <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
-                      MA
-                    </AvatarFallback>
+                    {userProfile?.avatar_url ? (
+                      <img
+                        src={userProfile.avatar_url}
+                        alt={userProfile.name || 'Avatar'}
+                        className='h-9 w-9 rounded-xl object-cover'
+                      />
+                    ) : (
+                      <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
+                        {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : 'AD'}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
-                    <span className='truncate font-semibold text-gray-900'>Admin</span>
-                    <span className='truncate text-xs text-gray-600'>admin@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>{userProfile?.name || 'Admin'}</span>
+                    <span className='truncate text-xs text-gray-600'>
+                      {userProfile?.email || 'Admin@flowpilot.io.vn'}
+                    </span>
                   </div>
                   <ChevronDown className='ml-auto size-4 text-gray-500 group-data-[collapsible=icon]:hidden' />
                 </SidebarMenuButton>
@@ -110,13 +124,23 @@ function AdminWsSidebar() {
               >
                 <div className='flex items-center justify-start gap-2 p-3 bg-gradient-to-r from-gray-50 to-gray-100'>
                   <Avatar className='h-8 w-8 rounded-lg'>
-                    <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
-                      MA
-                    </AvatarFallback>
+                    {userProfile?.avatar_url ? (
+                      <img
+                        src={userProfile.avatar_url}
+                        alt={userProfile.name || 'Avatar'}
+                        className='h-9 w-9 rounded-xl object-cover'
+                      />
+                    ) : (
+                      <AvatarFallback className='rounded-xl bg-red-500 text-white font-semibold text-sm'>
+                        {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : 'AD'}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div className='grid flex-1 text-left text-sm leading-tight'>
-                    <span className='truncate font-semibold text-gray-900'>Admin</span>
-                    <span className='truncate text-xs text-gray-600'>admin@flowpilot.io.vn</span>
+                    <span className='truncate font-semibold text-gray-900'>{userProfile?.name || 'Admin'}</span>
+                    <span className='truncate text-xs text-gray-600'>
+                      {userProfile?.email || 'Admin@flowpilot.io.vn'}
+                    </span>
                   </div>
                 </div>
                 <DropdownMenuSeparator className='bg-gray-200' />

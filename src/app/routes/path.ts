@@ -46,7 +46,6 @@ export const PATH = {
   EMPLOYEE_MY_TASKS: '/emp/my-tasks',
   EMPLOYEE_MY_PERFORMANCE: '/emp/my-performance',
   // TEAM LEADER
-
   EMPLOYEE_MANAGER: '/emp/mng',
   EMPLOYEE_MANAGE_PROJECTS: '/emp/mng/my-projects',
   EMPLOYEE_MANAGE_MY_TASKS: '/emp/mng/my-tasks',
@@ -57,6 +56,7 @@ export const PATH = {
   EMPLOYEE_MANAGE_MY_FILES: '/emp/mng/my-files',
   EMPLOYEE_MANAGE_BACKLOG: '/emp/mng/backlog',
   EMPLOYEE_MANAGE_NOTIFICATIONS: '/emp/mng/notifications',
+  EMPLOYEE_MANAGE_SETTINGS: '/emp/mng/account-settings',
   // EMPLOYEE_LEAD: '/emp/team-lead',
   // EMPLOYEE_STAFF: '/emp/staff',
   FORBIDDEN: '/403',

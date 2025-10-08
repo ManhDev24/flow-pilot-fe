@@ -72,6 +72,15 @@ export class UserSuperAdminAPI {
     const response = await fetcher.get('/user/me')
     return response.data?.data
   }
+
+  static async updateProfile(formData: FormData) {
+    const response = await fetcher.put('/user/update-profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return response.data
+  }
 }
 
 // Export individual functions for easier imports

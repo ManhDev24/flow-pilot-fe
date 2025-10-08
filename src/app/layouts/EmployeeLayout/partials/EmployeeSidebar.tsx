@@ -16,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/app/components/ui/sidebar'
-import { Briefcase, ChartPie, ChevronDown, FileText, LayoutDashboard, LogOut, Users } from 'lucide-react'
+import { Briefcase, ChartPie, ChevronDown, FileText, LayoutDashboard, LogOut, UserCogIcon, Users } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { authApi } from '@/app/apis/AUTH/Auth.api'
@@ -42,8 +42,9 @@ export function EmployeeSidebar() {
     { icon: LayoutDashboard, label: 'My Tasks', to: `${PATH.EMPLOYEE_MY_TASKS}` },
     { icon: Briefcase, label: 'Kanban', to: `${PATH.EMPLOYEE_KANBAN}` },
     { icon: Users, label: 'My Team', to: `${PATH.EMPLOYEE_MY_TEAM}` },
-    { icon: ChartPie, label: 'My performance', to: `${PATH.EMPLOYEE_MY_PERFORMANCE}` },
-    { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MY_FILES}` }
+    { icon: ChartPie, label: 'My Performance', to: `${PATH.EMPLOYEE_MY_PERFORMANCE}` },
+    { icon: FileText, label: 'My Files', to: `${PATH.EMPLOYEE_MY_FILES}` },
+    { icon: UserCogIcon, label: 'My Account', to: `${PATH.EMPLOYEE_SETTINGS}` }
   ]
 
   return (
