@@ -51,7 +51,14 @@ export function ProjectReportDashboard() {
         setError(null)
 
         const userLocalStorage: any = getLocalStorage('user')
-        const projectId = userLocalStorage?.projectId || 'c80d9f08-3e36-4cea-a7f1-4ed22527be74' // fallback ID
+        console.log('userLocalStorage: ', userLocalStorage);
+        const projectId = userLocalStorage?.projectId 
+
+        if (!projectId) {
+          setError('No project found for the user')
+          setLoading(false)
+          return
+        }
 
         const overviewResponse = await MyTaskApi.getManagerProjectOverview(projectId)
         setProjectOverview(overviewResponse.data)
