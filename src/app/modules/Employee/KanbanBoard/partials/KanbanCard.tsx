@@ -3,6 +3,7 @@ import { Card } from '@/app/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar'
 import { Button } from '@/app/components/ui/button'
 import { MessageSquare, MoreHorizontal } from 'lucide-react'
+import type { MyTask } from '../../MyTasks/models/myTask.type'
 
 interface Tag {
   label: string
@@ -17,6 +18,7 @@ interface KanbanCardProps {
   subtasks: number
   comments: number
   avatars: string[]
+  originalTask: MyTask
   onViewDetail?: () => void
 }
 
@@ -29,9 +31,24 @@ const tagColors: Record<string, string> = {
   blue: 'bg-blue-100 text-blue-700'
 }
 
-export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars, onViewDetail }: KanbanCardProps) {
+export function KanbanCard({
+  id,
+  image,
+  title,
+  tags,
+  subtasks,
+  comments,
+  avatars,
+  originalTask,
+  onViewDetail
+}: KanbanCardProps) {
+  // Check if task can be dragged (not feedbacked or rejected or completed)
+  const isDragDisabled =
+    originalTask.status === 'feedbacked' || originalTask.status === 'rejected' || originalTask.status === 'completed' || originalTask.status === 'reviewing'
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: id
+    id: id,
+    disabled: isDragDisabled
   })
 
   const style = transform
@@ -44,11 +61,16 @@ export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars
     <Card
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className={`overflow-hidden border border-border bg-card p-0 shadow-sm transition-all hover:shadow-md ${
-        isDragging ? 'cursor-grabbing opacity-50' : 'cursor-grab'
-      }`}
+      {...(isDragDisabled ? {} : listeners)}
+      {...(isDragDisabled ? {} : attributes)}
+      className={`overflow-hidden border border-border bg-card p-0 shadow-sm transition-all relative ${
+        isDragDisabled
+          ? 'opacity-75 cursor-not-allowed'
+          : isDragging
+            ? 'cursor-grabbing opacity-50'
+            : 'cursor-grab hover:shadow-md'
+      } 
+       ${isDragDisabled ? 'bg-gray-50' : ''}`}
     >
       {image && (
         <div className='relative h-40 w-full bg-muted'>
@@ -81,6 +103,26 @@ export function KanbanCard({ id, image, title, tags, subtasks, comments, avatars
               {tag.label}
             </span>
           ))}
+          {originalTask.status === 'reviewing' && (
+            <span className='rounded-full px-2 py-1 text-xs font-bold bg-purple-200 text-purple-800 border border-purple-500'>
+              🔍 REVIEWING
+            </span>
+          )}
+          {originalTask.status === 'feedbacked' && (
+            <span className='rounded-full px-2 py-1 text-xs font-bold bg-orange-200 text-orange-800 border border-orange-500'>
+              💬 FEEDBACKED
+            </span>
+          )}
+          {originalTask.status === 'rejected' && (
+            <span className='rounded-full px-2 py-1 text-xs font-bold bg-red-200 text-red-800 border border-red-500'>
+              ❌ REJECTED
+            </span>
+          )}
+          {originalTask.status === 'overdued' && (
+            <span className='rounded-full px-2 py-1 text-xs font-bold bg-red-200 text-red-800 border border-red-500'>
+              ⏰ OVERDUED
+            </span>
+          )}
         </div>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3 text-xs text-muted-foreground'>

@@ -10,11 +10,15 @@ import { useEffect, useState } from 'react'
 
 function MyTeam() {
   const [projectId, setProjectId] = useState<string>('')
+  const [hasProject, setHasProject] = useState<boolean>(true)
 
   useEffect(() => {
     const userLocalStorage: IUserStatePayload = getLocalStorage('user')
     if (userLocalStorage?.projectId) {
       setProjectId(userLocalStorage.projectId)
+      setHasProject(true)
+    } else {
+      setHasProject(false)
     }
   }, [])
 
@@ -55,6 +59,28 @@ function MyTeam() {
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200'
     }
+  }
+
+  // Check if user has project assigned
+  if (!hasProject) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <Card className='max-w-md w-full mx-4'>
+          <CardHeader>
+            <CardTitle className='text-center text-red-600'>No access</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='text-center space-y-4'>
+              <div className='w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto'>
+                <span className='text-3xl'>⚠️</span>
+              </div>
+              <p className='text-gray-700'>You must be assigned to a project to access this page.</p>
+              <p className='text-sm text-gray-500'>Please contact the administrator to be assigned to a project.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (isLoading) {
