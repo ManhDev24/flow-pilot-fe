@@ -81,6 +81,19 @@ export const MyTaskApi = {
     }
   },
 
+  // Delete task
+  deleteTask: async (taskId: string) => {
+    try {
+      const response: AxiosResponse<{ success: boolean; message: string; data: any }> = await fetcher.delete(
+        `/task/${taskId}`
+      )
+      return response.data
+    } catch (error) {
+      const axiosError = error as AxiosError
+      throw axiosError
+    }
+  },
+
   // Create review for task
   createReview: async (reviewData: {
     task_id: string

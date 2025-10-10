@@ -4,6 +4,7 @@ import { SortDialog } from '@/app/modules/Employee/KanbanBoard/partials/SortDial
 import { TaskDetailModal } from './TaskDetailModal'
 import { TaskCreateForm } from './TaskCreateForm'
 import { TaskUpdateForm } from './TaskUpdateForm'
+import { TaskDeleteModal } from './TaskDeleteModal'
 import { ManagerKanbanColumn } from './ManagerKanbanColumn'
 import { ReviewForm } from './ReviewForm'
 import { RejectForm } from './RejectForm'
@@ -20,6 +21,7 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'react-toastify'
 
 export interface Tag {
   label: string
@@ -119,9 +121,11 @@ export function KanbanBoardForm() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false)
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
   const [updateTaskOpen, setUpdateTaskOpen] = useState(false)
+  const [deleteTaskOpen, setDeleteTaskOpen] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string>('')
   const [selectedTaskOwnerId, setSelectedTaskOwnerId] = useState<string>('')
   const [selectedTaskForUpdate, setSelectedTaskForUpdate] = useState<MyTask | null>(null)
+  const [selectedTaskForDelete, setSelectedTaskForDelete] = useState<MyTask | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -265,6 +269,34 @@ export function KanbanBoardForm() {
       }
     } catch (error) {
       console.error('Error fetching task details:', error)
+    }
+  }
+
+  const handleDelete = async (taskId: string) => {
+    // Find task in current columns
+    const task = columns.flatMap((col) => col.cards).find((card) => card.id === taskId)?.originalTask
+    if (task) {
+      setSelectedTaskForDelete(task)
+      setDeleteTaskOpen(true)
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!selectedTaskForDelete) return
+
+    try {
+      await MyTaskApi.deleteTask(selectedTaskForDelete.id)
+      
+      // Close modal and reset state
+      setDeleteTaskOpen(false)
+      setSelectedTaskForDelete(null)
+      
+      // Refresh tasks
+      await fetchTasks()
+      toast.success('Task deleted successfully')
+    } catch (error) {
+      console.error('Error deleting task:', error)
+      toast.error('Failed to delete task. Please try again.')
     }
   }
 
@@ -503,6 +535,7 @@ export function KanbanBoardForm() {
                     onReview={handleReview}
                     onReject={handleReject}
                     onEdit={handleEdit}
+                    onDelete={handleDelete}
                   />
                 </div>
               ))}
@@ -607,6 +640,19 @@ export function KanbanBoardForm() {
           </div>
         </div>
       )}
+
+      {/* Delete Task Confirmation Modal */}
+      <TaskDeleteModal
+        open={deleteTaskOpen}
+        onOpenChange={(open) => {
+          setDeleteTaskOpen(open)
+          if (!open) {
+            setSelectedTaskForDelete(null)
+          }
+        }}
+        taskName={selectedTaskForDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }
