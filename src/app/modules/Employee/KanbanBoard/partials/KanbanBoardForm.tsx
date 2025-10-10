@@ -16,6 +16,7 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'react-toastify'
 
 export interface Tag {
   label: string
@@ -238,6 +239,11 @@ export function KanbanBoardForm() {
 
     const activeCardId = active.id as string
     const overColumnId = over.id as TaskStatus
+    if (!activeCardId || !overColumnId) return
+    if(overColumnId === 'rejected') {
+      toast.error('You cannot move tasks directly to the Rejected column.')
+      return
+    }
 
     // Find source column and card
     let sourceColumn: Column | undefined
@@ -253,10 +259,18 @@ export function KanbanBoardForm() {
     }
 
     if (!sourceColumn || !cardToMove) return
+    if (sourceColumn.id === 'rejected') {
+      toast.error('You cannot move tasks out of the Rejected column.')
+      return
+    }
 
     // Find target column
     const targetColumn = columns.find((col) => col.id === overColumnId)
     if (!targetColumn) return
+    if (targetColumn.id === 'rejected') {
+      toast.error('You cannot move tasks directly to the Rejected column.')
+      return
+    }
 
     // Don't do anything if dropping in the same column
     if (sourceColumn.id === targetColumn.id) return
