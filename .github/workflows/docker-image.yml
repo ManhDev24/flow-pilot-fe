@@ -19,20 +19,20 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker Image
-        run: docker build -t tienmanh/flow-pilot-fe .
+        run: docker build -t duyadmindocker/flow-pilot-fe .
 
       - name: Push Docker Image
-        run: docker push tienmanh/flow-pilot-fe:latest
+        run: docker push duyadmindocker/flow-pilot-fe:latest
 
-  deploy:
-    needs: build
-    runs-on: [self-hosted, linux, x64]
-    steps:
-      - name: Pull image from Docker Hub
-        run: sudo docker pull tienmanh/flow-pilot-fe:latest
+  # deploy:
+  #   needs: build
+  #   runs-on: [self-hosted, linux, x64]
+  #   steps:
+  #     - name: Pull image from Docker Hub
+  #       run: sudo docker pull duyadmindocker/flow-pilot-fe:latest
 
-      - name: Delete Old Container
-        run: sudo docker rm -f flow-pilot-fe-container || true
+  #     - name: Delete Old Container
+  #       run: sudo docker rm -f flow-pilot-fe-container || true
 
-      - name: Run docker container
-        run: sudo docker run -d -p 6868:6868 --name flow-pilot-fe-container tienmanh/flow-pilot-fe:latest
+  #     - name: Run docker container
+  #       run: sudo docker run -d -p 6868:6868 --name flow-pilot-fe-container tienmanh/flow-pilot-fe:latest
