@@ -41,14 +41,6 @@ export function AssignUserModal({ isOpen, onClose, project, onAssign }: AssignUs
   const [newRoleName, setNewRoleName] = useState('')
   const [customRoles, setCustomRoles] = useState<string[]>([])
 
-  // Available roles (only custom roles from localStorage)
-  const availableRoles = customRoles.map((role, index) => ({ 
-    value: `custom-${index}`, 
-    label: role 
-  }))
-
-
-
   // Get unique workspaces and roles
   const workspaces = Array.from(new Set(users.map(user => user.workspace?.name).filter(Boolean))).sort()
   const roles = Array.from(new Set(users.map(user => user.role?.role).filter(Boolean))).sort()
