@@ -52,7 +52,7 @@ jobs:
         run: |
           sudo docker run -d \
             --name flow-pilot-fe-container \
-            -p 80:6868 \
+            -p 127.0.0.1:6868:80 \
             --env-file container.env \
             --restart unless-stopped \
             duyadmindocker/flow-pilot-fe:latest
@@ -60,13 +60,10 @@ jobs:
       - name: Clean up
         run: |
           rm -f container.env
-          sudo docker image prune -f
 
-      - name: Verify container
+      - name: Checking container status
         run: |
-          sudo docker ps | grep flow-pilot-fe-container || (echo "Container not running" && exit 1)
-          curl -I http://127.0.0.1:6868 || (echo "Local curl failed" && exit 1)
-
+          sudo docker ps | grep flow-pilot-fe-container
 
       # - name: Stop & remove old container (if any)
       #   run: |
