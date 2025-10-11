@@ -52,7 +52,7 @@ jobs:
         run: |
           sudo docker run -d \
             --name flow-pilot-fe-container \
-            -p 127.0.0.1:6868:6868 \
+            -p 80:6868 \
             --env-file container.env \
             --restart unless-stopped \
             duyadmindocker/flow-pilot-fe:latest
